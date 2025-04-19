@@ -1,15 +1,22 @@
-import { Controller, Delete, Get, Post } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Body,
+  Param,
+  Query,
+} from '@nestjs/common';
+import { UriParamId } from '../../../core/types/input-types';
 
 @Controller('users')
-class UsersController {
+export class UsersController {
   @Get()
-  async getUsers() {}
+  async getUsers(@Query() query: any) {}
 
   @Post()
-  async createUsers() {}
+  async createUser(@Body() body: any) {}
 
-  @Delete()
-  async deleteUsers() {}
+  @Delete(':id')
+  async deleteUser(@Param('id') params: UriParamId) {}
 }
-
-export { UsersController };

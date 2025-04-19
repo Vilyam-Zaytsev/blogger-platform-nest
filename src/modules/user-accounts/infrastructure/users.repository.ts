@@ -1,3 +1,1 @@
-class UsersRepository {}
-
-export { UsersRepository };
+export class UsersRepository {}
