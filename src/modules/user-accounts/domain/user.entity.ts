@@ -1,4 +1,4 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import {
   PasswordRecovery,
   PasswordRecoverySchema,
@@ -7,6 +7,8 @@ import {
   EmailConfirmation,
   EmailConfirmationSchema,
 } from './email-confirmation.schema';
+import { CreateUserDomainDto } from './dto/create-user.domain.dto';
+import { HydratedDocument, Model } from 'mongoose';
 
 /**
  * User Entity Schema
@@ -90,4 +92,32 @@ export class User {
   //TODO: в каком случае необходимо указывать nullable: true?(Уточнить на уроке)
   @Prop({ type: Date, nullable: true })
   deletedAt: Date | null;
+
+  /**
+   * Factory method for creating a new User instance from a DTO.
+   * Initializes essential properties including login, email, password hash,
+   * as well as nested entities such as passwordRecovery and emailConfirmation.
+   *
+   * @param {CreateUserDomainDto} dto - Data transfer object containing the user registration data.
+   * @returns {UserDocument} A new User document instance ready for persistence.
+   */
+  static createInstance(dto: CreateUserDomainDto): UserDocument {
+    const user = new this();
+    //TODO: правильно ли я тут создаю passwordRecovery и emailConfirmation???
+    user.login = dto.login;
+    user.email = dto.email;
+    user.passwordHash = dto.passwordHash;
+    user.passwordRecovery = new PasswordRecovery();
+    user.emailConfirmation = new EmailConfirmation();
+
+    return user as UserDocument;
+  }
 }
+
+export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.loadClass(User);
+
+export type UserDocument = HydratedDocument<User>;
+
+export type UserModelType = Model<UserDocument> & typeof User;
