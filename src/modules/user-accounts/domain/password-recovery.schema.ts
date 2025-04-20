@@ -11,7 +11,7 @@ export class PasswordRecovery {
    * Used to verify the password reset request.
    * @example "f8c2e4d9-bec7-4a5d-9eae-1e42dc13d4a0"
    */
-  @Prop({ type: String, required: true, default: null })
+  @Prop({ type: String, default: null })
   recoveryCode: string | null;
 
   /**
@@ -19,7 +19,7 @@ export class PasswordRecovery {
    * After this time, the code is no longer valid.
    * @example "2025-04-20T12:00:00.000Z"
    */
-  @Prop({ type: Date, required: true, default: null })
+  @Prop({ type: Date, default: null })
   expirationDate: Date | null;
 }
 

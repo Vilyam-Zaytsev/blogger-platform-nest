@@ -18,7 +18,7 @@ export class EmailConfirmation {
    * This code is required to complete the email verification process.
    * @example "abc123-def456-ghi789"
    */
-  @Prop({ type: String, required: true, default: null })
+  @Prop({ type: String, default: null })
   confirmationCode: string | null;
 
   /**
@@ -26,7 +26,7 @@ export class EmailConfirmation {
    * After this timestamp, the code becomes invalid.
    * @example "2025-05-01T12:00:00.000Z"
    */
-  @Prop({ type: Date, required: true, default: null })
+  @Prop({ type: Date, default: null })
   expirationDate: Date | null;
 
   /**
@@ -37,7 +37,6 @@ export class EmailConfirmation {
    */
   @Prop({
     type: String,
-    required: true,
     default: ConfirmationStatus.NotConfirmed,
   })
   confirmationStatus: ConfirmationStatus;

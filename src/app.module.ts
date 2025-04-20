@@ -5,9 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      'mongodb+srv://Vilyam:D%21OBxcE9%26%3Cu4SK%5D3myze@cluster0.ur8pv.mongodb.net/blogger-platform-dev?retryWrites=true&w=majority&appName=Cluster0',
-    ),
+    MongooseModule.forRoot('mongodb://localhost:27017'),
     UserAccountsModule,
   ],
   controllers: [UsersController],

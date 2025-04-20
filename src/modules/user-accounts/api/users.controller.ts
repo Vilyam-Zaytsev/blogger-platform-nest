@@ -8,14 +8,25 @@ import {
   Query,
 } from '@nestjs/common';
 import { UriParamId } from '../../../core/types/input-types';
+import { UsersInputDto } from './input-dto/users.input-dto';
+import { UsersService } from '../application/users-service';
+import { UsersQueryRepository } from '../infrastructure/query/users.query-repository';
 
 @Controller('users')
 export class UsersController {
+  constructor(
+    private usersQueryRepository: UsersQueryRepository,
+    private usersService: UsersService,
+  ) {}
   @Get()
   async getUsers(@Query() query: any) {}
 
   @Post()
-  async createUser(@Body() body: any) {}
+  async createUser(@Body() body: UsersInputDto) {
+    const userId: string = await this.usersService.createUser(body);
+
+    return this.usersQueryRepository.getUserById(userId);
+  }
 
   @Delete(':id')
   async deleteUser(@Param('id') params: UriParamId) {}
