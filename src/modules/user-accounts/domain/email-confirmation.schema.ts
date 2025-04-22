@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { add } from 'date-fns';
 
 //TODO: куда лучше вынести enum???
-enum ConfirmationStatus {
+export enum ConfirmationStatus {
   Confirmed = 'Confirmed',
   NotConfirmed = 'Not confirmed',
 }

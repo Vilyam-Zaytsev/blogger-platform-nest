@@ -30,6 +30,7 @@ export class UsersService {
 
     const user: UserDocument = this.UserModel.createInstance(candidate);
 
+    console.log('UsersService', user);
     return await this.usersRepository.save(user);
   }
 }
