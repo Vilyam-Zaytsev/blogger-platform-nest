@@ -1,10 +1,6 @@
 import { CreateUserDomainDto } from './dto/create-user.domain.dto';
 import { User } from './user.entity';
-import { PasswordRecovery } from './password-recovery.schema';
-import {
-  ConfirmationStatus,
-  EmailConfirmation,
-} from './email-confirmation.schema';
+import { ConfirmationStatus } from './email-confirmation.schema';
 
 describe('User Entity - createInstance()', () => {
   it('should correctly create a User instance with nested entities(ConfirmationStatus: "NotConfirmed")', () => {
