@@ -102,13 +102,15 @@ export class User {
    * @returns {UserDocument} A new User document instance ready for persistence.
    */
   static createInstance(dto: CreateUserDomainDto): UserDocument {
+    const { login, email, passwordHash, isConfirmed } = dto;
+
     const user = new this();
     //TODO: правильно ли я тут создаю passwordRecovery и emailConfirmation???
-    user.login = dto.login;
-    user.email = dto.email;
-    user.passwordHash = dto.passwordHash;
+    user.login = login;
+    user.email = email;
+    user.passwordHash = passwordHash;
     user.passwordRecovery = new PasswordRecovery();
-    user.emailConfirmation = new EmailConfirmation();
+    user.emailConfirmation = EmailConfirmation.createInstance(isConfirmed);
 
     return user as UserDocument;
   }

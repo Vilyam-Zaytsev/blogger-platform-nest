@@ -11,6 +11,7 @@ import { UriParamId } from '../../../core/types/input-types';
 import { UsersInputDto } from './input-dto/users.input-dto';
 import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../infrastructure/query/users.query-repository';
+import { CreateUserDto } from '../dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -23,7 +24,16 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() body: UsersInputDto) {
-    const userId: string = await this.usersService.createUser(body);
+    const { email, login, password } = body;
+
+    const newUserDto: CreateUserDto = {
+      email,
+      login,
+      password,
+      isConfirmed: true,
+    };
+
+    const userId: string = await this.usersService.createUser(newUserDto);
 
     return this.usersQueryRepository.getUserById(userId);
   }
