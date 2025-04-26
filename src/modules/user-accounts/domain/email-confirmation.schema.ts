@@ -1,6 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { randomUUID } from 'node:crypto';
-import { add } from 'date-fns';
 
 //TODO: куда лучше вынести enum???
 export enum ConfirmationStatus {
@@ -54,24 +52,24 @@ export class EmailConfirmation {
    * @param {boolean} isConfirmed - Indicates whether the email should be considered confirmed upon creation.
    * @returns {EmailConfirmation} A new instance of EmailConfirmation configured according to the input flag.
    */
-  static createInstance(isConfirmed: boolean): EmailConfirmation {
-    const emailConfirmation = new this();
-
-    if (isConfirmed) {
-      emailConfirmation.confirmationCode = null;
-      emailConfirmation.expirationDate = null;
-      emailConfirmation.confirmationStatus = ConfirmationStatus.Confirmed;
-    } else {
-      emailConfirmation.confirmationCode = randomUUID();
-      emailConfirmation.expirationDate = add(new Date(), {
-        hours: 1,
-        minutes: 1,
-      });
-      emailConfirmation.confirmationStatus = ConfirmationStatus.NotConfirmed;
-    }
-
-    return emailConfirmation;
-  }
+  // static createInstance(isConfirmed: boolean): EmailConfirmation {
+  //   const emailConfirmation = new this();
+  //
+  //   if (isConfirmed) {
+  //     emailConfirmation.confirmationCode = null;
+  //     emailConfirmation.expirationDate = null;
+  //     emailConfirmation.confirmationStatus = ConfirmationStatus.Confirmed;
+  //   } else {
+  //     emailConfirmation.confirmationCode = randomUUID();
+  //     emailConfirmation.expirationDate = add(new Date(), {
+  //       hours: 1,
+  //       minutes: 1,
+  //     });
+  //     emailConfirmation.confirmationStatus = ConfirmationStatus.NotConfirmed;
+  //   }
+  //
+  //   return emailConfirmation;
+  // }
 }
 
 export const EmailConfirmationSchema =

@@ -16,7 +16,7 @@ export class UsersService {
   ) {}
 
   async createUser(dto: CreateUserDto): Promise<string> {
-    const { email, login, password, isConfirmed } = dto;
+    const { email, login, password } = dto;
 
     const passwordHash: string =
       await this.bcryptService.generateHash(password);
@@ -25,12 +25,10 @@ export class UsersService {
       email,
       login,
       passwordHash,
-      isConfirmed,
     };
 
     const user: UserDocument = this.UserModel.createInstance(candidate);
 
-    console.log('UsersService', user);
     return await this.usersRepository.save(user);
   }
 }
