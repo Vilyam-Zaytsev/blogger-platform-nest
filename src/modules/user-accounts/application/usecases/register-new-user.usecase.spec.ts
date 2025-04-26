@@ -1,30 +1,40 @@
-import { CreateUserByAdminUseCase } from './create-user-by-admin.usecase';
-import { BcryptService } from '../bcrypt.service';
+import { RegisterNewUserUseCase } from './register-new-user.usecase';
 import { UsersRepository } from '../../infrastructure/users.repository';
+import { BcryptService } from '../bcrypt.service';
 import { User, UserDocument, UserModelType } from '../../domain/user.entity';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
+import { CreateUserByAdminUseCase } from './create-user-by-admin.usecase';
 import { CreateUserDto } from '../../dto/create-user.dto';
-import { ConfirmationStatus } from '../../domain/email-confirmation.schema';
-import { TestLoggers } from '../../../../../test/helpers/test-loggers';
+import { randomUUID } from 'node:crypto';
 
-describe('CreateUserByAdminUseCase', () => {
-  let useCase: CreateUserByAdminUseCase;
-  let bcryptService: jest.Mocked<BcryptService>;
-  let usersRepository: jest.Mocked<UsersRepository>;
-  let UserModel: jest.Mocked<UserModelType>;
+jest.mock('crypto', () => ({
+  randomUUID: jest.fn(),
+}));
+
+describe('RegisterNewUserUseCase', () => {
+  let useCase: RegisterNewUserUseCase;
+  let usersRepository: UsersRepository;
+  let bcryptService: BcryptService;
+  let UserModel: UserModelType;
+  const UserDocument: Partial<UserDocument> = {};
+
+  const mockHashedPassword = 'hashedPassword';
+  const mockUserId = 'mockUserId';
+  const mockConfirmationCode = 'mocked-uuid';
+  const mockExpirationDate = 'mocked-expiration-date';
 
   beforeEach(async () => {
     bcryptService = {
-      generateHash: jest.fn(),
+      generateHash: jest.fn((): string => mockHashedPassword),
     } as unknown as jest.Mocked<BcryptService>;
 
     usersRepository = {
-      save: jest.fn(),
+      save: jest.fn((): string => mockUserId),
     } as unknown as jest.Mocked<UsersRepository>;
 
     UserModel = {
-      createInstance: jest.fn(),
+      createInstance: jest.fn((): UserDocument => UserDocument as UserDocument),
     } as unknown as jest.Mocked<UserModelType>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -39,30 +49,19 @@ describe('CreateUserByAdminUseCase', () => {
     useCase = module.get(CreateUserByAdminUseCase);
   });
 
-  it('should create user, hash password, and return saved userId ', async () => {
+  it('should register a new user', async () => {
     const dto: CreateUserDto = {
       login: 'test_user',
       email: 'test_user@example.com',
       password: 'qwerty',
     };
 
-    const mockHashedPassword = 'hashedPassword';
-    const mockUserId = 'mockUserId';
-
-    const mockUserDocument: Partial<UserDocument> = {
-      email: dto.email,
-      login: dto.login,
-      passwordHash: mockHashedPassword,
-      emailConfirmation: {
-        confirmationCode: null,
-        expirationDate: null,
-        confirmationStatus: ConfirmationStatus.Confirmed,
-      },
-    };
-
-    bcryptService.generateHash.mockResolvedValue(mockHashedPassword);
-    UserModel.createInstance.mockReturnValue(mockUserDocument as UserDocument);
-    usersRepository.save.mockResolvedValue(mockUserId);
+    (bcryptService.generateHash as jest.Mock).mockResolvedValue(
+      mockHashedPassword,
+    );
+    (UserModel.createInstance as jest.Mock).mockReturnValue(UserDocument);
+    (usersRepository.save as jest.Mock).mockResolvedValue(mockUserId);
+    (randomUUID as jest.Mock).mockReturnValue(mockConfirmationCode);
 
     const result: string = await useCase.execute(dto);
 
@@ -75,9 +74,7 @@ describe('CreateUserByAdminUseCase', () => {
       passwordHash: mockHashedPassword,
     });
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(usersRepository.save).toHaveBeenCalledWith(mockUserDocument);
+    expect(usersRepository.save).toHaveBeenCalledWith(UserDocument);
     expect(result).toBe(mockUserId);
-
-    TestLoggers.logUnit(result, 'Test №1: CreateUserByAdminUseCase');
   });
 });
