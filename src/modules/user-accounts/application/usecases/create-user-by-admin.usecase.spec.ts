@@ -48,7 +48,6 @@ describe('CreateUserByAdminUseCase', () => {
 
     const mockHashedPassword = 'hashedPassword';
     const mockUserId = 'mockUserId';
-
     const mockUserDocument: Partial<UserDocument> = {
       email: dto.email,
       login: dto.login,
@@ -68,16 +67,19 @@ describe('CreateUserByAdminUseCase', () => {
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(bcryptService.generateHash).toHaveBeenCalledWith(dto.password);
+
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(UserModel.createInstance).toHaveBeenCalledWith({
       email: dto.email,
       login: dto.login,
       passwordHash: mockHashedPassword,
     });
+
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(usersRepository.save).toHaveBeenCalledWith(mockUserDocument);
+
     expect(result).toBe(mockUserId);
 
-    TestLoggers.logUnit(result, 'Test №1: CreateUserByAdminUseCase');
+    TestLoggers.logUnit<string>(result, 'Test №1: CreateUserByAdminUseCase');
   });
 });
