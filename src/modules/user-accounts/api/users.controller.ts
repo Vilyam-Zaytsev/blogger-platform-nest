@@ -7,7 +7,6 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { UriParamId } from '../../../core/types/input-types';
 import { UsersInputDto } from './input-dto/users.input-dto';
 import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../infrastructure/query/users.query-repository';
@@ -31,5 +30,5 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') params: UriParamId) {}
+  async deleteUser(@Param('id') id: string) {}
 }

@@ -89,7 +89,6 @@ export class User {
    *
    * @type {Date | null}
    */
-  //TODO: в каком случае необходимо указывать nullable: true?(Уточнить на уроке)
   @Prop({ type: Date, nullable: true })
   deletedAt: Date | null;
 
