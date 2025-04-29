@@ -7,7 +7,7 @@ export class UsersRepository {
 
   async findById(id: string): Promise<UserDocument | null> {
     return this.UserModel.findById({
-      id,
+      _id: id,
       deletedAt: null,
     });
   }
