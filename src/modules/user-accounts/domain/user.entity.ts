@@ -112,6 +112,13 @@ export class User {
 
     return user as UserDocument;
   }
+
+  makeDeleted() {
+    if (this.deletedAt !== null) {
+      throw new Error('Entity already deleted');
+    }
+    this.deletedAt = new Date();
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

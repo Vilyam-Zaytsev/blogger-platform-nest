@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -30,12 +32,15 @@ export class UsersController {
   }
 
   @Post()
-  async createUser(@Body() body: UsersInputDto) {
+  async createUser(@Body() body: UsersInputDto): Promise<UsersViewDto> {
     const userId: string = await this.createUserByAdminUseCase.execute(body);
 
     return this.usersQueryRepository.getByIdOrNotFoundFail(userId);
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: string) {}
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUser(@Param('id') id: string): Promise<void> {
+    return this.usersService.deleteUser(id);
+  }
 }
