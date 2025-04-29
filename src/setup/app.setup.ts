@@ -1,11 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import { corsSetup } from './corsSetup';
-import { globalPrefixSetup } from './globalPrefixSetup';
+import { globalPrefixSetup } from './global-prefix.setup';
+import { pipesSetup } from './pipes.setup';
 
-function appSetup(app: INestApplication) {
-
+export function appSetup(app: INestApplication) {
   corsSetup(app);
+  pipesSetup(app);
   globalPrefixSetup(app);
 }
-
-export {appSetup};
