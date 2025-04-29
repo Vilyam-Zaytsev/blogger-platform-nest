@@ -25,8 +25,8 @@ export class UsersController {
   @Get()
   async getAll(
     @Query() query: GetUsersQueryParams,
-  ): Promise<PaginatedViewDto<UsersViewDto[]>> {
-    return this.usersQueryRepository.
+  ): Promise<PaginatedViewDto<UsersViewDto>> {
+    return this.usersQueryRepository.getAll(query);
   }
 
   @Post()
