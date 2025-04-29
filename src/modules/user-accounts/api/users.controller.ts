@@ -11,6 +11,9 @@ import { UsersInputDto } from './input-dto/users.input-dto';
 import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../infrastructure/query/users.query-repository';
 import { CreateUserByAdminUseCase } from '../application/usecases/create-user-by-admin.usecase';
+import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
+import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
+import { UsersViewDto } from './view-dto/users.view-dto';
 
 @Controller('users')
 export class UsersController {
@@ -20,13 +23,17 @@ export class UsersController {
     private readonly usersQueryRepository: UsersQueryRepository,
   ) {}
   @Get()
-  async getUsers(@Query() query: any) {}
+  async getAll(
+    @Query() query: GetUsersQueryParams,
+  ): Promise<PaginatedViewDto<UsersViewDto[]>> {
+    return this.usersQueryRepository.
+  }
 
   @Post()
   async createUser(@Body() body: UsersInputDto) {
     const userId: string = await this.createUserByAdminUseCase.execute(body);
 
-    return this.usersQueryRepository.getUserById(userId);
+    return this.usersQueryRepository.getByIdOrNotFoundFail(userId);
   }
 
   @Delete(':id')

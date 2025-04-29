@@ -6,7 +6,7 @@ class UsersViewDto {
   login: string;
   createdAt: string;
 
-  static mapToViewModel(user: UserDocument): UsersViewDto {
+  static mapToView(user: UserDocument): UsersViewDto {
     const dto = new this();
 
     dto.id = String(user._id);
