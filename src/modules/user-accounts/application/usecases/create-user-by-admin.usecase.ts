@@ -1,38 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { BcryptService } from '../bcrypt.service';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument, UserModelType } from '../../domain/user.entity';
+import { User, UserDocument } from '../../domain/user.entity';
 import { CreateUserDto } from '../../dto/create-user.dto';
-import { CreateUserDomainDto } from '../../domain/dto/create-user.domain.dto';
-import { ConfirmationStatus } from '../../domain/email-confirmation.schema';
+import { UsersFactory } from '../users.factory';
 
 @Injectable()
 export class CreateUserByAdminUseCase {
   constructor(
     @InjectModel(User.name)
-    private UserModel: UserModelType,
-    private readonly bcryptService: BcryptService,
     private readonly usersRepository: UsersRepository,
+    private readonly userFactory: UsersFactory,
   ) {}
 
   async execute(dto: CreateUserDto): Promise<string> {
-    const { email, login, password } = dto;
+    const user: UserDocument = await this.userFactory.create(dto);
 
-    const passwordHash: string =
-      await this.bcryptService.generateHash(password);
+    user.confirmByAdmin();
 
-    const user: CreateUserDomainDto = {
-      email,
-      login,
-      passwordHash,
-    };
-
-    const userDocument: UserDocument = this.UserModel.createInstance(user);
-
-    userDocument.emailConfirmation.confirmationStatus =
-      ConfirmationStatus.Confirmed;
-
-    return await this.usersRepository.save(userDocument);
+    return await this.usersRepository.save(user);
   }
 }

@@ -4,6 +4,7 @@ import {
   PasswordRecoverySchema,
 } from './password-recovery.schema';
 import {
+  ConfirmationStatus,
   EmailConfirmation,
   EmailConfirmationSchema,
 } from './email-confirmation.schema';
@@ -101,14 +102,19 @@ export class User {
    * @returns {UserDocument} A new User document instance ready for persistence.
    */
   static createInstance(dto: CreateUserDomainDto): UserDocument {
-    const { login, email, passwordHash } = dto;
+    const { login, email, passwordHash, confirmationCode, expirationDate } =
+      dto;
 
     const user = new this();
+
     user.login = login;
     user.email = email;
     user.passwordHash = passwordHash;
     user.passwordRecovery = new PasswordRecovery();
-    user.emailConfirmation = new EmailConfirmation();
+    user.emailConfirmation = EmailConfirmation.createInstance(
+      confirmationCode,
+      expirationDate,
+    );
 
     return user as UserDocument;
   }
@@ -129,6 +135,21 @@ export class User {
       throw new Error('Entity already deleted');
     }
     this.deletedAt = new Date();
+  }
+
+  /**
+   * Marks the user's email as confirmed manually by an administrator.
+   *
+   * This method clears the existing confirmation code and expiration date,
+   * and sets the confirmation status to "Confirmed".
+   * Typically used in administrative workflows where email confirmation is bypassed.
+   *
+   * @returns {void}
+   */
+  confirmByAdmin() {
+    this.emailConfirmation.confirmationCode = null;
+    this.emailConfirmation.expirationDate = null;
+    this.emailConfirmation.confirmationStatus = ConfirmationStatus.Confirmed;
   }
 }
 
