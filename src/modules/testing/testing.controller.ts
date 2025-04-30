@@ -8,7 +8,7 @@ export class TestingController {
     @InjectConnection() private readonly databaseConnection: Connection,
   ) {}
 
-  @Delete('testing/all-data')
+  @Delete('all-data')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAll() {
     const collections = await this.databaseConnection.listCollections();
