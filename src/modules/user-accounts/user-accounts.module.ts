@@ -7,6 +7,7 @@ import { User, UserSchema } from './domain/user.entity';
 import { UsersQueryRepository } from './infrastructure/query/users.query-repository';
 import { BcryptService } from './application/bcrypt.service';
 import { CreateUserByAdminUseCase } from './application/usecases/create-user-by-admin.usecase';
+import { UsersFactory } from './application/users.factory';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CreateUserByAdminUseCase } from './application/usecases/create-user-by-
     UsersQueryRepository,
     BcryptService,
     CreateUserByAdminUseCase,
+    UsersFactory,
   ],
   exports: [],
 })

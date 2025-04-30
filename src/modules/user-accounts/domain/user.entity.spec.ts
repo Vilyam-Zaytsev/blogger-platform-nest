@@ -10,6 +10,8 @@ describe('User Entity - createInstance()', () => {
       login: 'test_user',
       email: 'test_user@example.com',
       passwordHash: 'hashedPassword',
+      confirmationCode: 'test_confirmation-code',
+      expirationDate: new Date(),
     };
 
     const user: UserDocument = User.createInstance(dto);

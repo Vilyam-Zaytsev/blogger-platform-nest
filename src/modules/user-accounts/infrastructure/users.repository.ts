@@ -22,7 +22,7 @@ export class UsersRepository {
     return user;
   }
 
-  async save(user: UserDocument) {
+  async save(user: UserDocument): Promise<string> {
     const resultSave: UserDocument = await user.save();
 
     return resultSave._id.toString();

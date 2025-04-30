@@ -42,34 +42,29 @@ export class EmailConfirmation {
   confirmationStatus: ConfirmationStatus;
 
   /**
-   * Factory method for creating a new EmailConfirmation instance.
+   * Factory method for creating a new EmailConfirmation instance with a custom confirmation code and expiration date.
    *
-   * If the email is already confirmed, all related fields (confirmation code and expiration date)
-   * will be set to null, and the confirmation status will be set to "Confirmed".
-   * Otherwise, a new confirmation code will be generated, an expiration time will be set (1 hour and 1 minute from now),
-   * and the status will be set to "NotConfirmed".
+   * This method is useful when the confirmation code and expiration date
+   * need to be explicitly provided (e.g., for manual account setup or testing purposes).
+   * The confirmation status is set to "NotConfirmed" by default.
    *
-   * @param {boolean} isConfirmed - Indicates whether the email should be considered confirmed upon creation.
-   * @returns {EmailConfirmation} A new instance of EmailConfirmation configured according to the input flag.
+   * @param {string} confirmationCode - The code to be used for confirming the user's email.
+   * @param {Date} expirationDate - The date and time when the confirmation code expires.
+   * @returns {EmailConfirmation} A new instance of EmailConfirmation with the specified values.
    */
-  // static createInstance(isConfirmed: boolean): EmailConfirmation {
-  //   const emailConfirmation = new this();
-  //
-  //   if (isConfirmed) {
-  //     emailConfirmation.confirmationCode = null;
-  //     emailConfirmation.expirationDate = null;
-  //     emailConfirmation.confirmationStatus = ConfirmationStatus.Confirmed;
-  //   } else {
-  //     emailConfirmation.confirmationCode = randomUUID();
-  //     emailConfirmation.expirationDate = add(new Date(), {
-  //       hours: 1,
-  //       minutes: 1,
-  //     });
-  //     emailConfirmation.confirmationStatus = ConfirmationStatus.NotConfirmed;
-  //   }
-  //
-  //   return emailConfirmation;
-  // }
+  //TODO: написать unit тест
+  static createInstance(
+    confirmationCode: string,
+    expirationDate: Date,
+  ): EmailConfirmation {
+    const emailConfirmation = new this();
+
+    emailConfirmation.confirmationCode = confirmationCode;
+    emailConfirmation.expirationDate = expirationDate;
+    emailConfirmation.confirmationStatus = ConfirmationStatus.NotConfirmed;
+
+    return emailConfirmation;
+  }
 }
 
 export const EmailConfirmationSchema =
