@@ -1,6 +1,6 @@
 import { UserDocument } from '../../domain/user.entity';
 
-class UsersViewDto {
+export class UsersViewDto {
   id: string;
   email: string;
   login: string;
@@ -9,7 +9,7 @@ class UsersViewDto {
   static mapToView(user: UserDocument): UsersViewDto {
     const dto = new this();
 
-    dto.id = String(user._id);
+    dto.id = user._id.toString();
     dto.login = user.login;
     dto.email = user.email;
     dto.createdAt = user.createdAt.toISOString();
@@ -17,5 +17,3 @@ class UsersViewDto {
     return dto;
   }
 }
-
-export { UsersViewDto };
