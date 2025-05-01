@@ -1,4 +1,5 @@
 import { Prop, Schema } from '@nestjs/mongoose';
+import { CreateBlogDomainDto } from './dto/create-blog.domain.dto';
 
 /**
  * Blog Entity Schema
@@ -72,4 +73,25 @@ export class Blog {
    */
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
+
+  /**
+   * Factory method for creating a new Blog instance from a DTO.
+   *
+   * Initializes the blog entity with the provided name, description, and website URL.
+   * This method is typically used when registering a new blog in the system.
+   *
+   * @param {CreateBlogDomainDto} dto - Data transfer object containing blog creation details.
+   * @returns {BlogDocument} A new Blog document instance ready to be saved to the database.
+   */
+  static createInstance(dto: CreateBlogDomainDto): BlogDocument {
+    const { name, description, websiteUrl } = dto;
+
+    const blog = new this();
+
+    blog.name = name;
+    blog.description = description;
+    blog.websiteUrl = websiteUrl;
+
+    return blog as BlogDocument;
+  }
 }
