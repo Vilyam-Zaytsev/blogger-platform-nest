@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
 import { BlogDocument } from '../../domain/blog.entity';
-import { UpdateBlogDto } from '../../domain/dto/createBlogDto';
+import { UpdateBlogDto } from '../../dto/blog.dto';
 
 @Injectable()
 export class UpdateBlogUseCase {

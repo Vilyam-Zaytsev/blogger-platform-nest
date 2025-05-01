@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateBlogDto } from '../../dto/create-blog.dto';
 import { Blog, BlogDocument, BlogModelType } from '../../domain/blog.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
+import { CreateBlogDto } from '../../dto/blog.dto';
 
 @Injectable()
 export class CreateBlogUseCase {

@@ -9,13 +9,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { UsersInputDto } from './input-dto/users.input-dto';
+import { UserInputDto } from './input-dto/user.input-dto';
 import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../infrastructure/query/users.query-repository';
 import { CreateUserByAdminUseCase } from '../application/usecases/create-user-by-admin.usecase';
 import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
 import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
-import { UsersViewDto } from './view-dto/users.view-dto';
+import { UserViewDto } from './view-dto/user.view-dto';
 
 @Controller('users')
 export class UsersController {
@@ -28,12 +28,12 @@ export class UsersController {
   @Get()
   async getAll(
     @Query() query: GetUsersQueryParams,
-  ): Promise<PaginatedViewDto<UsersViewDto>> {
+  ): Promise<PaginatedViewDto<UserViewDto>> {
     return this.usersQueryRepository.getAll(query);
   }
 
   @Post()
-  async createUser(@Body() body: UsersInputDto): Promise<UsersViewDto> {
+  async createUser(@Body() body: UserInputDto): Promise<UserViewDto> {
     const userId: string = await this.createUserByAdminUseCase.execute(body);
 
     return this.usersQueryRepository.getByIdOrNotFoundFail(userId);
