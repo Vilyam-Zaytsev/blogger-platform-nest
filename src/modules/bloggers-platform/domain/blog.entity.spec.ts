@@ -10,7 +10,7 @@ describe('Blog Entity - createInstance()', () => {
       websiteUrl: 'www.test_website_url.com',
     };
 
-    const blog = Blog.createInstance(dto);
+    const blog: BlogDocument = Blog.createInstance(dto);
 
     expect(blog.name).toBe(dto.name);
     expect(blog.description).toBe(dto.description);
