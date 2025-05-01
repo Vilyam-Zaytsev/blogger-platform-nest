@@ -96,6 +96,24 @@ export class Blog {
 
     return blog as BlogDocument;
   }
+
+  /**
+   * Marks the entity as soft-deleted by setting the `deletedAt` timestamp.
+   *
+   * If the entity has already been marked as deleted (i.e., `deletedAt` is not null),
+   * an error will be thrown to prevent duplicate deletion operations.
+   *
+   * This method is typically used to implement soft deletion logic,
+   * allowing the entity to be excluded from active queries without being permanently removed from the database.
+   *
+   * @throws {Error} If the entity has already been soft-deleted.
+   */
+  makeDeleted() {
+    if (this.deletedAt !== null) {
+      throw new Error('Entity already deleted');
+    }
+    this.deletedAt = new Date();
+  }
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);
