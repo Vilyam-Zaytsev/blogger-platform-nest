@@ -1,5 +1,7 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CreateBlogDomainDto } from './dto/create-blog.domain.dto';
+import { HydratedDocument, Model } from 'mongoose';
+import { UserDocument } from '../../user-accounts/domain/user.entity';
 
 /**
  * Blog Entity Schema
@@ -95,3 +97,11 @@ export class Blog {
     return blog as BlogDocument;
   }
 }
+
+export const BlogSchema = SchemaFactory.createForClass(Blog);
+
+BlogSchema.loadClass(Blog);
+
+export type BlogDocument = HydratedDocument<Blog>;
+
+export type BlogModelType = Model<UserDocument> & typeof Blog;
