@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Blog, BlogSchema } from './domain/blog.entity';
-import { BlogsController } from './api/blogs.controller';
-import { BlogsRepository } from './infrastructure/blogs.repository';
-import { BlogsQueryRepository } from './infrastructure/query/blogs.query-repository';
-import { CreateBlogUseCase } from './application/usecases/create-blog.usecase';
-import { UpdateBlogUseCase } from './application/usecases/update-blog.usecase';
-import { DeleteBlogUseCase } from './application/usecases/delete-blog.usecase';
+import { Blog, BlogSchema } from './blogs/domain/blog.entity';
+import { BlogsController } from './blogs/api/blogs.controller';
+import { BlogsRepository } from './blogs/infrastructure/blogs.repository';
+import { BlogsQueryRepository } from './blogs/infrastructure/query/blogs.query-repository';
+import { CreateBlogUseCase } from './blogs/application/usecases/create-blog.usecase';
+import { UpdateBlogUseCase } from './blogs/application/usecases/update-blog.usecase';
+import { DeleteBlogUseCase } from './blogs/application/usecases/delete-blog.usecase';
 
 @Module({
   imports: [

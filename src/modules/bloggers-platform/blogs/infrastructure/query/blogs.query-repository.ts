@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument, BlogModelType } from '../../domain/blog.entity';
 import { BlogViewDto } from '../../api/view-dto/blog-view.dto';
-import { PaginatedViewDto } from '../../../../core/dto/paginated.view-dto';
+import { PaginatedViewDto } from '../../../../../core/dto/paginated.view-dto';
 import { FilterQuery } from 'mongoose';
 import { GetBlogsQueryParams } from '../../api/input-dto/get-blogs-query-params.input-dto';
 

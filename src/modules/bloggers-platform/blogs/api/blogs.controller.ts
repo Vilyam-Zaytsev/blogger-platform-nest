@@ -14,7 +14,7 @@ import { BlogInputDto } from './input-dto/blog-input.dto';
 import { BlogViewDto } from './view-dto/blog-view.dto';
 import { CreateBlogUseCase } from '../application/usecases/create-blog.usecase';
 import { BlogsQueryRepository } from '../infrastructure/query/blogs.query-repository';
-import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
+import { PaginatedViewDto } from '../../../../core/dto/paginated.view-dto';
 import { GetBlogsQueryParams } from './input-dto/get-blogs-query-params.input-dto';
 import { UpdateBlogUseCase } from '../application/usecases/update-blog.usecase';
 import { DeleteBlogUseCase } from '../application/usecases/delete-blog.usecase';
