@@ -7,6 +7,9 @@ import { TestingModule } from './modules/testing/testing.module';
   imports: [
     MongooseModule.forRoot(
       'mongodb+srv://Vilyam:D%21OBxcE9%26%3Cu4SK%5D3myze@cluster0.ur8pv.mongodb.net',
+      {
+        dbName: 'blogger-platform-dev',
+      },
     ),
     UserAccountsModule,
     TestingModule,
