@@ -116,6 +116,15 @@ export class Blog {
     this.deletedAt = new Date();
   }
 
+  /**
+   * Updates the blog's metadata using the provided data object.
+   *
+   * This method allows changing the blog's name, description, and website URL.
+   * Typically used in administrative or user-level operations where a blog's details need to be modified.
+   *
+   * @param {UpdateBlogDto} data - Object containing updated blog properties.
+   * @returns {void}
+   */
   update(data: UpdateBlogDto) {
     this.name = data.name;
     this.description = data.description;
