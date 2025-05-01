@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { CreateBlogDomainDto } from './dto/create-blog.domain.dto';
+import { CreateBlogDto, UpdateBlogDto } from './dto/createBlogDto';
 import { HydratedDocument, Model } from 'mongoose';
 import { UserDocument } from '../../user-accounts/domain/user.entity';
+import { BlogInputDto } from '../api/input-dto/blog-input.dto';
 
 /**
  * Blog Entity Schema
@@ -82,10 +83,10 @@ export class Blog {
    * Initializes the blog entity with the provided name, description, and website URL.
    * This method is typically used when registering a new blog in the system.
    *
-   * @param {CreateBlogDomainDto} dto - Data transfer object containing blog creation details.
+   * @param {CreateBlogDto} dto - Data transfer object containing blog creation details.
    * @returns {BlogDocument} A new Blog document instance ready to be saved to the database.
    */
-  static createInstance(dto: CreateBlogDomainDto): BlogDocument {
+  static createInstance(dto: CreateBlogDto): BlogDocument {
     const { name, description, websiteUrl } = dto;
 
     const blog = new this();
@@ -113,6 +114,12 @@ export class Blog {
       throw new Error('Entity already deleted');
     }
     this.deletedAt = new Date();
+  }
+
+  update(data: UpdateBlogDto) {
+    this.name = data.name;
+    this.description = data.description;
+    this.websiteUrl = data.websiteUrl;
   }
 }
 

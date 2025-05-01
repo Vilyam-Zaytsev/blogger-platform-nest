@@ -1,6 +1,6 @@
 import { BlogDocument } from '../../domain/blog.entity';
 
-export class BlogsViewDto {
+export class BlogViewDto {
   id: string;
   name: string;
   description: string;
@@ -8,7 +8,7 @@ export class BlogsViewDto {
   createdAt: string;
   isMembership: boolean;
 
-  static mapToView(blog: BlogDocument): BlogsViewDto {
+  static mapToView(blog: BlogDocument): BlogViewDto {
     const dto = new this();
 
     dto.id = blog._id.toString();
