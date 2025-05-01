@@ -1,3 +1,5 @@
+import { BlogDocument } from '../../domain/blog.entity';
+
 export class BlogsViewDto {
   id: string;
   name: string;
