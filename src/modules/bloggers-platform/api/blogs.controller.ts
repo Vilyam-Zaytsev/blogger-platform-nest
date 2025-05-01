@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -16,12 +17,14 @@ import { BlogsQueryRepository } from '../infrastructure/query/blogs.query-reposi
 import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
 import { GetBlogsQueryParams } from './input-dto/get-blogs-query-params.input-dto';
 import { UpdateBlogUseCase } from '../application/usecases/update-blog.usecase';
+import { DeleteBlogUseCase } from '../application/usecases/delete-blog.usecase';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private readonly createBlogUseCase: CreateBlogUseCase,
     private readonly updateBlogUseCase: UpdateBlogUseCase,
+    private readonly deleteBlogUseCase: DeleteBlogUseCase,
     private readonly blogsQueryRepository: BlogsQueryRepository,
   ) {}
   @Get()
@@ -50,5 +53,11 @@ export class BlogsController {
     @Body() body: BlogInputDto,
   ): Promise<void> {
     await this.updateBlogUseCase.execute(id, body);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBlog(@Param('id') id: string): Promise<void> {
+    await this.deleteBlogUseCase.execute(id);
   }
 }

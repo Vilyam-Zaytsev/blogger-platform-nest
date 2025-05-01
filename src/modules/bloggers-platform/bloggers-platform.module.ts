@@ -6,6 +6,7 @@ import { BlogsRepository } from './infrastructure/blogs.repository';
 import { BlogsQueryRepository } from './infrastructure/query/blogs.query-repository';
 import { CreateBlogUseCase } from './application/usecases/create-blog.usecase';
 import { UpdateBlogUseCase } from './application/usecases/update-blog.usecase';
+import { DeleteBlogUseCase } from './application/usecases/delete-blog.usecase';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UpdateBlogUseCase } from './application/usecases/update-blog.usecase';
     BlogsQueryRepository,
     CreateBlogUseCase,
     UpdateBlogUseCase,
+    DeleteBlogUseCase,
   ],
   exports: [],
 })
