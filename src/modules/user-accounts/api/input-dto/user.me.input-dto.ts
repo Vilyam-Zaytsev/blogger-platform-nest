@@ -1,7 +1,7 @@
-class UsersMeInputDto {
+class UserMeInputDto {
   email: string;
   login: string;
   userId: string;
 }
 
-export { UsersMeInputDto };
+export { UserMeInputDto };
