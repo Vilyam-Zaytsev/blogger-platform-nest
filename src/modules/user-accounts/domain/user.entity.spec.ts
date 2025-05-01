@@ -5,7 +5,7 @@ import { PasswordRecovery } from './password-recovery.schema';
 import { TestLoggers } from '../../../../test/helpers/test-loggers';
 
 describe('User Entity - createInstance()', () => {
-  it('should correctly create a User instance with nested entities(ConfirmationStatus: "Confirmed")', () => {
+  it('should correctly create a User instance with nested entities.', () => {
     const dto: CreateUserDomainDto = {
       login: 'test_user',
       email: 'test_user@example.com',
@@ -19,6 +19,10 @@ describe('User Entity - createInstance()', () => {
     expect(user.login).toBe(dto.login);
     expect(user.email).toBe(dto.email);
     expect(user.passwordHash).toBe(dto.passwordHash);
+
+    expect(user).toHaveProperty('createdAt');
+    expect(user).toHaveProperty('updatedAt');
+    expect(user).toHaveProperty('deletedAt');
 
     expect(user).toHaveProperty('passwordRecovery');
     expect(user.passwordRecovery).toBeInstanceOf(PasswordRecovery);
