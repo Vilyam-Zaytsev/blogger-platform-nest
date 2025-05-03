@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ReactionsCount, ReactionsCountSchema } from './reactions-count.schema';
 import { LastLike, LastLikeSchema } from './last-likes.schema';
 import { HydratedDocument, Model } from 'mongoose';
+import { CreatePostDto } from '../dto/post.dto';
 
 /**
  * Post Entity Schema
@@ -106,6 +107,28 @@ export class Post {
    */
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
+
+  /**
+   * Factory method for creating a new Post instance from a DTO.
+   *
+   * Initializes a Post entity with basic properties such as title, description, content, and blog reference.
+   * This method is typically used during post creation before saving the document to the database.
+   *
+   * @param {CreatePostDto} dto - Data transfer object containing post creation data.
+   * @returns {PostDocument} A new Post document instance ready to be persisted.
+   */
+  static createInstance(dto: CreatePostDto): PostDocument {
+    const { title, shortDescription, content, blogId } = dto;
+
+    const post = new this();
+
+    post.title = title;
+    post.shortDescription = shortDescription;
+    post.content = content;
+    post.blogId = blogId;
+
+    return post as PostDocument;
+  }
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
