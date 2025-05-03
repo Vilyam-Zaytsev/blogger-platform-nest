@@ -3,6 +3,7 @@ import { ReactionsCount, ReactionsCountSchema } from './reactions-count.schema';
 import { LastLike, LastLikeSchema } from './last-likes.schema';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDto } from '../dto/post.dto';
+import { CreatePostDomainDto } from './dto/create-post.domain.dto';
 
 /**
  * Post Entity Schema
@@ -117,7 +118,7 @@ export class Post {
    * @param {CreatePostDto} dto - Data transfer object containing post creation data.
    * @returns {PostDocument} A new Post document instance ready to be persisted.
    */
-  static createInstance(dto: CreatePostDto): PostDocument {
+  static createInstance(dto: CreatePostDomainDto): PostDocument {
     const { title, shortDescription, content, blogId } = dto;
 
     const post = new this();
@@ -126,6 +127,9 @@ export class Post {
     post.shortDescription = shortDescription;
     post.content = content;
     post.blogId = blogId;
+    post.blogName = dto.blogName;
+    post.reactionsCount = new ReactionsCount();
+    post.lastLikes = [];
 
     return post as PostDocument;
   }
