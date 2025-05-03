@@ -2,8 +2,9 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ReactionsCount, ReactionsCountSchema } from './reactions-count.schema';
 import { LastLike, LastLikeSchema } from './last-likes.schema';
 import { HydratedDocument, Model } from 'mongoose';
-import { CreatePostDto } from '../dto/post.dto';
 import { CreatePostDomainDto } from './dto/create-post.domain.dto';
+import { UpdateBlogDto } from '../../blogs/dto/blog.dto';
+import { UpdatePostDto } from '../dto/post.dto';
 
 /**
  * Post Entity Schema
@@ -110,13 +111,14 @@ export class Post {
   deletedAt: Date | null;
 
   /**
-   * Factory method for creating a new Post instance from a DTO.
+   * Factory method for creating a new Post instance from a domain DTO.
    *
-   * Initializes a Post entity with basic properties such as title, description, content, and blog reference.
-   * This method is typically used during post creation before saving the document to the database.
+   * Initializes a Post entity with core fields such as title, description, content, blog information,
+   * and default values for reactions and recent likes. This method ensures the post is ready for persistence
+   * with all required fields properly set.
    *
-   * @param {CreatePostDto} dto - Data transfer object containing post creation data.
-   * @returns {PostDocument} A new Post document instance ready to be persisted.
+   * @param {CreatePostDomainDto} dto - Domain-specific DTO containing data needed to create a new post.
+   * @returns {PostDocument} A fully initialized Post document instance.
    */
   static createInstance(dto: CreatePostDomainDto): PostDocument {
     const { title, shortDescription, content, blogId } = dto;
@@ -132,6 +134,39 @@ export class Post {
     post.lastLikes = [];
 
     return post as PostDocument;
+  }
+
+  /**
+   * Updates the current Post instance with new data.
+   *
+   * Replaces the post's title, short description, content, and blog reference
+   * based on the provided DTO. Typically used when editing an existing post.
+   *
+   * @param {UpdatePostDto} data - DTO containing the updated post data.
+   */
+  update(data: UpdatePostDto) {
+    this.title = data.title;
+    this.shortDescription = data.shortDescription;
+    this.content = data.content;
+    this.blogId = data.blogId;
+  }
+
+  /**
+   * Marks the entity as soft-deleted by setting the `deletedAt` timestamp.
+   *
+   * If the entity has already been marked as deleted (i.e., `deletedAt` is not null),
+   * an error will be thrown to prevent duplicate deletion operations.
+   *
+   * This method is typically used to implement soft deletion logic,
+   * allowing the entity to be excluded from active queries without being permanently removed from the database.
+   *
+   * @throws {Error} If the entity has already been soft-deleted.
+   */
+  makeDeleted() {
+    if (this.deletedAt !== null) {
+      throw new Error('Entity already deleted');
+    }
+    this.deletedAt = new Date();
   }
 }
 

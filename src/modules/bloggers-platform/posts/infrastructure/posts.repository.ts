@@ -8,7 +8,7 @@ export class PostsRepository {
   async getByIdOrNotFoundFail(id: string): Promise<PostDocument> {
     const post: PostDocument | null = await this.PostModel.findOne({
       _id: id,
-      deleted: null,
+      deletedAt: null,
     });
 
     if (!post) {

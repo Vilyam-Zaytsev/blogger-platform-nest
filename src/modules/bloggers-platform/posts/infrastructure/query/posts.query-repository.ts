@@ -2,6 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModelType } from '../../domain/post.entity';
 import { PostViewDto } from '../../api/view-dto/post-view.dto';
+import { PaginatedViewDto } from '../../../../../core/dto/paginated.view-dto';
+import { FilterQuery } from 'mongoose';
+import { GetPostsQueryParams } from '../../api/input-dto/get-posts-query-params.input-dto';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -13,7 +16,7 @@ export class PostsQueryRepository {
   async getByIdOrNotFoundFail(id: string): Promise<PostViewDto> {
     const post: PostDocument | null = await this.PostModel.findOne({
       _id: id,
-      deleted: null,
+      deletedAt: null,
     });
 
     if (!post) {
@@ -23,36 +26,29 @@ export class PostsQueryRepository {
     return PostViewDto.mapToView(post);
   }
 
-  // async getAll(
-  //   query: GetBlogsQueryParams,
-  // ): Promise<PaginatedViewDto<BlogViewDto>> {
-  //   const filter: FilterQuery<Blog> = {
-  //     deletedAt: null,
-  //   };
-  //
-  //   if (query.searchNameTerm) {
-  //     filter.$or = filter.$or || [];
-  //     filter.$or.push({
-  //       login: { $regex: query.searchNameTerm, $options: 'i' },
-  //     });
-  //   }
-  //
-  //   const blogs: BlogDocument[] = await this.BlogModel.find(filter)
-  //     .sort({ [query.sortBy]: query.sortDirection })
-  //     .skip(query.calculateSkip())
-  //     .limit(query.pageSize);
-  //
-  //   const totalCount: number = await this.BlogModel.countDocuments(filter);
-  //
-  //   const items: BlogViewDto[] = blogs.map(
-  //     (blog: BlogDocument): BlogViewDto => BlogViewDto.mapToView(blog),
-  //   );
-  //
-  //   return PaginatedViewDto.mapToView<BlogViewDto>({
-  //     items,
-  //     totalCount,
-  //     page: query.pageNumber,
-  //     size: query.pageSize,
-  //   });
-  // }
+  async getAll(
+    query: GetPostsQueryParams,
+  ): Promise<PaginatedViewDto<PostViewDto>> {
+    const filter: FilterQuery<Post> = {
+      deletedAt: null,
+    };
+
+    const posts: PostDocument[] = await this.PostModel.find(filter)
+      .sort({ [query.sortBy]: query.sortDirection })
+      .skip(query.calculateSkip())
+      .limit(query.pageSize);
+
+    const totalCount: number = await this.PostModel.countDocuments(filter);
+
+    const items: PostViewDto[] = posts.map(
+      (post: PostDocument): PostViewDto => PostViewDto.mapToView(post),
+    );
+
+    return PaginatedViewDto.mapToView<PostViewDto>({
+      items,
+      totalCount,
+      page: query.pageNumber,
+      size: query.pageSize,
+    });
+  }
 }

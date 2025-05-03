@@ -12,6 +12,8 @@ import { PostsController } from './posts/api/posts.controller';
 import { PostsRepository } from './posts/infrastructure/posts.repository';
 import { PostsQueryRepository } from './posts/infrastructure/query/posts.query-repository';
 import { CreatePostUseCase } from './posts/application/usecases/create-post.usecase';
+import { UpdatePostUseCase } from './posts/application/usecases/update-post.usecase';
+import { DeletePostUseCase } from './posts/application/usecases/delete-post.usecase';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { CreatePostUseCase } from './posts/application/usecases/create-post.usec
     PostsRepository,
     PostsQueryRepository,
     CreatePostUseCase,
+    UpdatePostUseCase,
+    DeletePostUseCase,
   ],
   exports: [],
 })
