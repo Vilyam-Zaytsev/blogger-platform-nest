@@ -1,3 +1,6 @@
+import { PostDocument } from '../../domain/post.entity';
+import { LastLike } from '../../domain/last-likes.schema';
+
 export class PostViewDto {
   id: string;
   title: string;
@@ -17,29 +20,24 @@ export class PostViewDto {
     dto.content = post.content;
     dto.blogId = post.blogId;
     dto.blogName = post.blogName;
-    (dto.extendedLikesInfo = {
-      likesCount: 0,
-      dislikesCount: 0,
+    dto.extendedLikesInfo = {
+      likesCount: post.reactionsCount.likesCount,
+      dislikesCount: post.reactionsCount.dislikesCount,
       myStatus: LikeStatus.None,
-      newestLikes: [],
-    }),
-      (dto.createdAt = post.createdAt.toISOString());
+      newestLikes: post.lastLikes,
+    };
+    dto.createdAt = post.createdAt.toISOString();
 
     return dto;
   }
 }
 
+//TODO: куда лучше вынести эти типы? или оставить здесь?
 type ExtendedLikesInfo = {
   likesCount: number;
   dislikesCount: number;
   myStatus: LikeStatus;
-  newestLikes: LikeDetails[];
-};
-
-type LikeDetails = {
-  addedAt: string;
-  userId: string;
-  login: string;
+  newestLikes: LastLike[];
 };
 
 enum LikeStatus {
