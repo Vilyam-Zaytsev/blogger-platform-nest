@@ -7,18 +7,29 @@ import { BlogsQueryRepository } from './blogs/infrastructure/query/blogs.query-r
 import { CreateBlogUseCase } from './blogs/application/usecases/create-blog.usecase';
 import { UpdateBlogUseCase } from './blogs/application/usecases/update-blog.usecase';
 import { DeleteBlogUseCase } from './blogs/application/usecases/delete-blog.usecase';
+import { Post, PostSchema } from './posts/domain/post.entity';
+import { PostsController } from './posts/api/posts.controller';
+import { PostsRepository } from './posts/infrastructure/posts.repository';
+import { PostsQueryRepository } from './posts/infrastructure/query/posts.query-repository';
+import { CreatePostUseCase } from './posts/application/usecases/create-post.usecase';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
+    MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
   ],
-  controllers: [BlogsController],
+  controllers: [BlogsController, PostsController],
   providers: [
+    //blogs
     BlogsRepository,
     BlogsQueryRepository,
     CreateBlogUseCase,
     UpdateBlogUseCase,
     DeleteBlogUseCase,
+    //posts
+    PostsRepository,
+    PostsQueryRepository,
+    CreatePostUseCase,
   ],
   exports: [],
 })
