@@ -32,7 +32,6 @@ export class PostViewDto {
   }
 }
 
-//TODO: куда лучше вынести эти типы? или оставить здесь?
 type ExtendedLikesInfo = {
   likesCount: number;
   dislikesCount: number;
@@ -40,6 +39,7 @@ type ExtendedLikesInfo = {
   newestLikes: LastLike[];
 };
 
+//TODO: вынести в отдельный файл!!!
 enum LikeStatus {
   None = 'None',
   Like = 'Like',

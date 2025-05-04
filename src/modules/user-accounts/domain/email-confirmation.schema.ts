@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-//TODO: куда лучше вынести enum???
 export enum ConfirmationStatus {
   Confirmed = 'Confirmed',
   NotConfirmed = 'Not confirmed',
