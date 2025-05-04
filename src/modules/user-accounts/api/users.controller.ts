@@ -10,18 +10,18 @@ import {
   Query,
 } from '@nestjs/common';
 import { UserInputDto } from './input-dto/user.input-dto';
-import { UsersService } from '../application/users.service';
 import { UsersQueryRepository } from '../infrastructure/query/users.query-repository';
 import { CreateUserByAdminUseCase } from '../application/usecases/create-user-by-admin.usecase';
 import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
 import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
 import { UserViewDto } from './view-dto/user.view-dto';
+import { DeleteUserUseCase } from '../application/usecases/delete-user.usecase';
 
 @Controller('users')
 export class UsersController {
   constructor(
     private readonly createUserByAdminUseCase: CreateUserByAdminUseCase,
-    private readonly usersService: UsersService,
+    private readonly deleteUserByAdminUseCase: DeleteUserUseCase,
     private readonly usersQueryRepository: UsersQueryRepository,
   ) {}
 
@@ -42,6 +42,6 @@ export class UsersController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: string): Promise<void> {
-    await this.usersService.deleteUser(id);
+    await this.deleteUserByAdminUseCase.execute(id);
   }
 }

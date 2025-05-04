@@ -8,7 +8,7 @@ export class BlogsRepository {
   async getByIdOrNotFoundFail(id: string): Promise<BlogDocument> {
     const blog: BlogDocument | null = await this.BlogModel.findOne({
       _id: id,
-      deleted: null,
+      deletedAt: null,
     });
 
     if (!blog) {

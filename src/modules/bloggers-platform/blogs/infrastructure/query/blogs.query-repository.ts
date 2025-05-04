@@ -16,7 +16,7 @@ export class BlogsQueryRepository {
   async getByIdOrNotFoundFail(id: string): Promise<BlogViewDto> {
     const blog: BlogDocument | null = await this.BlogModel.findOne({
       _id: id,
-      deleted: null,
+      deletedAt: null,
     });
 
     if (!blog) {
@@ -36,7 +36,7 @@ export class BlogsQueryRepository {
     if (query.searchNameTerm) {
       filter.$or = filter.$or || [];
       filter.$or.push({
-        login: { $regex: query.searchNameTerm, $options: 'i' },
+        name: { $regex: query.searchNameTerm, $options: 'i' },
       });
     }
 
