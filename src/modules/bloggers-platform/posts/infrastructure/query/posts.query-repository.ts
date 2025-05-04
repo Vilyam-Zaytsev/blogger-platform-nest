@@ -5,12 +5,15 @@ import { PostViewDto } from '../../api/view-dto/post-view.dto';
 import { PaginatedViewDto } from '../../../../../core/dto/paginated.view-dto';
 import { FilterQuery } from 'mongoose';
 import { GetPostsQueryParams } from '../../api/input-dto/get-posts-query-params.input-dto';
+import { BlogDocument } from '../../../blogs/domain/blog.entity';
+import { BlogsRepository } from '../../../blogs/infrastructure/blogs.repository';
 
 @Injectable()
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name)
-    private PostModel: PostModelType,
+    private readonly PostModel: PostModelType,
+    private readonly blogRepository: BlogsRepository,
   ) {}
 
   async getByIdOrNotFoundFail(id: string): Promise<PostViewDto> {
@@ -56,6 +59,8 @@ export class PostsQueryRepository {
     query: GetPostsQueryParams,
     blogId: string,
   ): Promise<PaginatedViewDto<PostViewDto>> {
+    await this.blogRepository.getByIdOrNotFoundFail(blogId);
+
     const filter: FilterQuery<Post> = {
       blogId,
       deletedAt: null,
