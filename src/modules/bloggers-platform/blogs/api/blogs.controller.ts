@@ -47,15 +47,12 @@ export class BlogsController {
     return this.blogsQueryRepository.getByIdOrNotFoundFail(id);
   }
 
-  // TODO: Корректно ли реализовано получение постов для блога (особенно проверка наличия блога)?
   @Get(':blogId/posts')
   async getPostsForBlog(
     @Param('blogId') blogId: string,
     @Query() query: GetPostsQueryParams,
   ): Promise<PaginatedViewDto<PostViewDto>> {
-    await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
-
-    return this.postsQueryRepository.getAll(query);
+    return this.postsQueryRepository.getPostsByBlogId(query, blogId);
   }
 
   @Post()
@@ -64,15 +61,12 @@ export class BlogsController {
 
     return this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
   }
-  // TODO: Корректно ли реализовано создание поста для блога (особенно проверка наличия блога)?
 
   @Post(':blogId/posts')
   async createPostForBlog(
     @Param('blogId') blogId: string,
     @Body() body: CreatePostForBlogInputDto,
   ): Promise<PostViewDto> {
-    await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
-
     const createPostDto: CreatePostDto = {
       ...body,
       blogId,
