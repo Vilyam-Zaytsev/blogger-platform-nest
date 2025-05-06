@@ -3,16 +3,14 @@ import { Connection } from 'mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { getConnectionToken } from '@nestjs/mongoose';
-// import * as request from 'supertest';
 import request from 'supertest';
 import { Response } from 'supertest';
 import { Server } from 'http';
+import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 
 describe('UsersController - createUser() (POST: /users)', () => {
   let app: INestApplication;
   let connection: Connection;
-  let httpServer: Server;
-  let req: request.SuperTest<request.Test>;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -23,9 +21,6 @@ describe('UsersController - createUser() (POST: /users)', () => {
     await app.init();
 
     connection = moduleFixture.get<Connection>(getConnectionToken());
-
-    httpServer = app.getHttpServer() as Server;
-    req = request(httpServer);
   });
 
   beforeEach(async () => {
@@ -45,13 +40,21 @@ describe('UsersController - createUser() (POST: /users)', () => {
   });
 
   it('should create a new user', async () => {
-    const res: Response = await req
+    const resCreateUser: Response = await request(app.getHttpServer() as Server)
       .post('/users')
       .send({
         login: 'test_user',
         email: 'test_user@example.com',
-        passwordHash: 'qwerty',
+        password: 'qwerty',
       })
       .expect(201);
+
+    const user: UserViewDto = resCreateUser.body as UserViewDto;
+
+    expect(user).toHaveProperty('id');
+    expect(user).toHaveProperty('createdAt');
+
+    expect(user.login).toBe('test_user');
+    expect(user.email).toBe('test_user@example.com');
   });
 });
