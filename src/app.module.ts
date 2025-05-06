@@ -1,20 +1,27 @@
 import { configModule } from './dynamic-config-module';
 import { Module } from '@nestjs/common';
 import { UserAccountsModule } from './modules/user-accounts/user-accounts.module';
-import { MongooseModule } from '@nestjs/mongoose';
+import {
+  MongooseModule,
+  type MongooseModuleAsyncOptions,
+} from '@nestjs/mongoose';
 import { TestingModule } from './modules/testing/testing.module';
 import { BloggersPlatformModule } from './modules/bloggers-platform/bloggers-platform.module';
-import process from 'node:process';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     configModule,
-    MongooseModule.forRoot(
-      process.env.MONGO_URI || 'mongodb://localhost:27017',
-      {
-        dbName: 'blogger-platform-dev',
+    MongooseModule.forRootAsync({
+      imports: [configModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          uri: configService.get('MONGO_URL') as string,
+          dbName: configService.get('DB_NAME') as string,
+        };
       },
-    ),
+    } as MongooseModuleAsyncOptions),
     UserAccountsModule,
     BloggersPlatformModule,
     TestingModule,
