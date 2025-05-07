@@ -4,6 +4,7 @@ function pipesSetup(app: INestApplication) {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
+      stopAtFirstError: true,
     }),
   );
 }
