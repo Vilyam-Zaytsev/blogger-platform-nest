@@ -10,6 +10,7 @@ import { BloggersPlatformModule } from './modules/bloggers-platform/bloggers-pla
 import { ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
+import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
 
 @Module({
   imports: [
@@ -32,6 +33,10 @@ import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exception
     {
       provide: APP_FILTER,
       useClass: AllHttpExceptionsFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: DomainHttpExceptionsFilter,
     },
   ],
 })
