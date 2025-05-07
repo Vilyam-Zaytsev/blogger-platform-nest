@@ -1,6 +1,6 @@
 import { DomainExceptionCode } from './domain-exception-codes';
 
-export class Exception {
+export class Extension {
   constructor(
     public message: string,
     public key: string,
@@ -10,12 +10,12 @@ export class Exception {
 export class DomainException extends Error {
   message: string;
   code: DomainExceptionCode;
-  extensions: Exception[];
+  extensions: Extension[];
 
   constructor(errorInfo: {
     code: DomainExceptionCode;
     message: string;
-    extensions?: Exception[];
+    extensions?: Extension[];
   }) {
     super(errorInfo.message);
     this.message = errorInfo.message;
