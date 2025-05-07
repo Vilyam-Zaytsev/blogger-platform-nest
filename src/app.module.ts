@@ -8,6 +8,8 @@ import {
 import { TestingModule } from './modules/testing/testing.module';
 import { BloggersPlatformModule } from './modules/bloggers-platform/bloggers-platform.module';
 import { ConfigService } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
+import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
 
 @Module({
   imports: [
@@ -25,6 +27,12 @@ import { ConfigService } from '@nestjs/config';
     UserAccountsModule,
     BloggersPlatformModule,
     TestingModule,
+  ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllHttpExceptionsFilter,
+    },
   ],
 })
 export class AppModule {}
