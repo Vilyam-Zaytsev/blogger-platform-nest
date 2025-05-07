@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 import { DomainException } from '../../../core/exceptions/damain-exceptions';
+import { parseBasicAuth } from '../../../core/utils/basic-auth.util';
 
 @Injectable()
 export class BasicAuthGuard implements CanActivate {
@@ -13,38 +14,35 @@ export class BasicAuthGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    if (isPublic) return true;
+
     const request = context.switchToHttp().getRequest<Request>();
-    const authHeader: string | undefined = request.headers.authorization;
+    const authHeader = request.headers.authorization;
 
-    const isPublic: boolean = this.reflector.getAllAndOverride<boolean>(
-      IS_PUBLIC_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    let username: string;
+    let password: string;
 
-    if (isPublic) {
-      return true;
-    }
-
-    if (!authHeader || !authHeader.startsWith('Basic ')) {
+    try {
+      [username, password] = parseBasicAuth(authHeader);
+    } catch (error) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
         message: 'unauthorised',
       });
     }
 
-    const base64Credentials: string = authHeader.split(' ')[1];
-    const credentials = Buffer.from(base64Credentials, 'base64').toString(
-      'utf-8',
-    );
-    const [username, password] = credentials.split(':');
-
-    if (username === this.validUsername || password === this.validPassword) {
-      return true;
-    } else {
+    if (username !== this.validUsername || password !== this.validPassword) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
         message: 'unauthorised',
       });
     }
+
+    return true;
   }
 }
