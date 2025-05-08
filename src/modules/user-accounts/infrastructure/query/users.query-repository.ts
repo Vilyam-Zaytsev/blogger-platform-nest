@@ -5,6 +5,8 @@ import { UserViewDto } from '../../api/view-dto/user.view-dto';
 import { PaginatedViewDto } from '../../../../core/dto/paginated.view-dto';
 import { GetUsersQueryParams } from '../../api/input-dto/get-users-query-params.input-dto';
 import { FilterQuery } from 'mongoose';
+import { DomainException } from '../../../../core/exceptions/damain-exceptions';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -20,7 +22,10 @@ export class UsersQueryRepository {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'User not found.',
+      });
     }
 
     return UserViewDto.mapToView(user);
