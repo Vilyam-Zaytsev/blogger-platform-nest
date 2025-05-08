@@ -27,7 +27,7 @@ export class CreateUserByAdminUseCase {
     }
 
     const doesEmailExist: UserDocument | null =
-      await this.usersRepository.getByLogin(email);
+      await this.usersRepository.getByEmail(email);
 
     if (doesEmailExist) {
       throw new DomainException({
