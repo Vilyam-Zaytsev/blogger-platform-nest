@@ -37,6 +37,7 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() body: UserInputDto): Promise<UserViewDto> {
+    //TODO: проверить нет ли такого юзера в базе(с такими же данными(login, email))
     const userId: string = await this.createUserByAdminUseCase.execute(body);
 
     return this.usersQueryRepository.getByIdOrNotFoundFail(userId);
