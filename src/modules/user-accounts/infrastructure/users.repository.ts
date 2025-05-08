@@ -17,6 +17,14 @@ export class UsersRepository {
     return user;
   }
 
+  async getByLogin(login: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ login });
+  }
+
+  async getByEmail(email: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ email });
+  }
+
   async save(user: UserDocument): Promise<string> {
     const resultSave: UserDocument = await user.save();
 
