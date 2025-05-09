@@ -11,11 +11,15 @@ import { UserInputDto } from '../../src/modules/user-accounts/api/input-dto/user
 import { TestUtils } from '../helpers/test.utils';
 import { ConfigService } from '@nestjs/config';
 import { TestDtoFactory } from '../helpers/test.dto-factory';
+import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
+import { UsersTestManager } from '../managers/users.test-manager';
+import { UsersQueryRepository } from '../../src/modules/user-accounts/infrastructure/query/users.query-repository';
 
 describe('UsersController - createUser() (POST: /users)', () => {
   let app: INestApplication;
   let connection: Connection;
   let configService: ConfigService;
+  let usersTestManager: UsersTestManager;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -28,6 +32,9 @@ describe('UsersController - createUser() (POST: /users)', () => {
     await app.init();
 
     connection = moduleFixture.get<Connection>(getConnectionToken());
+
+    const usersQueryRepository = moduleFixture.get(UsersQueryRepository);
+    usersTestManager = new UsersTestManager(usersQueryRepository);
   });
 
   beforeEach(async () => {
@@ -73,6 +80,9 @@ describe('UsersController - createUser() (POST: /users)', () => {
     expect(user.login).toBe(dto.login);
     expect(user.email).toBe(dto.email);
 
-    console.log(resCreateUser.body);
+    const users: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAllUsers();
+
+    console.log(users);
   });
 });
