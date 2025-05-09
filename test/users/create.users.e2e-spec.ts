@@ -7,10 +7,15 @@ import request from 'supertest';
 import { Response } from 'supertest';
 import { Server } from 'http';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
+import { UserInputDto } from '../../src/modules/user-accounts/api/input-dto/user.input-dto';
+import { TestUtils } from '../helpers/test-utils';
+import { ConfigService } from '@nestjs/config';
+import { TestDtoFactory } from '../helpers/test.dto.factory';
 
 describe('UsersController - createUser() (POST: /users)', () => {
   let app: INestApplication;
   let connection: Connection;
+  let configService: ConfigService;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -18,6 +23,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    configService = moduleFixture.get(ConfigService);
+
     await app.init();
 
     connection = moduleFixture.get<Connection>(getConnectionToken());
@@ -39,14 +46,23 @@ describe('UsersController - createUser() (POST: /users)', () => {
     await app.close();
   });
 
-  it('should create a new user', async () => {
+  it('should create a new user, the admin is authenticated.', async () => {
+    const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
+
     const resCreateUser: Response = await request(app.getHttpServer() as Server)
       .post('/users')
       .send({
-        login: 'test_user',
-        email: 'test_user@example.com',
-        password: 'qwerty',
+        login: dto.login,
+        email: dto.email,
+        password: dto.password,
       })
+      .set(
+        'Authorization',
+        TestUtils.encodingAdminDataInBase64(
+          configService.get('ADMIN_LOGIN')!,
+          configService.get('ADMIN_PASSWORD')!,
+        ),
+      )
       .expect(201);
 
     const user: UserViewDto = resCreateUser.body as UserViewDto;
@@ -54,7 +70,9 @@ describe('UsersController - createUser() (POST: /users)', () => {
     expect(user).toHaveProperty('id');
     expect(user).toHaveProperty('createdAt');
 
-    expect(user.login).toBe('test_user');
-    expect(user.email).toBe('test_user@example.com');
+    expect(user.login).toBe(dto.login);
+    expect(user.email).toBe(dto.email);
+
+    console.log(resCreateUser.body);
   });
 });
