@@ -1,4 +1,4 @@
-import { configModule } from './dynamic-config-module';
+import { configModule } from './dynamic-config.module';
 import { Module } from '@nestjs/common';
 import { UserAccountsModule } from './modules/user-accounts/user-accounts.module';
 import {

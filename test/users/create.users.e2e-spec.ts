@@ -8,9 +8,9 @@ import { Response } from 'supertest';
 import { Server } from 'http';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import { UserInputDto } from '../../src/modules/user-accounts/api/input-dto/user.input-dto';
-import { TestUtils } from '../helpers/test-utils';
+import { TestUtils } from '../helpers/test.utils';
 import { ConfigService } from '@nestjs/config';
-import { TestDtoFactory } from '../helpers/test.dto.factory';
+import { TestDtoFactory } from '../helpers/test.dto-factory';
 
 describe('UsersController - createUser() (POST: /users)', () => {
   let app: INestApplication;
