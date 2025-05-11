@@ -38,6 +38,10 @@ import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exc
       provide: APP_FILTER,
       useClass: DomainHttpExceptionsFilter,
     },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: ValidationExceptionsFilter,
+    // },
   ],
 })
 export class AppModule {}

@@ -25,11 +25,13 @@ export class BasicAuthGuard implements CanActivate {
     //вариант 2
     const username = this.configService.get<string>('ADMIN_LOGIN');
     const password = this.configService.get<string>('ADMIN_PASSWORD');
-    //TODO: уточнить на уроке(как лучше выбросить исключение?).
+
     if (!username || !password) {
-      throw new Error(
-        'ADMIN_LOGIN and ADMIN_PASSWORD must be set in environment variables',
-      );
+      throw new DomainException({
+        code: DomainExceptionCode.InternalServerError,
+        message:
+          'ADMIN_LOGIN and ADMIN_PASSWORD must be set in environment variables',
+      });
     }
 
     this.validUsername = username;

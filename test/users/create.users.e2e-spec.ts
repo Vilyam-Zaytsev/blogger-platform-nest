@@ -15,6 +15,7 @@ import { UsersTestManager } from '../managers/users.test-manager';
 import { appSetup } from '../../src/setup/app.setup';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
 import { TestLoggers } from '../helpers/test.loggers';
+import { DomainExceptionCode } from '../../src/core/exceptions/domain-exception-codes';
 
 describe('UsersController - createUser() (POST: /users)', () => {
   let app: INestApplication;
@@ -90,6 +91,80 @@ describe('UsersController - createUser() (POST: /users)', () => {
       user,
       resCreateUser.statusCode,
       'Test №1: UsersController - createUser() (POST: /users)',
+    );
+  });
+
+  it('should not create a user if the admin is not authenticated.', async () => {
+    const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
+
+    const resCreateUser: Response = await request(app.getHttpServer() as Server)
+      .post(`/${GLOBAL_PREFIX}/users`)
+      .send({
+        login: dto.login,
+        email: dto.email,
+        password: dto.password,
+      })
+      .set(
+        'Authorization',
+        TestUtils.encodingAdminDataInBase64(
+          'incorrect_login',
+          'incorrect_password',
+        ),
+      )
+      .expect(401);
+
+    expect(resCreateUser.body).toEqual({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      timestamp: expect.any(String),
+      path: '/api/users',
+      message: 'unauthorised',
+      code: DomainExceptionCode.Unauthorized,
+      extensions: [],
+    });
+
+    const users: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
+
+    expect(users.items).toHaveLength(0);
+
+    TestLoggers.logE2E(
+      resCreateUser.body,
+      resCreateUser.statusCode,
+      'Test №2: UsersController - createUser() (POST: /users)',
+    );
+  });
+
+  it('should not create a user if the data in the request body is incorrect (an empty object is passed).', async () => {
+    const resCreateUser: Response = await request(app.getHttpServer() as Server)
+      .post(`/${GLOBAL_PREFIX}/users`)
+      .send({})
+      .set(
+        'Authorization',
+        TestUtils.encodingAdminDataInBase64(
+          configService.get('ADMIN_LOGIN')!,
+          configService.get('ADMIN_PASSWORD')!,
+        ),
+      )
+      .expect(400);
+
+    // expect(resCreateUser.body).toEqual({
+    //   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    //   timestamp: expect.any(String),
+    //   path: '/api/users',
+    //   message: 'unauthorised',
+    //   code: DomainExceptionCode.Unauthorized,
+    //   extensions: [],
+    // });
+    //
+    // const users: PaginatedViewDto<UserViewDto> =
+    //   await usersTestManager.getAll();
+    //
+    // expect(users.items).toHaveLength(0);
+
+    TestLoggers.logE2E(
+      resCreateUser.body,
+      resCreateUser.statusCode,
+      'Test №3: UsersController - createUser() (POST: /users)',
     );
   });
 });
