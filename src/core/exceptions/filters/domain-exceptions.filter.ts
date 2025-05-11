@@ -8,6 +8,10 @@ import { DomainException } from '../damain-exceptions';
 import { DomainExceptionCode } from '../domain-exception-codes';
 import { ErrorResponseBody } from './error-response-body.type';
 import { Request, Response } from 'express';
+import {
+  ErrorBadRequestResponseBody,
+  FieldError,
+} from './error-bad-request-response-body.type';
 
 @Catch(DomainException)
 export class DomainHttpExceptionsFilter implements ExceptionFilter {
@@ -17,10 +21,13 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     const status: number = this.mapToHttpStatus(exception.code);
-    const responseBody: ErrorResponseBody = this.buildResponseBody(
-      exception,
-      request.url,
-    );
+    let responseBody: ErrorResponseBody | ErrorBadRequestResponseBody;
+
+    if (exception.code === DomainExceptionCode.ValidationError) {
+      responseBody = this.buildValidationResponseBody(exception);
+    } else {
+      responseBody = this.buildResponseBody(exception, request.url);
+    }
 
     response.status(status).json(responseBody);
   }
@@ -56,6 +63,23 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
       message: exception.message,
       code: exception.code,
       extensions: exception.extensions,
+    };
+  }
+
+  private buildValidationResponseBody(
+    exception: DomainException,
+  ): ErrorBadRequestResponseBody {
+    const exceptions: FieldError[] = exception.extensions.map((exception) => {
+      const fieldError: FieldError = {
+        message: exception.message,
+        field: exception.key,
+      };
+
+      return fieldError;
+    });
+
+    return {
+      errorsMessages: exceptions,
     };
   }
 }
