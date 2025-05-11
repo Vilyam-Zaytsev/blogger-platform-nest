@@ -3,8 +3,7 @@ import { Connection } from 'mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../src/app.module';
 import { getConnectionToken } from '@nestjs/mongoose';
-import request from 'supertest';
-import { Response } from 'supertest';
+import request, { Response } from 'supertest';
 import { Server } from 'http';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import { UserInputDto } from '../../src/modules/user-accounts/api/input-dto/user.input-dto';
@@ -13,7 +12,9 @@ import { ConfigService } from '@nestjs/config';
 import { TestDtoFactory } from '../helpers/test.dto-factory';
 import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { UsersTestManager } from '../managers/users.test-manager';
-import { UsersQueryRepository } from '../../src/modules/user-accounts/infrastructure/query/users.query-repository';
+import { appSetup } from '../../src/setup/app.setup';
+import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
+import { TestLoggers } from '../helpers/test.loggers';
 
 describe('UsersController - createUser() (POST: /users)', () => {
   let app: INestApplication;
@@ -27,14 +28,16 @@ describe('UsersController - createUser() (POST: /users)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    appSetup(app);
+
     configService = moduleFixture.get(ConfigService);
 
     await app.init();
 
     connection = moduleFixture.get<Connection>(getConnectionToken());
 
-    const usersQueryRepository = moduleFixture.get(UsersQueryRepository);
-    usersTestManager = new UsersTestManager(usersQueryRepository);
+    usersTestManager = new UsersTestManager(app, configService);
   });
 
   beforeEach(async () => {
@@ -57,7 +60,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
     const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
 
     const resCreateUser: Response = await request(app.getHttpServer() as Server)
-      .post('/users')
+      .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login: dto.login,
         email: dto.email,
@@ -81,8 +84,15 @@ describe('UsersController - createUser() (POST: /users)', () => {
     expect(user.email).toBe(dto.email);
 
     const users: PaginatedViewDto<UserViewDto> =
-      await usersTestManager.getAllUsers();
+      await usersTestManager.getAll();
 
-    console.log(users);
+    expect(users.items).toHaveLength(1);
+    expect(users.items[0]).toEqual(user);
+
+    TestLoggers.logE2E<UserViewDto>(
+      resCreateUser.body as UserViewDto,
+      resCreateUser.statusCode,
+      'Test №1: UsersController - createUser() (POST: /users)',
+    );
   });
 });
