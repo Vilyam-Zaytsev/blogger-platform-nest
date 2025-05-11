@@ -28,7 +28,6 @@ describe('UsersController - createUser() (POST: /users)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-
     appSetup(app);
 
     configService = moduleFixture.get(ConfigService);
@@ -45,11 +44,10 @@ describe('UsersController - createUser() (POST: /users)', () => {
       throw new Error('Database connection is not initialized');
     }
 
-    const collections = await connection.db.listCollections().toArray();
-
-    for (const collection of collections) {
-      await connection.db.collection(collection.name).deleteMany({});
-    }
+    const collections = await connection.db.collections();
+    await Promise.all(
+      collections.map((collection) => collection.deleteMany({})),
+    );
   });
 
   afterAll(async () => {
@@ -77,9 +75,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
 
     const user: UserViewDto = resCreateUser.body as UserViewDto;
 
-    expect(user).toHaveProperty('id');
-    expect(user).toHaveProperty('createdAt');
-
+    expect(typeof user.id).toBe('string');
+    expect(new Date(user.createdAt).toString()).not.toBe('Invalid Date');
     expect(user.login).toBe(dto.login);
     expect(user.email).toBe(dto.email);
 
@@ -90,7 +87,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
     expect(users.items[0]).toEqual(user);
 
     TestLoggers.logE2E<UserViewDto>(
-      resCreateUser.body as UserViewDto,
+      user,
       resCreateUser.statusCode,
       'Test №1: UsersController - createUser() (POST: /users)',
     );
