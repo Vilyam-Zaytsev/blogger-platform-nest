@@ -3,7 +3,7 @@ import { DomainExceptionCode } from './domain-exception-codes';
 export class Extension {
   constructor(
     public message: string,
-    public key: string,
+    public field: string,
   ) {}
 }
 

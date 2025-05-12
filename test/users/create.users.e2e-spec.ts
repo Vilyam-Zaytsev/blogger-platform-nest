@@ -150,17 +150,17 @@ describe('UsersController - createUser() (POST: /users)', () => {
     expect(resCreateUser.body).toEqual({
       errorsMessages: [
         {
-          message: 'login must be a string; Received value: undefined',
-          field: 'login',
+          field: 'password',
+          message: 'password must be a string; Received value: undefined',
         },
         {
+          field: 'email',
           message:
             'email must match /^[\\w.-]+@([\\w-]+\\.)+[\\w-]{2,4}$/ regular expression; Received value: undefined',
-          field: 'email',
         },
         {
-          message: 'password must be a string; Received value: undefined',
-          field: 'password',
+          field: 'login',
+          message: 'login must be a string; Received value: undefined',
         },
       ],
     });

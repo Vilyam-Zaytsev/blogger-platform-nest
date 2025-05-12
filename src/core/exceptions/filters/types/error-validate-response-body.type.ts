@@ -3,6 +3,6 @@ export type FieldError = {
   field: string;
 };
 
-export type ErrorBadRequestResponseBody = {
+export type ErrorValidationResponseBody = {
   errorsMessages: FieldError[];
 };
