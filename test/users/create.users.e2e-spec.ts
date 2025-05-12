@@ -147,19 +147,28 @@ describe('UsersController - createUser() (POST: /users)', () => {
       )
       .expect(400);
 
-    // expect(resCreateUser.body).toEqual({
-    //   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    //   timestamp: expect.any(String),
-    //   path: '/api/users',
-    //   message: 'unauthorised',
-    //   code: DomainExceptionCode.Unauthorized,
-    //   extensions: [],
-    // });
-    //
-    // const users: PaginatedViewDto<UserViewDto> =
-    //   await usersTestManager.getAll();
-    //
-    // expect(users.items).toHaveLength(0);
+    expect(resCreateUser.body).toEqual({
+      errorsMessages: [
+        {
+          message: 'login must be a string; Received value: undefined',
+          field: 'login',
+        },
+        {
+          message:
+            'email must match /^[\\w.-]+@([\\w-]+\\.)+[\\w-]{2,4}$/ regular expression; Received value: undefined',
+          field: 'email',
+        },
+        {
+          message: 'password must be a string; Received value: undefined',
+          field: 'password',
+        },
+      ],
+    });
+
+    const users: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
+
+    expect(users.items).toHaveLength(0);
 
     TestLoggers.logE2E(
       resCreateUser.body,
