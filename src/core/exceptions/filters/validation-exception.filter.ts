@@ -1,17 +1,13 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
 import { DomainException } from '../damain-exceptions';
-import { DomainExceptionCode } from '../domain-exception-codes';
 import { ErrorValidationResponseBody } from './types/error-validate-response-body.type';
 import { DomainExceptionsCodeMapper } from '../utils/domain-exceptions-code.mapper';
 import { Response } from 'express';
+import { ValidationException } from '../validation-exception';
 
-@Catch(DomainException)
+@Catch(ValidationException)
 export class ValidationExceptionFilter implements ExceptionFilter {
   catch(exception: DomainException, host: ArgumentsHost): void {
-    if (exception.code !== DomainExceptionCode.ValidationError) {
-      throw exception;
-    }
-
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
