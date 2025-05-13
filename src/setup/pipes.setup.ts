@@ -8,6 +8,7 @@ import {
   Extension,
 } from '../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../core/exceptions/domain-exception-codes';
+import { ValidationException } from '../core/exceptions/validation-exception';
 
 // export const errorFormatter = (
 //   errors: ValidationError[],
@@ -65,11 +66,7 @@ function pipesSetup(app: INestApplication) {
       exceptionFactory: (errors) => {
         const formattedErrors = errorFormatter(errors);
 
-        throw new DomainException({
-          code: DomainExceptionCode.ValidationError,
-          message: 'Validation failed',
-          extensions: formattedErrors,
-        });
+        throw new ValidationException(formattedErrors);
       },
     }),
   );
