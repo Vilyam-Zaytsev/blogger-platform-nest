@@ -35,7 +35,7 @@ import { ValidationException } from '../core/exceptions/validation-exception';
 //
 //   return errorsForResponse;
 // };
-
+//TODO: написать unit test
 export const errorFormatter = (errors: ValidationError[]): Extension[] => {
   const errorsForResponse: Extension[] = [];
   const stack = [...errors];
