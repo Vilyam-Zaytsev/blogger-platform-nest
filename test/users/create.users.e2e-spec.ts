@@ -10,22 +10,22 @@ import { TestLoggers } from '../helpers/test.loggers';
 import { DomainExceptionCode } from '../../src/core/exceptions/domain-exception-codes';
 import { AppTestManager } from '../managers/app.test-manager';
 import { AdminCredentials } from '../types';
+import { Server } from 'http';
 
 describe('UsersController - createUser() (POST: /users)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let server: Server;
 
   beforeAll(async () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    usersTestManager = new UsersTestManager(
-      appTestManager.app,
-      appTestManager.configService,
-    );
-
     adminCredentials = appTestManager.getAdminData();
+    server = appTestManager.getServer();
+
+    usersTestManager = new UsersTestManager(server, adminCredentials);
   });
 
   beforeEach(async () => {
@@ -39,7 +39,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   it('should create a new user, the admin is authenticated.', async () => {
     const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
 
-    const resCreateUser: Response = await request(appTestManager.getServer())
+    const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login: dto.login,
@@ -78,7 +78,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   it('should not create a user if the admin is not authenticated.', async () => {
     const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
 
-    const resCreateUser: Response = await request(appTestManager.getServer())
+    const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login: dto.login,
@@ -116,7 +116,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   });
 
   it('should not create a user if the data in the request body is incorrect (an empty object is passed).', async () => {
-    const resCreateUser: Response = await request(appTestManager.getServer())
+    const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({})
       .set(
@@ -159,7 +159,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   });
 
   it('should not create a user if the data in the request body is incorrect (login: empty line, email: empty line, password: empty line).', async () => {
-    const resCreateUser: Response = await request(appTestManager.getServer())
+    const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login: '   ',
@@ -212,7 +212,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
     const email: string = TestUtils.generateRandomString(10);
     const password: string = TestUtils.generateRandomString(5);
 
-    const resCreateUser: Response = await request(appTestManager.getServer())
+    const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login,
@@ -262,7 +262,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
     const email: string = TestUtils.generateRandomString(10);
     const password: string = TestUtils.generateRandomString(5);
 
-    const resCreateUser: Response = await request(appTestManager.getServer())
+    const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login,
@@ -308,7 +308,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   });
 
   it('should not create a user if the data in the request body is incorrect (login: type number,  email: type number, password: type number).', async () => {
-    const resCreateUser: Response = await request(appTestManager.getServer())
+    const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login: 123,
