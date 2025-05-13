@@ -1,64 +1,46 @@
-import { INestApplication } from '@nestjs/common';
-import { Connection } from 'mongoose';
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../../src/app.module';
-import { getConnectionToken } from '@nestjs/mongoose';
 import request, { Response } from 'supertest';
 import { Server } from 'http';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import { UserInputDto } from '../../src/modules/user-accounts/api/input-dto/user.input-dto';
 import { TestUtils } from '../helpers/test.utils';
-import { ConfigService } from '@nestjs/config';
 import { TestDtoFactory } from '../helpers/test.dto-factory';
 import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { UsersTestManager } from '../managers/users.test-manager';
-import { appSetup } from '../../src/setup/app.setup';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
 import { TestLoggers } from '../helpers/test.loggers';
 import { DomainExceptionCode } from '../../src/core/exceptions/domain-exception-codes';
+import { AppTestManager } from '../managers/app.test-manager';
+import { AdminCredentials } from '../types';
 
 describe('UsersController - createUser() (POST: /users)', () => {
-  let app: INestApplication;
-  let connection: Connection;
-  let configService: ConfigService;
+  let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
+  let adminCredentials: AdminCredentials;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+    appTestManager = new AppTestManager();
+    await appTestManager.init();
 
-    app = moduleFixture.createNestApplication();
-    appSetup(app);
+    usersTestManager = new UsersTestManager(
+      appTestManager.app,
+      appTestManager.configService,
+    );
 
-    configService = moduleFixture.get(ConfigService);
-
-    await app.init();
-
-    connection = moduleFixture.get<Connection>(getConnectionToken());
-
-    usersTestManager = new UsersTestManager(app, configService);
+    adminCredentials = appTestManager.getAdminData();
   });
 
   beforeEach(async () => {
-    if (!connection.db) {
-      throw new Error('Database connection is not initialized');
-    }
-
-    const collections = await connection.db.collections();
-    await Promise.all(
-      collections.map((collection) => collection.deleteMany({})),
-    );
+    await appTestManager.cleanupDb();
   });
 
   afterAll(async () => {
-    await app.close();
+    await appTestManager.close();
   });
 
   it('should create a new user, the admin is authenticated.', async () => {
     const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
 
-    const resCreateUser: Response = await request(app.getHttpServer() as Server)
+    const resCreateUser: Response = await request(appTestManager.getServer())
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login: dto.login,
@@ -68,8 +50,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
       .set(
         'Authorization',
         TestUtils.encodingAdminDataInBase64(
-          configService.get('ADMIN_LOGIN')!,
-          configService.get('ADMIN_PASSWORD')!,
+          adminCredentials.login,
+          adminCredentials.password,
         ),
       )
       .expect(201);
@@ -97,7 +79,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   it('should not create a user if the admin is not authenticated.', async () => {
     const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
 
-    const resCreateUser: Response = await request(app.getHttpServer() as Server)
+    const resCreateUser: Response = await request(appTestManager.getServer())
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login: dto.login,
@@ -135,14 +117,14 @@ describe('UsersController - createUser() (POST: /users)', () => {
   });
 
   it('should not create a user if the data in the request body is incorrect (an empty object is passed).', async () => {
-    const resCreateUser: Response = await request(app.getHttpServer() as Server)
+    const resCreateUser: Response = await request(appTestManager.getServer())
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({})
       .set(
         'Authorization',
         TestUtils.encodingAdminDataInBase64(
-          configService.get('ADMIN_LOGIN')!,
-          configService.get('ADMIN_PASSWORD')!,
+          adminCredentials.login,
+          adminCredentials.password,
         ),
       )
       .expect(400);
@@ -178,7 +160,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   });
 
   it('should not create a user if the data in the request body is incorrect (login: empty line, email: empty line, password: empty line).', async () => {
-    const resCreateUser: Response = await request(app.getHttpServer() as Server)
+    const resCreateUser: Response = await request(appTestManager.getServer())
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login: '   ',
@@ -188,8 +170,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
       .set(
         'Authorization',
         TestUtils.encodingAdminDataInBase64(
-          configService.get('ADMIN_LOGIN')!,
-          configService.get('ADMIN_PASSWORD')!,
+          adminCredentials.login,
+          adminCredentials.password,
         ),
       )
       .expect(400);
@@ -231,7 +213,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
     const email: string = TestUtils.generateRandomString(10);
     const password: string = TestUtils.generateRandomString(5);
 
-    const resCreateUser: Response = await request(app.getHttpServer() as Server)
+    const resCreateUser: Response = await request(appTestManager.getServer())
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login,
@@ -241,8 +223,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
       .set(
         'Authorization',
         TestUtils.encodingAdminDataInBase64(
-          configService.get('ADMIN_LOGIN')!,
-          configService.get('ADMIN_PASSWORD')!,
+          adminCredentials.login,
+          adminCredentials.password,
         ),
       )
       .expect(400);
@@ -281,7 +263,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
     const email: string = TestUtils.generateRandomString(10);
     const password: string = TestUtils.generateRandomString(5);
 
-    const resCreateUser: Response = await request(app.getHttpServer() as Server)
+    const resCreateUser: Response = await request(appTestManager.getServer())
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login,
@@ -291,8 +273,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
       .set(
         'Authorization',
         TestUtils.encodingAdminDataInBase64(
-          configService.get('ADMIN_LOGIN')!,
-          configService.get('ADMIN_PASSWORD')!,
+          adminCredentials.login,
+          adminCredentials.password,
         ),
       )
       .expect(400);
@@ -327,7 +309,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   });
 
   it('should not create a user if the data in the request body is incorrect (login: type number,  email: type number, password: type number).', async () => {
-    const resCreateUser: Response = await request(app.getHttpServer() as Server)
+    const resCreateUser: Response = await request(appTestManager.getServer())
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({
         login: 123,
@@ -337,8 +319,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
       .set(
         'Authorization',
         TestUtils.encodingAdminDataInBase64(
-          configService.get('ADMIN_LOGIN')!,
-          configService.get('ADMIN_PASSWORD')!,
+          adminCredentials.login,
+          adminCredentials.password,
         ),
       )
       .expect(400);
