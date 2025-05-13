@@ -1,5 +1,4 @@
 import request, { Response } from 'supertest';
-import { Server } from 'http';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import { UserInputDto } from '../../src/modules/user-accounts/api/input-dto/user.input-dto';
 import { TestUtils } from '../helpers/test.utils';
