@@ -1,6 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/user.entity';
-import { NotFoundException } from '@nestjs/common';
+import { DomainException } from '../../../core/exceptions/damain-exceptions';
+import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 
 export class UsersRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
@@ -10,11 +11,23 @@ export class UsersRepository {
       deletedAt: null,
     });
 
+    //TODO: правильно ли я понял, что в этом случае выкидывается доменное исключение?
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: `The user with ID (${id}) does not exist`,
+      });
     }
 
     return user;
+  }
+
+  async getByLogin(login: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ login });
+  }
+
+  async getByEmail(email: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ email });
   }
 
   async save(user: UserDocument): Promise<string> {

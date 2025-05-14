@@ -18,6 +18,7 @@ import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
 import { UserViewDto } from './view-dto/user.view-dto';
 import { DeleteUserUseCase } from '../application/usecases/delete-user.usecase';
 import { BasicAuthGuard } from '../guards/basic-auth.guard';
+import { IdInputDto } from './input-dto/id.input.dto';
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)
@@ -44,7 +45,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') id: string): Promise<void> {
-    await this.deleteUserByAdminUseCase.execute(id);
+  async deleteUser(@Param() id: IdInputDto): Promise<void> {
+    await this.deleteUserByAdminUseCase.execute(id.id);
   }
 }

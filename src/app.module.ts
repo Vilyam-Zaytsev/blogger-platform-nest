@@ -1,4 +1,4 @@
-import { configModule } from './dynamic-config-module';
+import { configModule } from './dynamic-config.module';
 import { Module } from '@nestjs/common';
 import { UserAccountsModule } from './modules/user-accounts/user-accounts.module';
 import {
@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
+import { ValidationExceptionFilter } from './core/exceptions/filters/validation-exception.filter';
 
 @Module({
   imports: [
@@ -37,6 +38,10 @@ import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exc
     {
       provide: APP_FILTER,
       useClass: DomainHttpExceptionsFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ValidationExceptionFilter,
     },
   ],
 })

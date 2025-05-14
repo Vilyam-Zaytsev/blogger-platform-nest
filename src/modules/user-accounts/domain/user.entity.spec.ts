@@ -5,7 +5,7 @@ import {
   EmailConfirmation,
 } from './email-confirmation.schema';
 import { PasswordRecovery } from './password-recovery.schema';
-import { TestLoggers } from '../../../../test/helpers/test-loggers';
+import { TestLoggers } from '../../../../test/helpers/test.loggers';
 
 describe('User Entity', () => {
   it('should correctly create a custom instance with nested entities using the "createInstance" method.', () => {
