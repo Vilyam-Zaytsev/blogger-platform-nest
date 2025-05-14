@@ -1,73 +1,14 @@
-// import { GetUsersQueryParams } from '../../src/modules/user-accounts/api/input-dto/get-users-query-params.input-dto';
-// import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
-//
-// export class Filter {
-//   private static propertyMap: Partial<Record<string, string>> = {};
-//
-//   private static createPropertyMap<T>(obj: T, prefix?: string): void {
-//     for (const key in obj) {
-//       const value: any = obj[key];
-//       const path: string = prefix ? `${prefix}.${key}` : key;
-//
-//       if (
-//         value !== null &&
-//         typeof value === 'object' &&
-//         !Array.isArray(value)
-//       ) {
-//         this.createPropertyMap(value, path);
-//       } else {
-//         this.propertyMap[key] = path;
-//       }
-//     }
-//   }
-//
-//   private static getValueByPath<T>(obj: T, path: string): any {
-//     return path.split('.').reduce((acc: any, key) => acc && acc[key], obj);
-//   }
-//
-//   private static compareValues(
-//     a: any,
-//     b: any,
-//     direction: SortDirection,
-//   ): number {
-//     if (typeof a === 'string' && typeof b === 'string') {
-//       const comparison: number = a.localeCompare(b);
-//
-//       return direction === SortDirection.Ascending ? comparison : -comparison;
-//     }
-//
-//     if (a < b) return direction === SortDirection.Ascending ? -1 : 1;
-//     if (a > b) return direction === SortDirection.Descending ? 1 : -1;
-//
-//     return 0;
-//   }
-//
-//   static sort<T>(items: T[], query: GetUsersQueryParams): Filter {
-//     const { sortBy, sortDirection } = query;
-//     this.createPropertyMap<T>(items[0]);
-//
-//     const path: string | undefined = this.propertyMap[sortBy];
-//
-//     if (!path) throw new Error(`Invalid sortBy property: ${sortBy}`);
-//
-//     items.sort((a, b): number => {
-//       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-//       const aValue: any = this.getValueByPath(a, path);
-//       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-//       const bValue: any = this.getValueByPath(b, path);
-//
-//       return this.compareValues(aValue, bValue, sortDirection);
-//     });
-//
-//     return this;
-//   }
-//
-//   static skip<T>(items: T[]);
-// }
-
 import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
 import { SearchFilter } from '../types';
 
+/**
+ * A generic utility class for filtering, sorting, and paginating an array of objects.
+ *
+ * Designed for working with plain JavaScript objects, including support for nested fields.
+ * Common use case — filtering and sorting in-memory collections, such as mock data in tests or simple queries.
+ *
+ * @template T The object type of the elements in the array.
+ */
 export class Filter<T extends object> {
   private items: T[];
   private propertyMap: Partial<Record<keyof T, string>> = {};
@@ -75,20 +16,23 @@ export class Filter<T extends object> {
   private limitCount?: number;
   private sortBy?: keyof T;
   private sortDirection?: SortDirection;
-  private searchFilterMap: Partial<Record<keyof SearchFilter, keyof T>>;
 
-  constructor(
-    items: T[],
-    searchFilterMap: Partial<Record<keyof SearchFilter, keyof T>>,
-  ) {
+  /**
+   * Initializes a new instance of the Filter class.
+   *
+   * @param {T[]} items - The list of items to apply filtering, sorting, and pagination on.
+   */
+  constructor(items: T[]) {
     this.items = items;
-    this.searchFilterMap = searchFilterMap;
   }
 
   /**
-   * Рекурсивно строит карту путей к свойствам объекта.
-   * @param obj Объект для анализа
-   * @param prefix Префикс пути (для вложенных свойств)
+   * Recursively creates a map of field names to their full dot-separated paths.
+   *
+   * Useful for accessing nested fields during sorting.
+   *
+   * @param {T} obj - The object from which to extract property paths.
+   * @param {string} [prefix] - The path prefix for nested properties.
    */
   private createPropertyMap(obj: T, prefix?: string): void {
     const recordObj = obj as unknown as Record<string, unknown>;
@@ -103,16 +47,17 @@ export class Filter<T extends object> {
       ) {
         this.createPropertyMap(value as unknown as T, path);
       } else {
-        // Здесь ключ приводим к keyof T, потому что propertyMap типизирована по ключам T
         this.propertyMap[key as keyof T] = path;
       }
     }
   }
 
   /**
-   * Получает значение из объекта по строковому пути с разделителем '.'
-   * @param obj Объект для доступа
-   * @param path Путь к свойству вида 'user.name.first'
+   * Retrieves a value from an object using a dot-separated property path.
+   *
+   * @param {T} obj - The object to access.
+   * @param {string} path - The dot-separated property path (e.g., "profile.name").
+   * @returns {unknown} The value at the specified path or undefined if not found.
    */
   private getValueByPath(obj: T, path: string): unknown {
     return path.split('.').reduce((acc: unknown, key) => {
@@ -124,7 +69,12 @@ export class Filter<T extends object> {
   }
 
   /**
-   * Сравнивает два значения с учётом направления сортировки
+   * Compares two values based on the provided sort direction.
+   *
+   * @param {unknown} a - First value to compare.
+   * @param {unknown} b - Second value to compare.
+   * @param {SortDirection} direction - Sorting direction (ascending or descending).
+   * @returns {number} The comparison result: -1, 0, or 1.
    */
   private compareValues(
     a: unknown,
@@ -140,13 +90,15 @@ export class Filter<T extends object> {
       if (a > b) return direction === SortDirection.Ascending ? 1 : -1;
       return 0;
     }
-    // Можно добавить сравнение для других типов, если нужно
     return 0;
   }
 
   /**
-   * Устанавливает параметры сортировки
-   * @param sortObj Объект с ключом из keyof T и значением SortDirection
+   * Sets sorting configuration based on a property and direction.
+   * Supports sorting by nested properties.
+   *
+   * @param {Partial<Record<keyof T, SortDirection>>} sortObj - Sorting configuration object.
+   * @returns {this} The current Filter instance for chaining.
    */
   sort(sortObj: Partial<Record<keyof T, SortDirection>>): this {
     const keys = Object.keys(sortObj) as (keyof T)[];
@@ -163,7 +115,10 @@ export class Filter<T extends object> {
   }
 
   /**
-   * Устанавливает количество пропускаемых элементов
+   * Skips the first N items in the result set.
+   *
+   * @param {number} count - The number of items to skip.
+   * @returns {this} The current Filter instance for chaining.
    */
   skip(count: number): this {
     this.skipCount = count;
@@ -171,43 +126,57 @@ export class Filter<T extends object> {
   }
 
   /**
-   * Устанавливает лимит выборки
+   * Limits the number of items in the result set.
+   *
+   * @param {number} count - The maximum number of items to return.
+   * @returns {this} The current Filter instance for chaining.
    */
   limit(count: number): this {
     this.limitCount = count;
     return this;
   }
 
+  /**
+   * Filters items based on a search filter.
+   * Currently only supports partial, case-insensitive string matches on top-level string fields.
+   *
+   * @param {Partial<SearchFilter>} searchFilter - Key-value pairs for filtering.
+   * @returns {this} The current Filter instance for chaining.
+   */
   filter(searchFilter: Partial<SearchFilter>): this {
     this.items = this.items.filter((item) => {
+      let hasAtLeastOneMatch = false;
+
       for (const key in searchFilter) {
-        const searchTerm = searchFilter[key as keyof SearchFilter];
-        if (searchTerm != null && searchTerm !== '') {
-          const itemKey = this.searchFilterMap[key as keyof SearchFilter];
-          if (!itemKey) {
-            // Если маппинга нет, пропускаем фильтр
-            continue;
-          }
+        const searchTerm: string | undefined =
+          searchFilter[key as keyof SearchFilter];
+        if (searchTerm == null || searchTerm === '') continue;
 
-          const itemValue = item[itemKey];
+        const fieldName: string = key;
 
-          if (typeof itemValue !== 'string') {
-            return false;
-          }
-
-          if (!itemValue.toLowerCase().includes(searchTerm.toLowerCase())) {
-            return false;
-          }
+        if (!(fieldName in item)) {
+          continue;
         }
+
+        const itemValue = item[fieldName as keyof T];
+
+        if (typeof itemValue !== 'string') continue;
+
+        if (itemValue.toLowerCase().includes(searchTerm.toLowerCase()))
+          hasAtLeastOneMatch = true;
       }
-      return true;
+      return hasAtLeastOneMatch;
     });
 
     return this;
   }
 
   /**
-   * Возвращает итоговый массив с применёнными сортировкой, пропуском и лимитом
+   * Executes the sorting, skipping, limiting, and returns the final array.
+   *
+   * @returns {T[]} The processed and filtered array of items.
+   *
+   * @throws {Error} If the specified sortBy field is invalid.
    */
   getResult(): T[] {
     let result: T[] = [...this.items];

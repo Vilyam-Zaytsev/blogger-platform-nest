@@ -1,6 +1,6 @@
 import { AppTestManager } from '../managers/app.test-manager';
 import { UsersTestManager } from '../managers/users.test-manager';
-import { AdminCredentials, SearchFilter } from '../types';
+import { AdminCredentials } from '../types';
 import { Server } from 'http';
 import request, { Response } from 'supertest';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
@@ -10,8 +10,6 @@ import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.v
 import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { Filter } from '../helpers/filter';
 import { GetUsersQueryParams } from '../../src/modules/user-accounts/api/input-dto/get-users-query-params.input-dto';
-import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
-import { UsersSortBy } from '../../src/modules/user-accounts/api/input-dto/users-sort-by';
 
 describe('UsersController - getUser() (GET: /users)', () => {
   let appTestManager: AppTestManager;
@@ -113,45 +111,33 @@ describe('UsersController - getUser() (GET: /users)', () => {
   it('should return an array with a three users, the admin is authenticated.', async () => {
     const newUsers: UserViewDto[] = await usersTestManager.createUser(3);
 
-    // const resGetUsers: Response = await request(server)
-    //   .get(`/${GLOBAL_PREFIX}/users`)
-    //   .set(
-    //     'Authorization',
-    //     TestUtils.encodingAdminDataInBase64(
-    //       adminCredentials.login,
-    //       adminCredentials.password,
-    //     ),
-    //   )
-    //   .expect(200);
+    const resGetUsers: Response = await request(server)
+      .get(`/${GLOBAL_PREFIX}/users`)
+      .set(
+        'Authorization',
+        TestUtils.encodingAdminDataInBase64(
+          adminCredentials.login,
+          adminCredentials.password,
+        ),
+      )
+      .expect(200);
+
+    const bodyFromGetRequest: PaginatedViewDto<UserViewDto> =
+      resGetUsers.body as PaginatedViewDto<UserViewDto>;
 
     const query: GetUsersQueryParams = new GetUsersQueryParams();
 
-    query.searchLoginTerm = '1';
-
-    const filter = {
-      searchLoginTerm: 'login',
-    };
-
-    const filteredItems = new Filter<UserViewDto>(newUsers, filter)
-      .filter(query.searchLoginTerm)
-      // .sort({ [query.sortBy]: query.sortDirection })
-      // .skip(query.calculateSkip())
-      // .limit(query.pageSize)
+    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+      .sort({ [query.sortBy]: query.sortDirection })
       .getResult();
 
-    console.log(newUsers);
-    console.log(filteredItems);
+    expect(bodyFromGetRequest.items).toEqual(filteredNewUsers);
+    expect(bodyFromGetRequest.items.length).toEqual(3);
 
-    // const bodyFromGetRequest: PaginatedViewDto<UserViewDto> =
-    //   resGetUsers.body as PaginatedViewDto<UserViewDto>;
-    //
-    // expect(bodyFromGetRequest.items[0]).toEqual(newUsers[0]);
-    // expect(bodyFromGetRequest.items.length).toEqual(1);
-    //
-    // TestLoggers.logE2E(
-    //   resGetUsers.body,
-    //   resGetUsers.statusCode,
-    //   'Test №3: UsersController - getUser() (GET: /users)',
-    // );
+    TestLoggers.logE2E(
+      resGetUsers.body,
+      resGetUsers.statusCode,
+      'Test №4: UsersController - getUser() (GET: /users)',
+    );
   });
 });

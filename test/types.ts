@@ -4,7 +4,7 @@ export type AdminCredentials = {
 };
 
 export type SearchFilter = {
-  searchLoginTerm?: string;
-  searchEmailTerm?: string;
-  searchNameTerm?: string;
+  login?: string;
+  email?: string;
+  name?: string;
 };
