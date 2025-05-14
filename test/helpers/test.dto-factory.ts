@@ -6,8 +6,8 @@ export class TestDtoFactory {
 
     for (let i = 0; i < quantity; i++) {
       users.push({
-        login: `testUser_${i}`,
-        email: `testUser_${i}@example.com`,
+        login: `testUser${i}`,
+        email: `testUser${i}@example.com`,
         password: 'qwerty',
       });
     }
