@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
+import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class CryptoService {
@@ -17,5 +18,9 @@ export class CryptoService {
     hash: string;
   }): Promise<boolean> {
     return bcrypt.compare(password, hash);
+  }
+
+  generateUUID(): string {
+    return randomUUID();
   }
 }
