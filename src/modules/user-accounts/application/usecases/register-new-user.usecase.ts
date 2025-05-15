@@ -4,16 +4,20 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../domain/user.entity';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { UsersFactory } from '../users.factory';
+import { UserValidationService } from '../user-validation.service';
 
 @Injectable()
 export class RegisterNewUserUseCase {
   constructor(
     @InjectModel(User.name)
+    private readonly userValidation: UserValidationService,
     private readonly usersRepository: UsersRepository,
     private readonly usersFactory: UsersFactory,
   ) {}
 
   async execute(dto: CreateUserDto): Promise<string> {
+    await this.userValidation.validateUniqueUser(dto);
+
     const user: UserDocument = await this.usersFactory.create(dto);
 
     //TODO: отправить письмо
