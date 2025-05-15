@@ -11,7 +11,6 @@ export class UsersRepository {
       deletedAt: null,
     });
 
-    //TODO: правильно ли я понял, что в этом случае выкидывается доменное исключение?
     if (!user) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
