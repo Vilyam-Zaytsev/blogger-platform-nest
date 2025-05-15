@@ -55,7 +55,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
       resGetUsers.body as PaginatedViewDto<UserViewDto>;
 
     const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
@@ -106,7 +106,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     query.sortBy = UsersSortBy.Login;
     query.sortDirection = SortDirection.Ascending;
 
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
@@ -155,7 +155,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     query.pageNumber = 6;
     query.sortDirection = SortDirection.Ascending;
 
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
@@ -201,7 +201,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
       login: 'r1',
     };
     const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .filter(searchFilter)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();
@@ -246,7 +246,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
       email: 'r1',
     };
     const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .filter(searchFilter)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();
@@ -293,7 +293,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
       email: 'r5',
     };
     const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .filter(searchFilter)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();

@@ -126,7 +126,7 @@ describe('UsersController - getUser() (GET: /users)', () => {
       resGetUsers.body as PaginatedViewDto<UserViewDto>;
 
     const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();
 
