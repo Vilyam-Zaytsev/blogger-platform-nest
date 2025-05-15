@@ -8,6 +8,7 @@ import { BcryptService } from './application/bcrypt.service';
 import { CreateUserByAdminUseCase } from './application/usecases/create-user-by-admin.usecase';
 import { UsersFactory } from './application/users.factory';
 import { DeleteUserUseCase } from './application/usecases/delete-user.usecase';
+import { BasicStrategy } from './guards/basic/basic.strategy';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { DeleteUserUseCase } from './application/usecases/delete-user.usecase';
   ],
   controllers: [UsersController],
   providers: [
+    BasicStrategy,
     UsersRepository,
     UsersQueryRepository,
     BcryptService,

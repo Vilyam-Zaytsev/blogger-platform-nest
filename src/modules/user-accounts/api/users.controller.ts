@@ -17,7 +17,7 @@ import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dt
 import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
 import { UserViewDto } from './view-dto/user.view-dto';
 import { DeleteUserUseCase } from '../application/usecases/delete-user.usecase';
-import { BasicAuthGuard } from '../guards/basic-auth.guard';
+import { BasicAuthGuard } from '../guards/basic/basic-auth.guard';
 import { IdInputDto } from './input-dto/id.input.dto';
 
 @Controller('users')

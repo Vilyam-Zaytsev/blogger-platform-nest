@@ -1,6 +1,6 @@
-import { CreateBlogDto, UpdateBlogDto } from './dto/createBlogDto';
 import { Blog, BlogDocument } from './blog.entity';
 import { TestLoggers } from '../../../../../test/helpers/test.loggers';
+import { CreateBlogDto, UpdateBlogDto } from '../dto/blog.dto';
 
 describe('Blog Entity - createInstance()', () => {
   it('should correctly create a Blog instance.', () => {
