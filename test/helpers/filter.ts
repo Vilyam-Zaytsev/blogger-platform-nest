@@ -1,5 +1,5 @@
 import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
-import { SearchFilter } from '../types';
+import { TestSearchFilter } from '../types';
 
 /**
  * A generic utility class for filtering, sorting, and paginating an array of objects.
@@ -140,16 +140,16 @@ export class Filter<T extends object> {
    * Filters items based on a search filter.
    * Currently only supports partial, case-insensitive string matches on top-level string fields.
    *
-   * @param {Partial<SearchFilter>} searchFilter - Key-value pairs for filtering.
+   * @param {Partial<TestSearchFilter>} searchFilter - Key-value pairs for filtering.
    * @returns {this} The current Filter instance for chaining.
    */
-  filter(searchFilter: Partial<SearchFilter>): this {
+  filter(searchFilter: Partial<TestSearchFilter>): this {
     this.items = this.items.filter((item) => {
       let hasAtLeastOneMatch = false;
 
       for (const key in searchFilter) {
         const searchTerm: string | undefined =
-          searchFilter[key as keyof SearchFilter];
+          searchFilter[key as keyof TestSearchFilter];
         if (searchTerm == null || searchTerm === '') continue;
 
         const fieldName: string = key;
