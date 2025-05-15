@@ -3,7 +3,7 @@ export type AdminCredentials = {
   password: string;
 };
 
-export type SearchFilter = {
+export type TestSearchFilter = {
   login?: string;
   email?: string;
   name?: string;
