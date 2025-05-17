@@ -18,7 +18,7 @@ export class CreateUserByAdminUseCase {
 
     const user: UserDocument = await this.userFactory.create(dto);
 
-    user.confirmByAdmin();
+    user.confirmEmail();
 
     return await this.usersRepository.save(user);
   }

@@ -15,6 +15,7 @@ import { UserValidationService } from './application/user-validation.service';
 import { CryptoService } from './application/crypto.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { ConfirmUserUseCase } from './application/usecases/confirm-user.usecase';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
     UserValidationService,
     CreateUserByAdminUseCase,
     RegisterUserUseCase,
+    ConfirmUserUseCase,
     DeleteUserUseCase,
     UsersFactory,
     CryptoService,

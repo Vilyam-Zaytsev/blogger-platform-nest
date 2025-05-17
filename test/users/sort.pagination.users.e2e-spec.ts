@@ -11,7 +11,6 @@ import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { Filter } from '../helpers/filter';
 import { GetUsersQueryParams } from '../../src/modules/user-accounts/api/input-dto/get-users-query-params.input-dto';
 import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
-import { UsersSortBy } from '../../src/modules/user-accounts/api/input-dto/users-sort-by';
 
 describe('UsersController - getUser() (GET: /users (pagination, sort, search in term))', () => {
   let appTestManager: AppTestManager;

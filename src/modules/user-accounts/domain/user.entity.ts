@@ -160,7 +160,7 @@ export class User {
    *
    * @returns {void}
    */
-  confirmByAdmin() {
+  confirmEmail() {
     this.emailConfirmation.confirmationCode = null;
     this.emailConfirmation.expirationDate = null;
     this.emailConfirmation.confirmationStatus = ConfirmationStatus.Confirmed;

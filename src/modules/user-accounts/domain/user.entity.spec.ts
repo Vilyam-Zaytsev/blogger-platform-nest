@@ -56,7 +56,7 @@ describe('User Entity', () => {
       ConfirmationStatus.NotConfirmed,
     );
 
-    user.confirmByAdmin();
+    user.confirmEmail();
 
     expect(user.emailConfirmation.confirmationCode).toBeNull();
     expect(user.emailConfirmation.expirationDate).toBeNull();
