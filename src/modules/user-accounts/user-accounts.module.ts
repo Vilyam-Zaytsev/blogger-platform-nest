@@ -9,20 +9,31 @@ import { CreateUserByAdminUseCase } from './application/usecases/create-user-by-
 import { UsersFactory } from './application/users.factory';
 import { DeleteUserUseCase } from './application/usecases/delete-user.usecase';
 import { BasicStrategy } from './guards/basic/basic.strategy';
+import { AuthController } from './api/auth.controller';
+import { RegisterUserUseCase } from './application/usecases/register-user.useсase';
+import { UserValidationService } from './application/user-validation.service';
+import { CryptoService } from './application/crypto.service';
+import { CqrsModule } from '@nestjs/cqrs';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
+    CqrsModule,
+    NotificationsModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
-  controllers: [UsersController],
+  controllers: [UsersController, AuthController],
   providers: [
     BasicStrategy,
     UsersRepository,
     UsersQueryRepository,
     BcryptService,
+    UserValidationService,
     CreateUserByAdminUseCase,
+    RegisterUserUseCase,
     DeleteUserUseCase,
     UsersFactory,
+    CryptoService,
   ],
   exports: [],
 })
