@@ -16,6 +16,7 @@ import { CryptoService } from './application/crypto.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { ConfirmUserUseCase } from './application/usecases/confirm-user.usecase';
+import { ResendRegistrationEmailUseCase } from './application/usecases/resend-registration-email.usecase';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ConfirmUserUseCase } from './application/usecases/confirm-user.usecase'
     CreateUserByAdminUseCase,
     RegisterUserUseCase,
     ConfirmUserUseCase,
+    ResendRegistrationEmailUseCase,
     DeleteUserUseCase,
     UsersFactory,
     CryptoService,

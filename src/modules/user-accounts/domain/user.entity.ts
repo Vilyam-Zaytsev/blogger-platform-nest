@@ -10,6 +10,8 @@ import {
 } from './email-confirmation.schema';
 import { CreateUserDomainDto } from './dto/create-user.domain.dto';
 import { HydratedDocument, Model } from 'mongoose';
+import { add } from 'date-fns';
+import { randomUUID } from 'node:crypto';
 
 export const loginConstraints = {
   minLength: 3,
@@ -164,6 +166,11 @@ export class User {
     this.emailConfirmation.confirmationCode = null;
     this.emailConfirmation.expirationDate = null;
     this.emailConfirmation.confirmationStatus = ConfirmationStatus.Confirmed;
+  }
+
+  refreshConfirmationCode(confirmationCode: string, expirationDate: Date) {
+    this.emailConfirmation.confirmationCode = confirmationCode;
+    this.emailConfirmation.expirationDate = expirationDate;
   }
 }
 
