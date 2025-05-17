@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { UserInputDto } from './input-dto/user.input-dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.useсase';
@@ -10,11 +10,13 @@ export class AuthController {
   constructor(private commandBus: CommandBus) {}
 
   @Post('registration')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() body: UserInputDto): Promise<void> {
     return this.commandBus.execute(new RegisterUserCommand(body));
   }
 
   @Post('registration-confirmation')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async registrationConfirmation(
     @Body() body: RegistrationConfirmationCodeInputDto,
   ): Promise<void> {
