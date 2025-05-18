@@ -17,16 +17,52 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { ConfirmUserUseCase } from './application/usecases/confirm-user.usecase';
 import { ResendRegistrationEmailUseCase } from './application/usecases/resend-registration-email.usecase';
+import { LoginUserUseCase } from './application/usecases/login-user.usecase';
+import {
+  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+} from './constans/auth-tokens.inject-constants';
+import { JwtService } from '@nestjs/jwt';
+import { configModule } from '../../dynamic-config.module';
+import { ConfigService } from '@nestjs/config';
+import { JwtStrategy } from './guards/bearer/jwt.strategy';
+import { LocalStrategy } from './guards/local/local.strategy';
 
 @Module({
   imports: [
+    configModule,
     CqrsModule,
     NotificationsModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UsersController, AuthController],
   providers: [
+    {
+      provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+      useFactory: (configService: ConfigService): JwtService => {
+        return new JwtService({
+          secret: configService.get<string>('JWT_SECRET_AT'),
+          signOptions: {
+            expiresIn: configService.get<string>('JWT_EXPIRATION_AT'),
+          },
+        });
+      },
+      inject: [ConfigService],
+    },
+    {
+      provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+      useFactory: (configService: ConfigService): JwtService => {
+        return new JwtService({
+          secret: configService.get<string>('JWT_SECRET_RT'),
+          signOptions: {
+            expiresIn: configService.get<string>('JWT_EXPIRATION_RT'),
+          },
+        });
+      },
+      inject: [ConfigService],
+    },
     BasicStrategy,
+    LocalStrategy,
     UsersRepository,
     UsersQueryRepository,
     BcryptService,
@@ -35,9 +71,11 @@ import { ResendRegistrationEmailUseCase } from './application/usecases/resend-re
     RegisterUserUseCase,
     ConfirmUserUseCase,
     ResendRegistrationEmailUseCase,
+    LoginUserUseCase,
     DeleteUserUseCase,
     UsersFactory,
     CryptoService,
+    JwtStrategy,
   ],
   exports: [],
 })
