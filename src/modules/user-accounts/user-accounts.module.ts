@@ -23,7 +23,7 @@ import {
   REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
 } from './constans/auth-tokens.inject-constants';
 import { JwtService } from '@nestjs/jwt';
-import { configModule } from '../../dynamic-config.module';
+import { configModule } from '../../config/dynamic-config.module';
 import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './guards/bearer/jwt.strategy';
 import { LocalStrategy } from './guards/local/local.strategy';

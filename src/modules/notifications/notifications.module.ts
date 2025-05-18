@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './email.service';
 import { ConfigService } from '@nestjs/config';
-import { configModule } from '../../dynamic-config.module';
+import { configModule } from '../../config/dynamic-config.module';
 import { EmailTemplates } from './templates/email.templates';
 
 @Module({

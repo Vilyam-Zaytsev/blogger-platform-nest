@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../../decorators/public.decorator';
 import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 import { DomainException } from '../../../../core/exceptions/damain-exceptions';
-import { parseBasicAuth } from '../../../../core/utils/basic-auth.util';
+import { parseBasicAuth } from '../../../../core/utils/basic-auth.utility';
 import { BasicStrategy } from './basic.strategy';
 
 @Injectable()

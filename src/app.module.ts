@@ -1,4 +1,4 @@
-import { configModule } from './dynamic-config.module';
+import { configModule } from './config/dynamic-config.module';
 import { Module } from '@nestjs/common';
 import { UserAccountsModule } from './modules/user-accounts/user-accounts.module';
 import {
@@ -21,7 +21,7 @@ import { ValidationExceptionFilter } from './core/exceptions/filters/validation-
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
-          uri: configService.get('MONGO_URL') as string,
+          uri: configService.get('MONGO_URI') as string,
           dbName: configService.get('DB_NAME') as string,
         };
       },
