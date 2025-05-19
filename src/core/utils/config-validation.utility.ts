@@ -10,6 +10,7 @@ export const configValidationUtility = {
       throw new Error('Validation failed: ' + sortedMessages);
     }
   },
+
   convertToBoolean(value: string) {
     const trimmedValue = value?.trim();
     if (trimmedValue === 'true') return true;
@@ -21,6 +22,7 @@ export const configValidationUtility = {
 
     return null;
   },
+
   getEnumValues<T extends Record<string, string>>(enumObj: T): string[] {
     return Object.values(enumObj);
   },

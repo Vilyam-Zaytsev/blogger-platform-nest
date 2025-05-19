@@ -16,10 +16,14 @@ export class CoreConfig {
   port: number;
 
   @IsNotEmpty({
-    message:
-      'Set Env variable MONGO_URI, example: mongodb://localhost:27017/my-app-local-db',
+    message: 'Set Env variable MONGO_URI, example: mongodb://localhost:27017',
   })
   mongoURI: string;
+
+  @IsNotEmpty({
+    message: 'Set Env variable DB_NAME, example: blogger-platform-dev',
+  })
+  dbName: string;
 
   @IsEnum(Environments, {
     message:
@@ -50,6 +54,8 @@ export class CoreConfig {
     this.port = Number(this.configService.get('PORT'));
 
     this.mongoURI = this.configService.get('MONGO_URI');
+
+    this.dbName = this.configService.get('DB_NAME');
 
     this.env = this.configService.get('NODE_ENV');
 
