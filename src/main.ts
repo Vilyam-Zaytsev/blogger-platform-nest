@@ -8,7 +8,7 @@ async function bootstrap() {
 
   const coreConfig: CoreConfig = app.get<CoreConfig>(CoreConfig);
 
-  appSetup(app);
+  appSetup(app, coreConfig.isSwaggerEnabled);
 
   const PORT: number = coreConfig.port;
 

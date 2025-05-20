@@ -1,5 +1,5 @@
-import { configModule } from './config/dynamic-config.module';
-import { Module } from '@nestjs/common';
+import { configModule } from './dynamic-config.module';
+import { DynamicModule, Module } from '@nestjs/common';
 import { UserAccountsModule } from './modules/user-accounts/user-accounts.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from './modules/testing/testing.module';
@@ -13,6 +13,11 @@ import { CoreConfig } from './core/core.config';
 
 @Module({
   imports: [
+    configModule,
+    CoreModule,
+    UserAccountsModule,
+    BloggersPlatformModule,
+    TestingModule,
     MongooseModule.forRootAsync({
       inject: [CoreConfig],
       useFactory: (coreConfig: CoreConfig) => {
@@ -22,12 +27,6 @@ import { CoreConfig } from './core/core.config';
         };
       },
     }),
-
-    UserAccountsModule,
-    BloggersPlatformModule,
-    TestingModule,
-    CoreModule,
-    configModule,
   ],
   providers: [
     {
@@ -44,4 +43,11 @@ import { CoreConfig } from './core/core.config';
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  static forRoot(coreConfig: CoreConfig): DynamicModule {
+    return {
+      module: AppModule,
+      imports: [...(coreConfig.includeTestingModule ? [TestingModule] : [])],
+    };
+  }
+}

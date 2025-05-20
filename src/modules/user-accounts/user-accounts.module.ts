@@ -13,7 +13,6 @@ import { AuthController } from './api/auth.controller';
 import { RegisterUserUseCase } from './application/usecases/register-user.useсase';
 import { UserValidationService } from './application/user-validation.service';
 import { CryptoService } from './application/crypto.service';
-import { CqrsModule } from '@nestjs/cqrs';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { ConfirmUserUseCase } from './application/usecases/confirm-user.usecase';
 import { ResendRegistrationEmailUseCase } from './application/usecases/resend-registration-email.usecase';
@@ -23,15 +22,12 @@ import {
   REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
 } from './constans/auth-tokens.inject-constants';
 import { JwtService } from '@nestjs/jwt';
-import { configModule } from '../../config/dynamic-config.module';
-import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './guards/bearer/jwt.strategy';
 import { LocalStrategy } from './guards/local/local.strategy';
+import { UserAccountsConfig } from './config/user-accounts.config';
 
 @Module({
   imports: [
-    configModule,
-    CqrsModule,
     NotificationsModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
@@ -39,43 +35,52 @@ import { LocalStrategy } from './guards/local/local.strategy';
   providers: [
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
-      useFactory: (configService: ConfigService): JwtService => {
+      inject: [UserAccountsConfig],
+
+      useFactory: (userAccountConfig: UserAccountsConfig): JwtService => {
         return new JwtService({
-          secret: configService.get<string>('JWT_SECRET_AT'),
+          secret: userAccountConfig.accessTokenSecret,
           signOptions: {
-            expiresIn: configService.get<string>('JWT_EXPIRATION_AT'),
+            expiresIn: userAccountConfig.accessTokenExpireIn,
           },
         });
       },
-      inject: [ConfigService],
     },
     {
       provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
-      useFactory: (configService: ConfigService): JwtService => {
+      inject: [UserAccountsConfig],
+
+      useFactory: (userAccountConfig: UserAccountsConfig): JwtService => {
         return new JwtService({
-          secret: configService.get<string>('JWT_SECRET_RT'),
+          secret: userAccountConfig.refreshTokenSecret,
           signOptions: {
-            expiresIn: configService.get<string>('JWT_EXPIRATION_RT'),
+            expiresIn: userAccountConfig.refreshTokenExpireIn,
           },
         });
       },
-      inject: [ConfigService],
     },
+    //strategies
+    JwtStrategy,
     BasicStrategy,
     LocalStrategy,
+    //repo
     UsersRepository,
     UsersQueryRepository,
+    //services
     BcryptService,
+    CryptoService,
     UserValidationService,
-    CreateUserByAdminUseCase,
-    RegisterUserUseCase,
-    ConfirmUserUseCase,
-    ResendRegistrationEmailUseCase,
+    //use-cases
     LoginUserUseCase,
     DeleteUserUseCase,
+    ConfirmUserUseCase,
+    RegisterUserUseCase,
+    CreateUserByAdminUseCase,
+    ResendRegistrationEmailUseCase,
+    //factories
     UsersFactory,
-    CryptoService,
-    JwtStrategy,
+    //config
+    UserAccountsConfig,
   ],
   exports: [],
 })

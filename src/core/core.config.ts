@@ -25,12 +25,23 @@ export class CoreConfig {
   })
   dbName: string;
 
+  //TODO: не работает валидация
   @IsEnum(Environments, {
     message:
       'Set correct NODE_ENV value, available values: ' +
       configValidationUtility.getEnumValues(Environments).join(', '),
   })
   env: string;
+
+  @IsNotEmpty({
+    message: 'Set Env variable ADMIN_LOGIN, example: "admin365"',
+  })
+  adminLogin: string;
+
+  @IsNotEmpty({
+    message: 'Set Env variable ADMIN_PASSWORD',
+  })
+  adminPassword: string;
 
   @IsBoolean({
     message:
@@ -58,6 +69,10 @@ export class CoreConfig {
     this.dbName = this.configService.get('DB_NAME');
 
     this.env = this.configService.get('NODE_ENV');
+
+    this.adminLogin = this.configService.get('ADMIN_LOGIN');
+
+    this.adminPassword = this.configService.get('ADMIN_PASSWORD');
 
     this.isSwaggerEnabled = configValidationUtility.convertToBoolean(
       this.configService.get('IS_SWAGGER_ENABLED'),

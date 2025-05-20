@@ -2,20 +2,22 @@ import { SendConfirmationEmailWhenUserRegisteredEventHandler } from './event-han
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EmailService } from './email.service';
-import { ConfigService } from '@nestjs/config';
-import { configModule } from '../../config/dynamic-config.module';
+import { configModule } from '../../dynamic-config.module';
 import { EmailTemplates } from './templates/email.templates';
+import { NotificationsConfig } from './config/notifications.config';
+import { NotificationsConfigModule } from './config/notifications-config.module';
 
 @Module({
   imports: [
     configModule,
     MailerModule.forRootAsync({
-      imports: [configModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const email: string | undefined = configService.get<string>('EMAIL');
+      imports: [NotificationsConfigModule],
+      inject: [NotificationsConfig],
+
+      useFactory: (notificationsConfig: NotificationsConfig) => {
+        const email: string | undefined = notificationsConfig.emailApp;
         const password: string | undefined =
-          configService.get<string>('EMAIL_PASSWORD');
+          notificationsConfig.emailAppPassword;
 
         if (!email || !password) {
           throw new Error(
@@ -33,6 +35,7 @@ import { EmailTemplates } from './templates/email.templates';
   providers: [
     EmailService,
     EmailTemplates,
+    NotificationsConfig,
     SendConfirmationEmailWhenUserRegisteredEventHandler,
   ],
   exports: [EmailService],
