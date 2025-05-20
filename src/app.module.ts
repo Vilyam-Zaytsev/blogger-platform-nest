@@ -10,6 +10,7 @@ import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exc
 import { ValidationExceptionFilter } from './core/exceptions/filters/validation-exception.filter';
 import { CoreModule } from './core/core.module';
 import { CoreConfig } from './core/core.config';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CoreConfig } from './core/core.config';
     CoreModule,
     UserAccountsModule,
     BloggersPlatformModule,
+    NotificationsModule,
     TestingModule,
     MongooseModule.forRootAsync({
       inject: [CoreConfig],
