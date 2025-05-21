@@ -15,7 +15,6 @@ export class RegisterUserUseCase
   implements ICommandHandler<RegisterUserCommand>
 {
   constructor(
-    // @InjectModel(User.name)
     private readonly userValidation: UserValidationService,
     private readonly usersRepository: UsersRepository,
     private readonly usersFactory: UsersFactory,

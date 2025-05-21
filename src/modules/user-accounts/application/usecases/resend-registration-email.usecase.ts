@@ -7,7 +7,7 @@ import { ConfirmationStatus } from '../../domain/email-confirmation.schema';
 import { RegistrationEmailResandingInputDto } from '../../api/input-dto/registration-email-resending.input-dto';
 import { add } from 'date-fns';
 import { CryptoService } from '../crypto.service';
-import { UserRegisteredEvent } from '../../domain/events/user-registered.event';
+import { UserResendRegisteredEvent } from '../../domain/events/user-resend-registered.event';
 
 export class ResendRegistrationEmailCommand {
   constructor(public readonly dto: RegistrationEmailResandingInputDto) {}
@@ -45,7 +45,7 @@ export class ResendRegistrationEmailUseCase
     await this.usersRepository.save(user);
 
     this.eventBus.publish(
-      new UserRegisteredEvent(user.email, confirmationCode),
+      new UserResendRegisteredEvent(user.email, confirmationCode),
     );
   }
 }
