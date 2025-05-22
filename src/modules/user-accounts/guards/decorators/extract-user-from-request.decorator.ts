@@ -6,13 +6,12 @@ export const ExtractUserFromRequest = createParamDecorator(
   (data: unknown, context: ExecutionContext): UserContextDto => {
     const request: Request = context.switchToHttp().getRequest<Request>();
 
-    //TODO: как правильно типизировать user в Request
-    const user: UserContextDto | undefined = request.user;
+    const user = request.user;
 
     if (!user) {
       throw new Error('There is no user information in the request object');
     }
 
-    return user;
+    return user as UserContextDto;
   },
 );
