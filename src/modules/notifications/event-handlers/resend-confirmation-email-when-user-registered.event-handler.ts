@@ -1,13 +1,12 @@
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { UserRegisteredEvent } from '../../user-accounts/domain/events/user-registered.event';
 import { EmailService } from '../email.service';
 import { EmailTemplate } from '../templates/types';
 import { EmailTemplates } from '../templates/email.templates';
 import { UserResendRegisteredEvent } from '../../user-accounts/domain/events/user-resend-registered.event';
 
-@EventsHandler(UserRegisteredEvent)
+@EventsHandler(UserResendRegisteredEvent)
 export class ResendConfirmationEmailWhenUserRegisteredEventHandler
-  implements IEventHandler<UserRegisteredEvent>
+  implements IEventHandler<UserResendRegisteredEvent>
 {
   constructor(
     private readonly emailService: EmailService,

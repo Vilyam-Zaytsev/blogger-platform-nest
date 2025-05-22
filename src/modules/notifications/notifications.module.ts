@@ -6,6 +6,7 @@ import { configModule } from '../../dynamic-config.module';
 import { EmailTemplates } from './templates/email.templates';
 import { NotificationsConfig } from './config/notifications.config';
 import { NotificationsConfigModule } from './config/notifications-config.module';
+import { ResendConfirmationEmailWhenUserRegisteredEventHandler } from './event-handlers/resend-confirmation-email-when-user-registered.event-handler';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { NotificationsConfigModule } from './config/notifications-config.module'
     EmailTemplates,
     NotificationsConfig,
     SendConfirmationEmailWhenUserRegisteredEventHandler,
+    ResendConfirmationEmailWhenUserRegisteredEventHandler,
   ],
   exports: [EmailService],
 })
