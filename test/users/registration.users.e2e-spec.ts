@@ -7,22 +7,18 @@ import { TestLoggers } from '../helpers/test.loggers';
 import { AppTestManager } from '../managers/app.test-manager';
 import { AdminCredentials } from '../types';
 import { Server } from 'http';
-import {
-  User,
-  UserDocument,
-} from '../../src/modules/user-accounts/domain/user.entity';
 import { EmailService } from '../../src/modules/notifications/email.service';
-import { UsersRepository } from '../../src/modules/user-accounts/infrastructure/users.repository';
-import { ConfirmationStatus } from '../../src/modules/user-accounts/domain/email-confirmation.schema';
-import { ObjectId } from 'mongodb';
+import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
+import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
+import { EmailTemplate } from '../../src/modules/notifications/templates/types';
+import { TestUtils } from '../helpers/test.utils';
 
 describe('AuthController - registration() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
   let server: Server;
-  let usersRepository: UsersRepository;
-  let sendEmailMock: any;
+  let sendEmailMock: jest.Mock;
 
   beforeAll(async () => {
     appTestManager = new AppTestManager();
@@ -32,15 +28,16 @@ describe('AuthController - registration() (POST: /auth)', () => {
     server = appTestManager.getServer();
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
-    usersRepository = appTestManager.app.get<UsersRepository>(UsersRepository);
 
     sendEmailMock = jest
       .spyOn(EmailService.prototype, 'sendEmail')
-      .mockResolvedValue();
+      .mockResolvedValue() as jest.Mock<Promise<void>, [string, EmailTemplate]>;
   });
 
   beforeEach(async () => {
     await appTestManager.cleanupDb();
+
+    sendEmailMock.mockClear();
   });
 
   afterAll(async () => {
@@ -48,7 +45,7 @@ describe('AuthController - registration() (POST: /auth)', () => {
   });
 
   it('should be registered if the user has sent the correct data (login or email address and password).', async () => {
-    const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
+    const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
 
     const resRegistration: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/registration`)
@@ -59,40 +56,23 @@ describe('AuthController - registration() (POST: /auth)', () => {
       })
       .expect(204);
 
-    const user: UserDocument | null = await usersRepository.getByEmail(
-      dto.email,
-    );
+    const { items }: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
 
-    expect(user).not.toBeNull();
+    const [user] = items;
 
-    const userObject: User = user!.toObject();
+    if (!user) {
+      throw new Error(
+        'Test №1: AuthController - registration() (POST: /auth): User not found',
+      );
+    }
 
-    expect(userObject).toEqual({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      _id: expect.any(ObjectId),
-      login: dto.login,
-      email: dto.email,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      passwordHash: expect.any(String),
-      passwordRecovery: {
-        expirationDate: null,
-        recoveryCode: null,
-      },
-      emailConfirmation: {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        confirmationCode: expect.any(String),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        expirationDate: expect.any(Date),
-        confirmationStatus: ConfirmationStatus.NotConfirmed,
-      },
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      createdAt: expect.any(Date),
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      updatedAt: expect.any(Date),
-      deletedAt: null,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      __v: expect.any(Number),
-    });
+    expect(items).toHaveLength(1);
+
+    expect(typeof user.id).toBe('string');
+    expect(new Date(user.createdAt).toString()).not.toBe('Invalid Date');
+    expect(user.login).toBe(dto.login);
+    expect(user.email).toBe(dto.email);
 
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
@@ -101,6 +81,281 @@ describe('AuthController - registration() (POST: /auth)', () => {
       resRegistration.body,
       resRegistration.statusCode,
       'Test №1: AuthController - registration() (POST: /auth)',
+    );
+  });
+
+  it('should not be registered if a user with such data already exists (login).', async () => {
+    const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+    const [user]: UserViewDto[] = await usersTestManager.createUser(1);
+
+    const resRegistration: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration`)
+      .send({
+        login: user.login,
+        email: dto.email,
+        password: dto.password,
+      })
+      .expect(400);
+
+    const { items }: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
+
+    expect(items).toHaveLength(1);
+
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).toHaveBeenCalledTimes(0);
+
+    TestLoggers.logE2E(
+      resRegistration.body,
+      resRegistration.statusCode,
+      'Test №3: AuthController - registration() (POST: /auth)',
+    );
+  });
+
+  it('should not be registered if a user with such data already exists (email).', async () => {
+    const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+    const [user]: UserViewDto[] = await usersTestManager.createUser(1);
+
+    const resRegistration: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration`)
+      .send({
+        login: dto.login,
+        email: user.email,
+        password: dto.password,
+      })
+      .expect(400);
+
+    const { items }: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
+
+    expect(items).toHaveLength(1);
+
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).toHaveBeenCalledTimes(0);
+
+    TestLoggers.logE2E(
+      resRegistration.body,
+      resRegistration.statusCode,
+      'Test №4: AuthController - registration() (POST: /auth)',
+    );
+  });
+
+  it('should not be registered a user if the data in the request body is incorrect (an empty object is passed).', async () => {
+    const resRegistration: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration`)
+      .send({})
+      .expect(400);
+
+    expect(resRegistration.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'password',
+          message: 'password must be a string; Received value: undefined',
+        },
+        {
+          field: 'email',
+          message:
+            'email must match /^[\\w.-]+@([\\w-]+\\.)+[\\w-]{2,4}$/ regular expression; Received value: undefined',
+        },
+        {
+          field: 'login',
+          message: 'login must be a string; Received value: undefined',
+        },
+      ],
+    });
+
+    const { items }: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
+
+    expect(items).toHaveLength(0);
+
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).toHaveBeenCalledTimes(0);
+
+    TestLoggers.logE2E(
+      resRegistration.body,
+      resRegistration.statusCode,
+      'Test №5: AuthController - registration() (POST: /auth)',
+    );
+  });
+
+  it('should not be registered a user if the data in the request body is incorrect (login: empty line, email: empty line, password: empty line).', async () => {
+    const resRegistration: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration`)
+      .send({
+        login: '   ',
+        email: '   ',
+        password: '   ',
+      })
+      .expect(400);
+
+    expect(resRegistration.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'password',
+          message:
+            'password must be longer than or equal to 6 characters; Received value: ',
+        },
+        {
+          field: 'email',
+          message:
+            'email must match /^[\\w.-]+@([\\w-]+\\.)+[\\w-]{2,4}$/ regular expression; Received value: ',
+        },
+        {
+          field: 'login',
+          message:
+            'login must be longer than or equal to 3 characters; Received value: ',
+        },
+      ],
+    });
+
+    const { items }: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
+
+    expect(items).toHaveLength(0);
+
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).toHaveBeenCalledTimes(0);
+
+    TestLoggers.logE2E(
+      resRegistration.body,
+      resRegistration.statusCode,
+      'Test №6: AuthController - registration() (POST: /auth)',
+    );
+  });
+
+  it('should not be registered a user if the data in the request body is incorrect (login: less than the minimum length, email: incorrect, password: less than the minimum length).', async () => {
+    const login: string = TestUtils.generateRandomString(2);
+    const email: string = TestUtils.generateRandomString(10);
+    const password: string = TestUtils.generateRandomString(5);
+
+    const resRegistration: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration`)
+      .send({
+        login,
+        email,
+        password,
+      })
+      .expect(400);
+
+    expect(resRegistration.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'password',
+          message: `password must be longer than or equal to 6 characters; Received value: ${password}`,
+        },
+        {
+          field: 'email',
+          message: `email must match /^[\\w.-]+@([\\w-]+\\.)+[\\w-]{2,4}$/ regular expression; Received value: ${email}`,
+        },
+        {
+          field: 'login',
+          message: `login must be longer than or equal to 3 characters; Received value: ${login}`,
+        },
+      ],
+    });
+
+    const { items }: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
+
+    expect(items).toHaveLength(0);
+
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).toHaveBeenCalledTimes(0);
+
+    TestLoggers.logE2E(
+      resRegistration.body,
+      resRegistration.statusCode,
+      'Test №7: AuthController - registration() (POST: /auth)',
+    );
+  });
+
+  it('should not be registered a user if the data in the request body is incorrect (login: exceeds max length,  email: incorrect, password: exceeds max length).', async () => {
+    const login: string = TestUtils.generateRandomString(11);
+    const email: string = TestUtils.generateRandomString(10);
+    const password: string = TestUtils.generateRandomString(21);
+
+    const resRegistration: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration`)
+      .send({
+        login,
+        email,
+        password,
+      })
+      .expect(400);
+
+    expect(resRegistration.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'password',
+          message: `password must be shorter than or equal to 20 characters; Received value: ${password}`,
+        },
+        {
+          field: 'email',
+          message: `email must match /^[\\w.-]+@([\\w-]+\\.)+[\\w-]{2,4}$/ regular expression; Received value: ${email}`,
+        },
+        {
+          field: 'login',
+          message: `login must be shorter than or equal to 10 characters; Received value: ${login}`,
+        },
+      ],
+    });
+
+    const { items }: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
+
+    expect(items).toHaveLength(0);
+
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).toHaveBeenCalledTimes(0);
+
+    TestLoggers.logE2E(
+      resRegistration.body,
+      resRegistration.statusCode,
+      'Test №8: AuthController - registration() (POST: /auth)',
+    );
+  });
+
+  it('should not be registered a user if the data in the request body is incorrect (login: type number,  email: type number, password: type number).', async () => {
+    const resRegistration: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration`)
+      .send({
+        login: 123,
+        email: 123,
+        password: 123,
+      })
+      .expect(400);
+
+    expect(resRegistration.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'password',
+          message: 'password must be a string; Received value: 123',
+        },
+        {
+          field: 'email',
+          message:
+            'email must match /^[\\w.-]+@([\\w-]+\\.)+[\\w-]{2,4}$/ regular expression; Received value: 123',
+        },
+        {
+          field: 'login',
+          message: 'login must be a string; Received value: 123',
+        },
+      ],
+    });
+
+    const { items }: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
+
+    expect(items).toHaveLength(0);
+
+    expect(sendEmailMock).not.toHaveBeenCalled();
+    expect(sendEmailMock).toHaveBeenCalledTimes(0);
+
+    TestLoggers.logE2E(
+      resRegistration.body,
+      resRegistration.statusCode,
+      'Test №9: AuthController - registration() (POST: /auth)',
     );
   });
 });
