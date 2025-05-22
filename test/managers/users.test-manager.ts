@@ -47,6 +47,13 @@ export class UsersTestManager {
     return newUsers;
   }
 
+  async registration(dto: UserInputDto): Promise<Response> {
+    return await request(this.server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration`)
+      .send(dto)
+      .expect(204);
+  }
+
   async getAll(
     query: Partial<GetUsersQueryParams> = {},
   ): Promise<PaginatedViewDto<UserViewDto>> {
