@@ -12,6 +12,7 @@ import { EmailTemplate } from '../../src/modules/notifications/templates/types';
 import { UsersRepository } from '../../src/modules/user-accounts/infrastructure/users.repository';
 import { UserDocument } from '../../src/modules/user-accounts/domain/user.entity';
 import { ConfirmationStatus } from '../../src/modules/user-accounts/domain/email-confirmation.schema';
+import { TestUtils } from '../helpers/test.utils';
 
 describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
@@ -116,6 +117,122 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
       resRegistrationConfirmation.body,
       resRegistrationConfirmation.statusCode,
       'Test №1: AuthController - registrationConfirmation() (POST: /auth)',
+    );
+  });
+
+  it('should not be confirmed if the user has sent an incorrect verification code.', async () => {
+    const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+
+    await usersTestManager.registration(dto);
+
+    const resRegistrationConfirmation: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration-confirmation`)
+      .send({
+        code: TestUtils.generateRandomString(15),
+      })
+      .expect(400);
+
+    const user: UserDocument | null = await usersRepository.getByEmail(
+      dto.email,
+    );
+
+    expect(user).not.toBeNull();
+
+    if (!user) {
+      throw new Error(
+        'Test №1: AuthController - registrationConfirmation() (POST: /auth): User not found',
+      );
+    }
+
+    expect(user).toEqual(
+      expect.objectContaining({
+        emailConfirmation: expect.objectContaining({
+          confirmationCode: expect.any(String),
+          expirationDate: expect.any(Date),
+          confirmationStatus: ConfirmationStatus.NotConfirmed,
+        }),
+      }),
+    );
+
+    expect(sendEmailMock).toHaveBeenCalled();
+    expect(sendEmailMock).toHaveBeenCalledTimes(1);
+
+    TestLoggers.logE2E(
+      resRegistrationConfirmation.body,
+      resRegistrationConfirmation.statusCode,
+      'Test №3: AuthController - registrationConfirmation() (POST: /auth)',
+    );
+  });
+
+  it('should not be confirmed if the user has sent an incorrect verification code (the code has already been used', async () => {
+    const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+
+    await usersTestManager.registration(dto);
+
+    const user_notConfirmed: UserDocument | null =
+      await usersRepository.getByEmail(dto.email);
+
+    expect(user_notConfirmed).not.toBeNull();
+
+    if (!user_notConfirmed) {
+      throw new Error(
+        'Test №1: AuthController - registrationConfirmation() (POST: /auth): User not found',
+      );
+    }
+
+    expect(user_notConfirmed).toEqual(
+      expect.objectContaining({
+        emailConfirmation: expect.objectContaining({
+          confirmationCode: expect.any(String),
+          expirationDate: expect.any(Date),
+          confirmationStatus: ConfirmationStatus.NotConfirmed,
+        }),
+      }),
+    );
+
+    await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration-confirmation`)
+      .send({
+        code: user_notConfirmed.emailConfirmation.confirmationCode,
+      })
+      .expect(204);
+
+    const user: UserDocument | null = await usersRepository.getByEmail(
+      dto.email,
+    );
+
+    expect(user).not.toBeNull();
+
+    if (!user) {
+      throw new Error(
+        'Test №1: AuthController - registrationConfirmation() (POST: /auth): User not found',
+      );
+    }
+
+    expect(user).toEqual(
+      expect.objectContaining({
+        emailConfirmation: expect.objectContaining({
+          confirmationCode: null,
+          expirationDate: null,
+          confirmationStatus: ConfirmationStatus.Confirmed,
+        }),
+      }),
+    );
+
+    const resRegistrationConfirmation: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/registration-confirmation`)
+      .send({
+        code: user_notConfirmed.emailConfirmation.confirmationCode,
+      })
+      .expect(400);
+
+    expect(sendEmailMock).toHaveBeenCalled();
+    expect(sendEmailMock).toHaveBeenCalledTimes(1);
+
+    TestLoggers.logE2E(
+      resRegistrationConfirmation.body,
+      resRegistrationConfirmation.statusCode,
+      'Test №4: AuthController - registrationConfirmation() (POST: /auth)',
     );
   });
 });
