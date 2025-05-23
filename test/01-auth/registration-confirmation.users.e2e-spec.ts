@@ -140,7 +140,7 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
 
     if (!user) {
       throw new Error(
-        'Test №1: AuthController - registrationConfirmation() (POST: /auth): User not found',
+        'Test №3: AuthController - registrationConfirmation() (POST: /auth): User not found',
       );
     }
 
@@ -176,7 +176,7 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
 
     if (!user_notConfirmed) {
       throw new Error(
-        'Test №1: AuthController - registrationConfirmation() (POST: /auth): User not found',
+        'Test №4: AuthController - registrationConfirmation() (POST: /auth): User not found',
       );
     }
 
@@ -205,7 +205,7 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
 
     if (!user) {
       throw new Error(
-        'Test №1: AuthController - registrationConfirmation() (POST: /auth): User not found',
+        'Test №4: AuthController - registrationConfirmation() (POST: /auth): User not found',
       );
     }
 
