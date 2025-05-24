@@ -1,14 +1,22 @@
-import { CryptoService } from './crypto.service';
 import { DomainException } from '../../../core/exceptions/damain-exceptions';
 import { AppTestManager } from '../../../../test/managers/app.test-manager';
-import { connection } from 'mongoose';
 import { UserValidationService } from './user-validation.service';
 import { UserInputDto } from '../api/input-dto/user.input-dto';
 import { TestDtoFactory } from '../../../../test/helpers/test.dto-factory';
+import { UsersTestManager } from '../../../../test/managers/users.test-manager';
+import { AdminCredentials } from '../../../../test/types';
+import { Server } from 'http';
+import { UserViewDto } from '../api/view-dto/user.view-dto';
+import { CryptoService } from './crypto.service';
+import { UserContextDto } from '../guards/dto/user-context.dto';
+import { TestLoggers } from '../../../../test/helpers/test.loggers';
 
 describe('UserValidationService (integration)', () => {
   let appTestManager: AppTestManager;
   let userValidationService: UserValidationService;
+  let usersTestManager: UsersTestManager;
+  let adminCredentials: AdminCredentials;
+  let server: Server;
 
   beforeAll(async () => {
     appTestManager = new AppTestManager();
@@ -17,6 +25,10 @@ describe('UserValidationService (integration)', () => {
     userValidationService = appTestManager.app.get<UserValidationService>(
       UserValidationService,
     );
+    adminCredentials = appTestManager.getAdminData();
+    server = appTestManager.getServer();
+
+    usersTestManager = new UsersTestManager(server, adminCredentials);
   });
 
   beforeEach(async () => {
@@ -27,9 +39,9 @@ describe('UserValidationService (integration)', () => {
     await appTestManager.close();
   });
 
-  describe('UserValidationService - validateUniqueUser', () => {
+  describe('UserValidationService - validateUniqueUser()', () => {
     it('should not throw error if user is unique', async () => {
-      const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
+      const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
 
       await expect(
         userValidationService.validateUniqueUser({
@@ -40,70 +52,131 @@ describe('UserValidationService (integration)', () => {
       ).resolves.toBeUndefined();
     });
 
-    //   it('should throw if login is already used', async () => {
-    //     await connection.collection('users').insertOne({
-    //       login: 'existingLogin',
-    //       email: 'other@example.com',
-    //       passwordHash: 'somehash',
-    //     });
-    //
-    //     await expect(
-    //       service.validateUniqueUser({
-    //         login: 'existingLogin',
-    //         email: 'new@example.com',
-    //         password: '12345678',
-    //       }),
-    //     ).rejects.toThrow(DomainException);
-    //   });
-    //
-    //   it('should throw if email is already used', async () => {
-    //     await connection.collection('users').insertOne({
-    //       login: 'anotherLogin',
-    //       email: 'existing@example.com',
-    //       passwordHash: 'somehash',
-    //     });
-    //
-    //     await expect(
-    //       service.validateUniqueUser({
-    //         login: 'newLogin',
-    //         email: 'existing@example.com',
-    //         password: '12345678',
-    //       }),
-    //     ).rejects.toThrow(DomainException);
-    //   });
-    // });
-    //
-    // describe('authenticateUser', () => {
-    //   const crypto = new CryptoService();
-    //   let passwordHash: string;
-    //
-    //   beforeAll(async () => {
-    //     passwordHash = await crypto.hashPassword('password123');
-    //     await connection.collection('users').insertOne({
-    //       login: 'loginUser',
-    //       email: 'auth@example.com',
-    //       passwordHash,
-    //     });
-    //   });
-    //
-    //   it('should return user context for valid credentials', async () => {
-    //     const user = await service.authenticateUser(
-    //       'auth@example.com',
-    //       'password123',
-    //     );
-    //     expect(user).toHaveProperty('id');
-    //   });
-    //
-    //   it('should throw if user does not exist', async () => {
-    //     await expect(
-    //       service.authenticateUser('notfound@example.com', 'password123'),
-    //     ).rejects.toThrow(DomainException);
-    //   });
-    //
-    //   it('should throw if password is invalid', async () => {
-    //     await expect(
-    //       service.authenticateUser('auth@example.com', 'wrongpassword'),
-    //     ).rejects.toThrow(DomainException);
-    //   });
+    it('should throw error if login is already used', async () => {
+      const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+
+      const [user]: UserViewDto[] = await usersTestManager.createUser(1);
+
+      await expect(
+        userValidationService.validateUniqueUser({
+          login: user.login,
+          email: dto.email,
+          password: dto.password,
+        }),
+      ).rejects.toThrow(DomainException);
+    });
+
+    it('should throw error if email is already used', async () => {
+      const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+
+      const [user]: UserViewDto[] = await usersTestManager.createUser(1);
+
+      await expect(
+        userValidationService.validateUniqueUser({
+          login: dto.login,
+          email: user.email,
+          password: dto.password,
+        }),
+      ).rejects.toThrow(DomainException);
+    });
+  });
+
+  describe('UserValidationService - authenticateUser()', () => {
+    let comparePasswordMock: jest.SpyInstance;
+
+    beforeAll(async () => {
+      comparePasswordMock = jest
+        .spyOn(CryptoService.prototype, 'comparePassword')
+        .mockImplementation(
+          async ({
+            password,
+            hash,
+          }: {
+            password: string;
+            hash: string;
+          }): Promise<boolean> => {
+            return password === 'qwerty';
+          },
+        );
+    });
+
+    beforeEach(() => {
+      comparePasswordMock.mockClear();
+    });
+
+    it('should return a UserContextDto upon successful authentication №1', async () => {
+      const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+
+      await usersTestManager.createUser(1);
+
+      const userContext: UserContextDto =
+        await userValidationService.authenticateUser(dto.email, dto.password);
+
+      expect(userContext).toHaveProperty('id');
+
+      TestLoggers.logUnit<UserContextDto>(
+        userContext,
+        'Test №1: UserValidationService - authenticateUser()',
+      );
+    });
+
+    it('should return a UserContextDto upon successful authentication №2', async () => {
+      const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+
+      await usersTestManager.createUser(1);
+
+      const userContext: UserContextDto =
+        await userValidationService.authenticateUser(dto.login, dto.password);
+
+      expect(userContext).toHaveProperty('id');
+
+      TestLoggers.logUnit<UserContextDto>(
+        userContext,
+        'Test №2: UserValidationService - authenticateUser()',
+      );
+    });
+
+    it('should throw error if email is invalid', async () => {
+      const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+
+      await usersTestManager.createUser(1);
+
+      await expect(
+        userValidationService.authenticateUser(
+          'invalid_email@example.com',
+          dto.password,
+        ),
+      ).rejects.toThrow(DomainException);
+    });
+
+    it('should throw error if login is invalid', async () => {
+      const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+
+      await usersTestManager.createUser(1);
+
+      await expect(
+        userValidationService.authenticateUser('invalid_login', dto.password),
+      ).rejects.toThrow(DomainException);
+    });
+
+    it('should throw error if password is invalid №1', async () => {
+      const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+
+      await usersTestManager.createUser(1);
+
+      await expect(
+        userValidationService.authenticateUser(dto.login, 'invalid_password'),
+      ).rejects.toThrow(DomainException);
+    });
+
+    it('should throw error if password is invalid №2', async () => {
+      const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
+
+      await usersTestManager.createUser(1);
+
+      await expect(
+        userValidationService.authenticateUser(dto.email, 'invalid_password'),
+      ).rejects.toThrow(DomainException);
+    });
   });
 });
