@@ -114,6 +114,9 @@ describe('UserValidationService (integration)', () => {
 
       expect(userContext).toHaveProperty('id');
 
+      expect(comparePasswordMock).toHaveBeenCalled();
+      expect(comparePasswordMock).toHaveBeenCalledTimes(1);
+
       TestLoggers.logUnit<UserContextDto>(
         userContext,
         'Test №1: UserValidationService - authenticateUser()',
@@ -129,6 +132,9 @@ describe('UserValidationService (integration)', () => {
         await userValidationService.authenticateUser(dto.login, dto.password);
 
       expect(userContext).toHaveProperty('id');
+
+      expect(comparePasswordMock).toHaveBeenCalled();
+      expect(comparePasswordMock).toHaveBeenCalledTimes(1);
 
       TestLoggers.logUnit<UserContextDto>(
         userContext,
@@ -147,6 +153,8 @@ describe('UserValidationService (integration)', () => {
           dto.password,
         ),
       ).rejects.toThrow(DomainException);
+
+      expect(comparePasswordMock).toHaveBeenCalledTimes(0);
     });
 
     it('should throw error if login is invalid', async () => {
@@ -157,6 +165,8 @@ describe('UserValidationService (integration)', () => {
       await expect(
         userValidationService.authenticateUser('invalid_login', dto.password),
       ).rejects.toThrow(DomainException);
+
+      expect(comparePasswordMock).toHaveBeenCalledTimes(0);
     });
 
     it('should throw error if password is invalid №1', async () => {
@@ -167,6 +177,9 @@ describe('UserValidationService (integration)', () => {
       await expect(
         userValidationService.authenticateUser(dto.login, 'invalid_password'),
       ).rejects.toThrow(DomainException);
+
+      expect(comparePasswordMock).toHaveBeenCalled();
+      expect(comparePasswordMock).toHaveBeenCalledTimes(1);
     });
 
     it('should throw error if password is invalid №2', async () => {
@@ -177,6 +190,9 @@ describe('UserValidationService (integration)', () => {
       await expect(
         userValidationService.authenticateUser(dto.email, 'invalid_password'),
       ).rejects.toThrow(DomainException);
+
+      expect(comparePasswordMock).toHaveBeenCalled();
+      expect(comparePasswordMock).toHaveBeenCalledTimes(1);
     });
   });
 });
