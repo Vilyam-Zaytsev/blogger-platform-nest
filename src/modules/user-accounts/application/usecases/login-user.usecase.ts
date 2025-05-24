@@ -17,10 +17,10 @@ export class LoginUserCommand {
 export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
   constructor(
     @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
-    private accessTokenContext: JwtService,
+    private readonly accessTokenContext: JwtService,
 
     @Inject(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
-    private refreshTokenContext: JwtService,
+    private readonly refreshTokenContext: JwtService,
 
     private readonly cryptoService: CryptoService,
   ) {}

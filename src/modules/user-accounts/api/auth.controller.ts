@@ -20,6 +20,8 @@ import { UserContextDto } from '../guards/dto/user-context.dto';
 import { LoginUserCommand } from '../application/usecases/login-user.usecase';
 import { AuthTokens } from '../types/auth-tokens.type';
 import { Response } from 'express';
+import { LoginInputDto } from './input-dto/login.input-dto';
+import { LoginValidationGuard } from '../guards/login-validation.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -49,16 +51,15 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(LoginValidationGuard, LocalAuthGuard)
   async login(
     @ExtractUserFromRequest() user: UserContextDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const tokens: AuthTokens = await this.commandBus.execute(
-      new LoginUserCommand(user),
-    );
+    const { accessToken, refreshToken }: AuthTokens =
+      await this.commandBus.execute(new LoginUserCommand(user));
 
-    res.cookie('refreshToken', tokens.refreshToken, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
@@ -66,7 +67,7 @@ export class AuthController {
       path: '/',
     });
 
-    return tokens;
+    return { accessToken };
   }
 
   async logout() {}
