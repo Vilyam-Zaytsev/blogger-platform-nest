@@ -35,9 +35,6 @@ export class Filter<T extends object> {
    * @param {string} [prefix] - The path prefix for nested properties.
    */
   private createPropertyMap(obj: T, prefix?: string): void {
-    //TODO: удалить эту типизацию если будет работать
-
-    // const recordObj = obj as unknown as Record<string, unknown>;
     for (const key in obj) {
       const value = obj[key];
       const path = prefix ? `${prefix}.${key}` : key;

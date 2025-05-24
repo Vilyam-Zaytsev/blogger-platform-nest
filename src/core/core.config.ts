@@ -25,7 +25,6 @@ export class CoreConfig {
   })
   dbName: string;
 
-  //TODO: не работает валидация
   @IsEnum(Environments, {
     message:
       'Set correct NODE_ENV value, available values: ' +
