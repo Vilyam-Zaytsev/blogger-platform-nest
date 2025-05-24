@@ -10,8 +10,6 @@ import {
 } from './email-confirmation.schema';
 import { CreateUserDomainDto } from './dto/create-user.domain.dto';
 import { HydratedDocument, Model } from 'mongoose';
-import { add } from 'date-fns';
-import { randomUUID } from 'node:crypto';
 
 export const loginConstraints = {
   minLength: 3,
