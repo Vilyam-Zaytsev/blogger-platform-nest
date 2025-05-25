@@ -1,6 +1,13 @@
 import { BaseQueryParams } from '../../../../core/dto/base.query-params.input-dto';
-import { UsersSortBy } from './users-sort-by';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
+
+export enum UsersSortBy {
+  CreatedAt = 'createdAt',
+  UpdatedAt = 'updatedAt',
+  DeletedAt = 'deletedAt',
+  Login = 'login',
+  Email = 'email',
+}
 
 export class GetUsersQueryParams extends BaseQueryParams<UsersSortBy> {
   @IsEnum(UsersSortBy)

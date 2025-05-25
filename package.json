@@ -13,17 +13,24 @@
     "start:debug": "cross-env NODE_ENV=development nest start --debug --watch",
     "start:prod": "cross-env NODE_ENV=production node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "test": "cross-env NODE_ENV=testing jest --runInBand",
     "test:watch": "cross-env NODE_ENV=testing jest --watch",
     "test:cov": "cross-env NODE_ENV=testing jest --coverage",
     "test:debug": "cross-env NODE_ENV=testing node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cross-env NODE_ENV=testing jest --config ./test/jest-e2e.json"
+    "test:e2e":  "cross-env NODE_ENV=testing jest --config ./test/jest-e2e.json --runInBand --detectOpenHandles %npm_config_testfile%",
+    "test:e2e-all":  "cross-env NODE_ENV=testing jest --config ./test/jest-e2e.json --runInBand",
+    "test:unit": "cross-env NODE_ENV=testing jest --config test/jest-unit.json --runInBand --detectOpenHandles %npm_config_testfile%",
+    "test:int": "cross-env NODE_ENV=testing jest --config test/jest-int.json --runInBand --detectOpenHandles %npm_config_testfile%"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
+    "@nestjs/cqrs": "^11.0.3",
+    "@nestjs/jwt": "^11.0.0",
     "@nestjs/mongoose": "^11.0.3",
+    "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.1.6",
     "bcrypt": "^5.1.1",
@@ -33,9 +40,13 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "mongoose": "^8.13.2",
+    "nodemailer": "^7.0.3",
+    "passport": "^0.7.0",
+    "passport-http": "^0.3.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
-    "uuid": "^11.1.0"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -50,8 +61,11 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.14.1",
+    "@types/nodemailer": "^6.4.17",
+    "@types/passport-http": "^0.3.11",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.2",
-    "@types/uuid": "^10.0.0",
     "cross-env": "^7.0.3",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
@@ -67,22 +81,5 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   }
 }

@@ -37,7 +37,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   });
 
   it('should create a new user, the admin is authenticated.', async () => {
-    const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
+    const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
 
     const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
@@ -76,7 +76,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   });
 
   it('should not create a user if the admin is not authenticated.', async () => {
-    const dto: UserInputDto = TestDtoFactory.generateUserInputDto(1)[0];
+    const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
 
     const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
@@ -95,7 +95,6 @@ describe('UsersController - createUser() (POST: /users)', () => {
       .expect(401);
 
     expect(resCreateUser.body).toEqual({
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       timestamp: expect.any(String),
       path: '/api/users',
       message: 'unauthorised',

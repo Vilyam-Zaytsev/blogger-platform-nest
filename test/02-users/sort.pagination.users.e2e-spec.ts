@@ -9,9 +9,11 @@ import { TestLoggers } from '../helpers/test.loggers';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { Filter } from '../helpers/filter';
-import { GetUsersQueryParams } from '../../src/modules/user-accounts/api/input-dto/get-users-query-params.input-dto';
+import {
+  GetUsersQueryParams,
+  UsersSortBy,
+} from '../../src/modules/user-accounts/api/input-dto/get-users-query-params.input-dto';
 import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
-import { UsersSortBy } from '../../src/modules/user-accounts/api/input-dto/users-sort-by';
 
 describe('UsersController - getUser() (GET: /users (pagination, sort, search in term))', () => {
   let appTestManager: AppTestManager;
@@ -55,7 +57,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
       resGetUsers.body as PaginatedViewDto<UserViewDto>;
 
     const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
@@ -106,7 +108,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     query.sortBy = UsersSortBy.Login;
     query.sortDirection = SortDirection.Ascending;
 
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
@@ -155,7 +157,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     query.pageNumber = 6;
     query.sortDirection = SortDirection.Ascending;
 
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
@@ -201,7 +203,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
       login: 'r1',
     };
     const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .filter(searchFilter)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();
@@ -246,7 +248,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
       email: 'r1',
     };
     const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .filter(searchFilter)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();
@@ -293,7 +295,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
       email: 'r5',
     };
     const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter(newUsers)
+    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
       .filter(searchFilter)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();

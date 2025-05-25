@@ -5,13 +5,13 @@ import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-c
 
 export class UsersRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
+
   async getByIdOrNotFoundFail(id: string): Promise<UserDocument> {
     const user: UserDocument | null = await this.UserModel.findOne({
       _id: id,
       deletedAt: null,
     });
 
-    //TODO: правильно ли я понял, что в этом случае выкидывается доменное исключение?
     if (!user) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
@@ -22,12 +22,34 @@ export class UsersRepository {
     return user;
   }
 
+  async getByConfirmationCode(
+    confirmationCode: string,
+  ): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      'emailConfirmation.confirmationCode': confirmationCode,
+      deletedAt: null,
+    });
+  }
+
+  async getByRecoveryCode(recoveryCode: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      'passwordRecovery.recoveryCode': recoveryCode,
+      deletedAt: null,
+    });
+  }
+
   async getByLogin(login: string): Promise<UserDocument | null> {
-    return this.UserModel.findOne({ login });
+    return this.UserModel.findOne({
+      login,
+      deletedAt: null,
+    });
   }
 
   async getByEmail(email: string): Promise<UserDocument | null> {
-    return this.UserModel.findOne({ email });
+    return this.UserModel.findOne({
+      email,
+      deletedAt: null,
+    });
   }
 
   async save(user: UserDocument): Promise<string> {

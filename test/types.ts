@@ -8,3 +8,11 @@ export type TestSearchFilter = {
   email?: string;
   name?: string;
 };
+
+export type TestResultLogin = {
+  loginOrEmail: string;
+  authTokens: {
+    accessToken: string;
+    refreshToken: string;
+  };
+};

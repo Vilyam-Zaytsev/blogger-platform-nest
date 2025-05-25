@@ -1,31 +1,44 @@
-import { INestApplication } from '@nestjs/common';
+import { DynamicModule, INestApplication } from '@nestjs/common';
 import { Connection } from 'mongoose';
-import { ConfigService } from '@nestjs/config';
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../../src/app.module';
+import { Test, TestingModuleBuilder } from '@nestjs/testing';
 import { appSetup } from '../../src/setup/app.setup';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Server } from 'http';
 import { AdminCredentials } from '../types';
+import { CoreConfig } from '../../src/core/core.config';
+import { initAppModule } from '../../src/init-app-module';
 
 export class AppTestManager {
   app: INestApplication;
   connection: Connection;
-  configService: ConfigService;
+  coreConfig: CoreConfig;
 
-  async init() {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+  async init(
+    addSettingsToModuleBuilder?: (moduleBuilder: TestingModuleBuilder) => void,
+  ) {
+    const DynamicAppModule: DynamicModule = await initAppModule();
 
-    this.app = moduleFixture.createNestApplication();
-    appSetup(this.app);
+    const testingModuleBuilder: TestingModuleBuilder = Test.createTestingModule(
+      {
+        imports: [DynamicAppModule],
+      },
+    );
 
-    this.configService = moduleFixture.get(ConfigService);
+    if (addSettingsToModuleBuilder) {
+      addSettingsToModuleBuilder(testingModuleBuilder);
+    }
+
+    const testingAppModule = await testingModuleBuilder.compile();
+
+    this.app = testingAppModule.createNestApplication();
+
+    this.coreConfig = this.app.get<CoreConfig>(CoreConfig);
+
+    appSetup(this.app, this.coreConfig.isSwaggerEnabled);
 
     await this.app.init();
 
-    this.connection = moduleFixture.get<Connection>(getConnectionToken());
+    this.connection = this.app.get<Connection>(getConnectionToken());
   }
 
   async cleanupDb() {
@@ -48,9 +61,8 @@ export class AppTestManager {
   }
 
   getAdminData(): AdminCredentials {
-    const login: string | undefined = this.configService.get('ADMIN_LOGIN');
-    const password: string | undefined =
-      this.configService.get('ADMIN_PASSWORD');
+    const login: string | undefined = this.coreConfig.adminLogin;
+    const password: string | undefined = this.coreConfig.adminPassword;
 
     if (!login || !password) {
       throw new Error(
