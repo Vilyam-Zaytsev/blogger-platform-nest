@@ -17,9 +17,8 @@ import { SendRecoveryCodeEmailWhenUserPasswordRecoveryEventHandler } from './eve
       inject: [NotificationsConfig],
 
       useFactory: (notificationsConfig: NotificationsConfig) => {
-        const email: string | undefined = notificationsConfig.emailApp;
-        const password: string | undefined =
-          notificationsConfig.emailAppPassword;
+        const email: string = notificationsConfig.emailApp;
+        const password: string = notificationsConfig.emailAppPassword;
 
         if (!email || !password) {
           throw new Error(
