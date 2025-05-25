@@ -21,7 +21,6 @@ import { LoginUserCommand } from '../application/usecases/login-user.usecase';
 import { AuthTokens } from '../types/auth-tokens.type';
 import { Response } from 'express';
 import { LoginValidationGuard } from '../guards/login-validation.guard';
-import { async } from 'rxjs';
 import { PasswordRecoveryInputDto } from './input-dto/password-recovery.input-dto';
 import { LoginViewDto } from './view-dto/login.view-dto';
 import { PasswordRecoveryCommand } from '../application/usecases/password-recovery.usecase';
