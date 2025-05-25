@@ -26,6 +26,7 @@ import { JwtStrategy } from './guards/bearer/jwt.strategy';
 import { LocalStrategy } from './guards/local/local.strategy';
 import { UserAccountsConfig } from './config/user-accounts.config';
 import { PasswordRecoveryUseCase } from './application/usecases/password-recovery.usecase';
+import { NewPasswordUseCase } from './application/usecases/new-password.usecase';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { PasswordRecoveryUseCase } from './application/usecases/password-recover
     LoginUserUseCase,
     DeleteUserUseCase,
     ConfirmUserUseCase,
+    NewPasswordUseCase,
     RegisterUserUseCase,
     PasswordRecoveryUseCase,
     CreateUserByAdminUseCase,

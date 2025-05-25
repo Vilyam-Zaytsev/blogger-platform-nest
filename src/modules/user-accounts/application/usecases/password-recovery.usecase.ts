@@ -3,7 +3,7 @@ import { UsersRepository } from '../../infrastructure/users.repository';
 import { UserDocument } from '../../domain/user.entity';
 import { add } from 'date-fns';
 import { CryptoService } from '../crypto.service';
-import { PasswordRecoveryInputDto } from '../../api/input-dto/password-recovery.input-dto';
+import { PasswordRecoveryInputDto } from '../../api/input-dto/authentication-authorization/password-recovery.input-dto';
 import { UserPasswordRecoveryEvent } from '../../domain/events/user-password-recovery.event';
 
 export class PasswordRecoveryCommand {

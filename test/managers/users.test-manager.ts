@@ -71,4 +71,13 @@ export class UsersTestManager {
 
     return response.body as PaginatedViewDto<UserViewDto>;
   }
+
+  async passwordRecovery(email: string) {
+    await request(this.server)
+      .post(`/${GLOBAL_PREFIX}/auth/password-recovery`)
+      .send({
+        email,
+      })
+      .expect(204);
+  }
 }

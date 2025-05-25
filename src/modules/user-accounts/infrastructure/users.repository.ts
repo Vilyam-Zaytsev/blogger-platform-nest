@@ -31,6 +31,13 @@ export class UsersRepository {
     });
   }
 
+  async getByRecoveryCode(recoveryCode: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      'passwordRecovery.recoveryCode': recoveryCode,
+      deletedAt: null,
+    });
+  }
+
   async getByLogin(login: string): Promise<UserDocument | null> {
     return this.UserModel.findOne({
       login,

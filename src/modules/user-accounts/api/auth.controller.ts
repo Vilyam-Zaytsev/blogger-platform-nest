@@ -21,9 +21,11 @@ import { LoginUserCommand } from '../application/usecases/login-user.usecase';
 import { AuthTokens } from '../types/auth-tokens.type';
 import { Response } from 'express';
 import { LoginValidationGuard } from '../guards/login-validation.guard';
-import { PasswordRecoveryInputDto } from './input-dto/password-recovery.input-dto';
+import { PasswordRecoveryInputDto } from './input-dto/authentication-authorization/password-recovery.input-dto';
 import { LoginViewDto } from './view-dto/login.view-dto';
 import { PasswordRecoveryCommand } from '../application/usecases/password-recovery.usecase';
+import { NewPasswordInputDto } from './input-dto/authentication-authorization/new-password-input.dto';
+import { NewPasswordCommand } from '../application/usecases/new-password.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -83,7 +85,11 @@ export class AuthController {
     return this.commandBus.execute(new PasswordRecoveryCommand(body));
   }
 
-  async newPassword() {}
+  @Post('new-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async newPassword(@Body() body: NewPasswordInputDto): Promise<void> {
+    return this.commandBus.execute(new NewPasswordCommand(body));
+  }
 
   async me() {}
 }

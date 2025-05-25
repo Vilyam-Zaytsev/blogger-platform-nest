@@ -194,6 +194,21 @@ export class User {
       expirationDate,
     };
   }
+
+  /**
+   * Updates the user's password with a new password hash and clears the recovery data.
+   *
+   * This method is typically used after a successful password recovery process.
+   * It replaces the current password hash with a new one and nullifies the recovery code and its expiration date
+   * to prevent reuse of the same recovery token.
+   *
+   * @param {string} newPasswordHash - The new hashed password to set for the user.
+   */
+  updatePassword(newPasswordHash: string) {
+    this.passwordRecovery.recoveryCode = null;
+    this.passwordRecovery.expirationDate = null;
+    this.passwordHash = newPasswordHash;
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
