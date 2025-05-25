@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDomainDto } from '../domain/dto/create-user.domain.dto';
 import { add } from 'date-fns';
 import { Injectable } from '@nestjs/common';
-import { CryptoService } from './crypto.service';
+import { CryptoService } from './services/crypto.service';
 
 @Injectable()
 export class UsersFactory {

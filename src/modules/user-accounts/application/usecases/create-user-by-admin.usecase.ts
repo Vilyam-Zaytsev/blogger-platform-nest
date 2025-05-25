@@ -3,7 +3,7 @@ import { UsersRepository } from '../../infrastructure/users.repository';
 import { UserDocument } from '../../domain/user.entity';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { UsersFactory } from '../users.factory';
-import { UserValidationService } from '../user-validation.service';
+import { UserValidationService } from '../services/user-validation.service';
 
 @Injectable()
 export class CreateUserByAdminUseCase {

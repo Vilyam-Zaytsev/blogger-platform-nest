@@ -7,7 +7,7 @@ import { GetUsersQueryParams } from '../../src/modules/user-accounts/api/input-d
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
 import { UserInputDto } from '../../src/modules/user-accounts/api/input-dto/user.input-dto';
 import { TestDtoFactory } from '../helpers/test.dto-factory';
-import { AdminCredentials } from '../types';
+import { AdminCredentials, TestResultLogin } from '../types';
 
 export class UsersTestManager {
   constructor(
@@ -52,6 +52,43 @@ export class UsersTestManager {
       .post(`/${GLOBAL_PREFIX}/auth/registration`)
       .send(dto)
       .expect(204);
+  }
+
+  async login(loginsOrEmails: string[]): Promise<TestResultLogin[]> {
+    const resultLogin: TestResultLogin[] = [];
+
+    for (let i = 0; i < loginsOrEmails.length; i++) {
+      const res: Response = await request(this.server)
+        .post(`/${GLOBAL_PREFIX}/auth/login`)
+        .send({
+          loginOrEmail: loginsOrEmails[i],
+          password: 'qwerty',
+        })
+        .expect(200);
+
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          accessToken: expect.any(String),
+        }),
+      );
+
+      const body = res.body as { accessToken: string };
+
+      const authTokens = {
+        accessToken: body.accessToken,
+        refreshToken: res.headers['set-cookie'][0].split(';')[0].split('=')[1],
+      };
+
+      const result = {
+        loginOrEmail: loginsOrEmails[i],
+        authTokens,
+      };
+
+      resultLogin.push(result);
+    }
+
+    return resultLogin;
   }
 
   async getAll(

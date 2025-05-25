@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -8,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserInputDto } from './input-dto/user.input-dto';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.useсase';
 import { RegistrationConfirmationCodeInputDto } from './input-dto/authentication-authorization/registration-confirmation-code.input-dto';
 import { ConfirmUserCommand } from '../application/usecases/confirm-user.usecase';
@@ -20,16 +21,21 @@ import { UserContextDto } from '../guards/dto/user-context.dto';
 import { LoginUserCommand } from '../application/usecases/login-user.usecase';
 import { AuthTokens } from '../types/auth-tokens.type';
 import { Response } from 'express';
-import { LoginValidationGuard } from '../guards/login-validation.guard';
 import { PasswordRecoveryInputDto } from './input-dto/authentication-authorization/password-recovery.input-dto';
 import { LoginViewDto } from './view-dto/login.view-dto';
 import { PasswordRecoveryCommand } from '../application/usecases/password-recovery.usecase';
 import { NewPasswordInputDto } from './input-dto/authentication-authorization/new-password-input.dto';
 import { NewPasswordCommand } from '../application/usecases/new-password.usecase';
+import { MeViewDto } from './view-dto/user.view-dto';
+import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
+import { GetMeQuery } from '../application/queries/get-me.query-handler';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -55,8 +61,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  //TODO: правильно ли я валидирую входные данные?
-  @UseGuards(LoginValidationGuard, LocalAuthGuard)
+  @UseGuards(LocalAuthGuard)
   async login(
     @ExtractUserFromRequest() user: UserContextDto,
     @Res({ passthrough: true }) res: Response,
@@ -91,5 +96,9 @@ export class AuthController {
     return this.commandBus.execute(new NewPasswordCommand(body));
   }
 
-  async me() {}
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async me(@ExtractUserFromRequest() user: UserContextDto): Promise<MeViewDto> {
+    return this.queryBus.execute(new GetMeQuery(user.id));
+  }
 }

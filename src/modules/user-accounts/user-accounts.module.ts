@@ -4,15 +4,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersRepository } from './infrastructure/users.repository';
 import { User, UserSchema } from './domain/user.entity';
 import { UsersQueryRepository } from './infrastructure/query/users.query-repository';
-import { BcryptService } from './application/bcrypt.service';
+import { BcryptService } from './application/services/bcrypt.service';
 import { CreateUserByAdminUseCase } from './application/usecases/create-user-by-admin.usecase';
 import { UsersFactory } from './application/users.factory';
 import { DeleteUserUseCase } from './application/usecases/delete-user.usecase';
 import { BasicStrategy } from './guards/basic/basic.strategy';
 import { AuthController } from './api/auth.controller';
 import { RegisterUserUseCase } from './application/usecases/register-user.useсase';
-import { UserValidationService } from './application/user-validation.service';
-import { CryptoService } from './application/crypto.service';
+import { UserValidationService } from './application/services/user-validation.service';
+import { CryptoService } from './application/services/crypto.service';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { ConfirmUserUseCase } from './application/usecases/confirm-user.usecase';
 import { ResendRegistrationEmailUseCase } from './application/usecases/resend-registration-email.usecase';
@@ -27,6 +27,8 @@ import { LocalStrategy } from './guards/local/local.strategy';
 import { UserAccountsConfig } from './config/user-accounts.config';
 import { PasswordRecoveryUseCase } from './application/usecases/password-recovery.usecase';
 import { NewPasswordUseCase } from './application/usecases/new-password.usecase';
+import { GetMeQueryHandler } from './application/queries/get-me.query-handler';
+import { AuthQueryRepository } from './infrastructure/query/auth.query-repository';
 
 @Module({
   imports: [
@@ -85,6 +87,10 @@ import { NewPasswordUseCase } from './application/usecases/new-password.usecase'
     UsersFactory,
     //config
     UserAccountsConfig,
+    //query-handlers
+    GetMeQueryHandler,
+    //repo
+    AuthQueryRepository,
   ],
   exports: [],
 })

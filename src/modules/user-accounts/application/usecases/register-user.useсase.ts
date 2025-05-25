@@ -2,7 +2,7 @@ import { UsersRepository } from '../../infrastructure/users.repository';
 import { UserDocument } from '../../domain/user.entity';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { UsersFactory } from '../users.factory';
-import { UserValidationService } from '../user-validation.service';
+import { UserValidationService } from '../services/user-validation.service';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { UserRegisteredEvent } from '../../domain/events/user-registered.event';
 

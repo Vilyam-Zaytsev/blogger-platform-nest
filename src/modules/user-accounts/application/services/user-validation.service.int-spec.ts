@@ -1,15 +1,15 @@
-import { DomainException } from '../../../core/exceptions/damain-exceptions';
-import { AppTestManager } from '../../../../test/managers/app.test-manager';
+import { DomainException } from '../../../../core/exceptions/damain-exceptions';
+import { AppTestManager } from '../../../../../test/managers/app.test-manager';
 import { UserValidationService } from './user-validation.service';
-import { UserInputDto } from '../api/input-dto/user.input-dto';
-import { TestDtoFactory } from '../../../../test/helpers/test.dto-factory';
-import { UsersTestManager } from '../../../../test/managers/users.test-manager';
-import { AdminCredentials } from '../../../../test/types';
+import { UserInputDto } from '../../api/input-dto/user.input-dto';
+import { TestDtoFactory } from '../../../../../test/helpers/test.dto-factory';
+import { UsersTestManager } from '../../../../../test/managers/users.test-manager';
+import { AdminCredentials } from '../../../../../test/types';
 import { Server } from 'http';
-import { UserViewDto } from '../api/view-dto/user.view-dto';
+import { UserViewDto } from '../../api/view-dto/user.view-dto';
 import { CryptoService } from './crypto.service';
-import { UserContextDto } from '../guards/dto/user-context.dto';
-import { TestLoggers } from '../../../../test/helpers/test.loggers';
+import { UserContextDto } from '../../guards/dto/user-context.dto';
+import { TestLoggers } from '../../../../../test/helpers/test.loggers';
 
 describe('UserValidationService (integration)', () => {
   let appTestManager: AppTestManager;

@@ -4,7 +4,7 @@ import { AppTestManager } from '../../../../../../test/managers/app.test-manager
 import { UsersTestManager } from '../../../../../../test/managers/users.test-manager';
 import { UserInputDto } from '../../../api/input-dto/user.input-dto';
 import { TestDtoFactory } from '../../../../../../test/helpers/test.dto-factory';
-import { CryptoService } from '../../crypto.service';
+import { CryptoService } from '../../services/crypto.service';
 import { CreateUserByAdminUseCase } from '../create-user-by-admin.usecase';
 import { TestLoggers } from '../../../../../../test/helpers/test.loggers';
 import { UsersRepository } from '../../../infrastructure/users.repository';

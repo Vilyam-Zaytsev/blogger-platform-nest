@@ -6,7 +6,7 @@ import {
   REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
 } from '../../constans/auth-tokens.inject-constants';
 import { JwtService } from '@nestjs/jwt';
-import { CryptoService } from '../crypto.service';
+import { CryptoService } from '../services/crypto.service';
 import { AuthTokens } from '../../types/auth-tokens.type';
 
 export class LoginUserCommand {
