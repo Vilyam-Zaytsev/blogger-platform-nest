@@ -1,4 +1,4 @@
-import { RegistrationConfirmationCodeInputDto } from '../../api/input-dto/registration-confirmation-code.input-dto';
+import { RegistrationConfirmationCodeInputDto } from '../../api/input-dto/authentication-authorization/registration-confirmation-code.input-dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { UserDocument } from '../../domain/user.entity';

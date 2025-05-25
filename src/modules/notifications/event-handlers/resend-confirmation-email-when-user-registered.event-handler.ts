@@ -18,7 +18,6 @@ export class ResendConfirmationEmailWhenUserRegisteredEventHandler
 
     const template: EmailTemplate =
       this.templates.registrationEmail(confirmationCode);
-
     try {
       await this.emailService.sendEmail(email, template);
     } catch (e) {

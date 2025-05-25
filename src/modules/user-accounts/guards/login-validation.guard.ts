@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { LoginInputDto } from '../api/input-dto/login.input-dto';
+import { LoginInputDto } from '../api/input-dto/authentication-authorization/login.input-dto';
 import { Request } from 'express';
 import { errorFormatter } from '../../../setup/pipes.setup';
 import { ValidationException } from '../../../core/exceptions/validation-exception';

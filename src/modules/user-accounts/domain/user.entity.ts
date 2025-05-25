@@ -166,9 +166,33 @@ export class User {
     this.emailConfirmation.confirmationStatus = ConfirmationStatus.Confirmed;
   }
 
+  /**
+   * Updates the confirmation code and its expiration date for the user's email verification.
+   *
+   * Typically used when resending the confirmation email or generating a new verification code.
+   *
+   * @param {string} confirmationCode - The new confirmation code to be sent to the user.
+   * @param {Date} expirationDate - The new expiration date and time for the confirmation code.
+   */
   refreshConfirmationCode(confirmationCode: string, expirationDate: Date) {
     this.emailConfirmation.confirmationCode = confirmationCode;
     this.emailConfirmation.expirationDate = expirationDate;
+  }
+
+  /**
+   * Sets the password recovery code and its expiration date for the user.
+   *
+   * Typically used when initiating a password recovery process (e.g., user requested a password reset).
+   * Stores the provided recovery code and expiration date in the user entity.
+   *
+   * @param {string} recoveryCode - A unique recovery code to be used for resetting the password.
+   * @param {Date} expirationDate - The date and time when the recovery code expires.
+   */
+  recoverPassword(recoveryCode: string, expirationDate: Date) {
+    this.passwordRecovery = {
+      recoveryCode,
+      expirationDate,
+    };
   }
 }
 

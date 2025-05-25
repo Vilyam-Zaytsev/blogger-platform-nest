@@ -4,7 +4,7 @@ import { UserDocument } from '../../domain/user.entity';
 import { DomainException } from '../../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 import { ConfirmationStatus } from '../../domain/email-confirmation.schema';
-import { RegistrationEmailResandingInputDto } from '../../api/input-dto/registration-email-resending.input-dto';
+import { RegistrationEmailResandingInputDto } from '../../api/input-dto/authentication-authorization/registration-email-resending.input-dto';
 import { add } from 'date-fns';
 import { CryptoService } from '../crypto.service';
 import { UserResendRegisteredEvent } from '../../domain/events/user-resend-registered.event';

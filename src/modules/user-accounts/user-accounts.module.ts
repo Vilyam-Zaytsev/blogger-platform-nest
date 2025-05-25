@@ -25,6 +25,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from './guards/bearer/jwt.strategy';
 import { LocalStrategy } from './guards/local/local.strategy';
 import { UserAccountsConfig } from './config/user-accounts.config';
+import { PasswordRecoveryUseCase } from './application/usecases/password-recovery.usecase';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { UserAccountsConfig } from './config/user-accounts.config';
     DeleteUserUseCase,
     ConfirmUserUseCase,
     RegisterUserUseCase,
+    PasswordRecoveryUseCase,
     CreateUserByAdminUseCase,
     ResendRegistrationEmailUseCase,
     //factories

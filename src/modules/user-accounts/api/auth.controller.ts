@@ -10,9 +10,9 @@ import {
 import { UserInputDto } from './input-dto/user.input-dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.useсase';
-import { RegistrationConfirmationCodeInputDto } from './input-dto/registration-confirmation-code.input-dto';
+import { RegistrationConfirmationCodeInputDto } from './input-dto/authentication-authorization/registration-confirmation-code.input-dto';
 import { ConfirmUserCommand } from '../application/usecases/confirm-user.usecase';
-import { RegistrationEmailResandingInputDto } from './input-dto/registration-email-resending.input-dto';
+import { RegistrationEmailResandingInputDto } from './input-dto/authentication-authorization/registration-email-resending.input-dto';
 import { ResendRegistrationEmailCommand } from '../application/usecases/resend-registration-email.usecase';
 import { LocalAuthGuard } from '../guards/local/local-auth.guard';
 import { ExtractUserFromRequest } from '../guards/decorators/extract-user-from-request.decorator';
@@ -20,8 +20,11 @@ import { UserContextDto } from '../guards/dto/user-context.dto';
 import { LoginUserCommand } from '../application/usecases/login-user.usecase';
 import { AuthTokens } from '../types/auth-tokens.type';
 import { Response } from 'express';
-import { LoginInputDto } from './input-dto/login.input-dto';
 import { LoginValidationGuard } from '../guards/login-validation.guard';
+import { async } from 'rxjs';
+import { PasswordRecoveryInputDto } from './input-dto/password-recovery.input-dto';
+import { LoginViewDto } from './view-dto/login.view-dto';
+import { PasswordRecoveryCommand } from '../application/usecases/password-recovery.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -51,11 +54,12 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  //TODO: правильно ли я валидирую входные данные?
   @UseGuards(LoginValidationGuard, LocalAuthGuard)
   async login(
     @ExtractUserFromRequest() user: UserContextDto,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<LoginViewDto> {
     const { accessToken, refreshToken }: AuthTokens =
       await this.commandBus.execute(new LoginUserCommand(user));
 
@@ -72,7 +76,13 @@ export class AuthController {
 
   async logout() {}
 
-  async passwordRecovery() {}
+  @Post('password-recovery')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async passwordRecovery(
+    @Body() body: PasswordRecoveryInputDto,
+  ): Promise<void> {
+    return this.commandBus.execute(new PasswordRecoveryCommand(body));
+  }
 
   async newPassword() {}
 
