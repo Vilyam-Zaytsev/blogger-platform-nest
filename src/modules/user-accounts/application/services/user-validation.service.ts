@@ -6,6 +6,7 @@ import { DomainExceptionCode } from '../../../../core/exceptions/domain-exceptio
 import { UserContextDto } from '../../guards/dto/user-context.dto';
 import { UserDocument } from '../../domain/user.entity';
 import { CryptoService } from './crypto.service';
+import { ValidationException } from '../../../../core/exceptions/validation-exception';
 
 @Injectable()
 export class UserValidationService {
@@ -19,19 +20,23 @@ export class UserValidationService {
       this.usersRepository.getByLogin(dto.login),
       this.usersRepository.getByEmail(dto.email),
     ]);
-
+    //TODO: как лучше формировать extensions? Так как у меня или через new Extension(message, field)?
     if (byLogin) {
-      throw new DomainException({
-        code: DomainExceptionCode.BadRequest,
-        message: 'User with the same login already exists.',
-      });
+      throw new ValidationException([
+        {
+          message: 'User with the same login already exists.',
+          field: 'login',
+        },
+      ]);
     }
 
     if (byEmail) {
-      throw new DomainException({
-        code: DomainExceptionCode.BadRequest,
-        message: 'User with the same email already exists.',
-      });
+      throw new ValidationException([
+        {
+          message: 'User with the same email already exists.',
+          field: 'email',
+        },
+      ]);
     }
   }
 
