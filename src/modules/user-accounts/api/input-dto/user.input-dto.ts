@@ -8,9 +8,11 @@ import { IsEmail, IsString, Matches } from 'class-validator';
 import { Trim } from '../../../../core/decorators/transform/trim';
 
 export class UserInputDto {
+  @Matches(loginConstraints.match)
   @IsStringWithTrim(loginConstraints.minLength, loginConstraints.maxLength)
   login: string;
 
+  //TODO: в каком порядке выполняются декораторы?
   @IsString()
   @IsEmail()
   @Matches(emailConstraints.match)
