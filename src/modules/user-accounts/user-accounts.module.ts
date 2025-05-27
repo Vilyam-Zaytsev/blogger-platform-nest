@@ -27,8 +27,9 @@ import { LocalStrategy } from './guards/local/local.strategy';
 import { UserAccountsConfig } from './config/user-accounts.config';
 import { PasswordRecoveryUseCase } from './application/usecases/password-recovery.usecase';
 import { NewPasswordUseCase } from './application/usecases/new-password.usecase';
-import { GetMeQueryHandler } from './application/queries/get-me.query-handler';
+import { GetMeQueryHandler } from './application/queries/auth/get-me.query-handler';
 import { AuthQueryRepository } from './infrastructure/query/auth.query-repository';
+import { GetUsersQueryHandler } from './application/queries/users/get-users.query-handler';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { AuthQueryRepository } from './infrastructure/query/auth.query-repositor
     UserAccountsConfig,
     //query-handlers
     GetMeQueryHandler,
+    GetUsersQueryHandler,
     //repo
     AuthQueryRepository,
   ],

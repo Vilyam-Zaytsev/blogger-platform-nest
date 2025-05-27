@@ -28,7 +28,7 @@ import { NewPasswordInputDto } from './input-dto/authentication-authorization/ne
 import { NewPasswordCommand } from '../application/usecases/new-password.usecase';
 import { MeViewDto } from './view-dto/user.view-dto';
 import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
-import { GetMeQuery } from '../application/queries/get-me.query-handler';
+import { GetMeQuery } from '../application/queries/auth/get-me.query-handler';
 
 @Controller('auth')
 export class AuthController {

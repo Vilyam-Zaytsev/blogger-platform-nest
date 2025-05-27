@@ -19,6 +19,8 @@ import { UserViewDto } from './view-dto/user.view-dto';
 import { DeleteUserUseCase } from '../application/usecases/delete-user.usecase';
 import { BasicAuthGuard } from '../guards/basic/basic-auth.guard';
 import { IdInputDto } from './input-dto/id.input-dto';
+import { QueryBus } from '@nestjs/cqrs';
+import { GetUsersQuery } from '../application/queries/users/get-users.query-handler';
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)
@@ -27,13 +29,14 @@ export class UsersController {
     private readonly createUserByAdminUseCase: CreateUserByAdminUseCase,
     private readonly deleteUserByAdminUseCase: DeleteUserUseCase,
     private readonly usersQueryRepository: UsersQueryRepository,
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Get()
   async getAll(
     @Query() query: GetUsersQueryParams,
   ): Promise<PaginatedViewDto<UserViewDto>> {
-    return this.usersQueryRepository.getAll(query);
+    return this.queryBus.execute(new GetUsersQuery(query));
   }
 
   @Post()
