@@ -1,13 +1,12 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '../../infrastructure/users.repository';
 import { UserDocument } from '../../domain/user.entity';
-import { DomainException } from '../../../../core/exceptions/damain-exceptions';
-import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 import { ConfirmationStatus } from '../../domain/email-confirmation.schema';
 import { RegistrationEmailResandingInputDto } from '../../api/input-dto/authentication-authorization/registration-email-resending.input-dto';
 import { add } from 'date-fns';
 import { CryptoService } from '../services/crypto.service';
 import { UserResendRegisteredEvent } from '../../domain/events/user-resend-registered.event';
+import { ValidationException } from '../../../../core/exceptions/validation-exception';
 
 export class ResendRegistrationEmailCommand {
   constructor(public readonly dto: RegistrationEmailResandingInputDto) {}
@@ -32,10 +31,13 @@ export class ResendRegistrationEmailUseCase
       !user ||
       user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed
     ) {
-      throw new DomainException({
-        code: DomainExceptionCode.BadRequest,
-        message: `The email address (${dto.email}) is incorrect or has already been verified`,
-      });
+      //TODO: как лучше формировать extensions? Так как у меня или через new Extension(message, field)?
+      throw new ValidationException([
+        {
+          message: `The email address (${dto.email}) is incorrect or has already been verified`,
+          field: 'email',
+        },
+      ]);
     }
 
     const confirmationCode: string = this.cryptoService.generateUUID();

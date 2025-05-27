@@ -181,6 +181,15 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
       })
       .expect(400);
 
+    expect(resRegistrationEmailResending.body).toEqual({
+      errorsMessages: [
+        {
+          message: `The email address (${user.email}) is incorrect or has already been verified`,
+          field: 'email',
+        },
+      ],
+    });
+
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
     TestLoggers.logE2E(
