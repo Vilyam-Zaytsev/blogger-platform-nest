@@ -15,7 +15,7 @@ import { UsersQueryRepository } from '../infrastructure/query/users.query-reposi
 import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
 import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
 import { UserViewDto } from './view-dto/user.view-dto';
-import { DeleteUserUseCase } from '../application/usecases/delete-user.usecase';
+import { DeleteUserCommand } from '../application/usecases/delete-user.usecase';
 import { BasicAuthGuard } from '../guards/basic/basic-auth.guard';
 import { IdInputDto } from './input-dto/id.input-dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -26,7 +26,6 @@ import { CreateUserCommand } from '../application/usecases/create-user-by-admin.
 @UseGuards(BasicAuthGuard)
 export class UsersController {
   constructor(
-    private readonly deleteUserByAdminUseCase: DeleteUserUseCase,
     private readonly usersQueryRepository: UsersQueryRepository,
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
@@ -51,6 +50,6 @@ export class UsersController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param() id: IdInputDto): Promise<void> {
-    await this.deleteUserByAdminUseCase.execute(id.id);
+    await this.commandBus.execute(new DeleteUserCommand(id));
   }
 }
