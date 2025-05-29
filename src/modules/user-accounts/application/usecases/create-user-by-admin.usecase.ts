@@ -6,7 +6,7 @@ import { UserValidationService } from '../services/user-validation.service';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class CreateUserCommand {
-  constructor(public dto: CreateUserDto) {}
+  constructor(public readonly dto: CreateUserDto) {}
 }
 
 @CommandHandler(CreateUserCommand)

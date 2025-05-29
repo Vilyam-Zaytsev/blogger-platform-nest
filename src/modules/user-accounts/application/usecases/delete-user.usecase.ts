@@ -4,7 +4,7 @@ import { IdInputDto } from '../../api/input-dto/id.input-dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class DeleteUserCommand {
-  constructor(public dto: IdInputDto) {}
+  constructor(public readonly dto: IdInputDto) {}
 }
 
 @CommandHandler(DeleteUserCommand)

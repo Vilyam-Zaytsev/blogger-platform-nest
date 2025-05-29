@@ -49,7 +49,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param() id: IdInputDto): Promise<void> {
-    await this.commandBus.execute(new DeleteUserCommand(id));
+  async deleteUser(@Param() params: IdInputDto): Promise<void> {
+    await this.commandBus.execute(new DeleteUserCommand(params));
   }
 }
