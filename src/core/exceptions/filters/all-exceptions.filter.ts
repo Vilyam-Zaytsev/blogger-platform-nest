@@ -31,17 +31,17 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
   ): ErrorResponseBody {
     //TODO: Replace with getter from configService. will be in the following lessons
     console.log('buildResponseBody', message);
-    const isProduction: boolean = process.env.NODE_ENV === 'production';
-
-    if (isProduction) {
-      return {
-        timestamp: new Date().toISOString(),
-        path: null,
-        message: 'Some error occurred',
-        extensions: [],
-        code: DomainExceptionCode.InternalServerError,
-      };
-    }
+    // const isProduction: boolean = process.env.NODE_ENV === 'production';
+    //
+    // if (isProduction) {
+    //   return {
+    //     timestamp: new Date().toISOString(),
+    //     path: null,
+    //     message: 'Some error occurred',
+    //     extensions: [],
+    //     code: DomainExceptionCode.InternalServerError,
+    //   };
+    // }
 
     return {
       timestamp: new Date().toISOString(),
