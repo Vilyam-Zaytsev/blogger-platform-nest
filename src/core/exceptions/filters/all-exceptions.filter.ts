@@ -30,7 +30,7 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
     message: string,
   ): ErrorResponseBody {
     //TODO: Replace with getter from configService. will be in the following lessons
-
+    console.log('buildResponseBody', message);
     const isProduction: boolean = process.env.NODE_ENV === 'production';
 
     if (isProduction) {
