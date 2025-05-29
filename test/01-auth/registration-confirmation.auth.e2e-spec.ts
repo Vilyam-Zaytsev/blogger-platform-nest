@@ -121,6 +121,8 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
   });
 
   it('should not be confirmed if the user has sent an incorrect verification code.', async () => {
+    const code: string = TestUtils.generateRandomString(15);
+
     const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
 
     await usersTestManager.registration(dto);
@@ -128,9 +130,18 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
     const resRegistrationConfirmation: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/registration-confirmation`)
       .send({
-        code: TestUtils.generateRandomString(15),
+        code,
       })
       .expect(400);
+
+    expect(resRegistrationConfirmation.body).toEqual({
+      errorsMessages: [
+        {
+          message: `Confirmation code (${code}) incorrect or the email address has already been confirmed`,
+          field: 'code',
+        },
+      ],
+    });
 
     const user: UserDocument | null = await usersRepository.getByEmail(
       dto.email,

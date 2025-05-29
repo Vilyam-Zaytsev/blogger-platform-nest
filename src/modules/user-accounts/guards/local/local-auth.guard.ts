@@ -16,6 +16,7 @@ export class LocalAuthGuard extends AuthGuard('local') {
       LoginInputDto,
       request.body,
     );
+
     const errors = validateSync(dtoObject, {
       whitelist: true,
       forbidNonWhitelisted: true,

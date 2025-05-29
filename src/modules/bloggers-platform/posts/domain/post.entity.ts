@@ -3,8 +3,19 @@ import { ReactionsCount, ReactionsCountSchema } from './reactions-count.schema';
 import { LastLike, LastLikeSchema } from './last-likes.schema';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDomainDto } from './dto/create-post.domain.dto';
-import { UpdateBlogDto } from '../../blogs/dto/blog.dto';
 import { UpdatePostDto } from '../dto/post.dto';
+
+export const titleConstraints = {
+  maxLength: 30,
+};
+
+export const shortDescriptionConstraints = {
+  maxLength: 100,
+};
+
+export const contentConstraints = {
+  maxLength: 1000,
+};
 
 /**
  * Post Entity Schema
@@ -21,7 +32,7 @@ export class Post {
    * @type {string}
    * @required
    */
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, ...titleConstraints })
   title: string;
 
   /**
@@ -31,7 +42,7 @@ export class Post {
    * @type {string}
    * @required
    */
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, ...shortDescriptionConstraints })
   shortDescription: string;
 
   /**
@@ -41,7 +52,7 @@ export class Post {
    * @type {string}
    * @required
    */
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, ...contentConstraints })
   content: string;
 
   /**

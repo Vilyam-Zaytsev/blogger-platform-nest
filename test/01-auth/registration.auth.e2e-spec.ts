@@ -85,17 +85,25 @@ describe('AuthController - registration() (POST: /auth)', () => {
   });
 
   it('should not be registered if a user with such data already exists (login).', async () => {
-    const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
     const [user]: UserViewDto[] = await usersTestManager.createUser(1);
 
     const resRegistration: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/registration`)
       .send({
         login: user.login,
-        email: dto.email,
-        password: dto.password,
+        email: 'newUser@example.com',
+        password: 'qwerty',
       })
       .expect(400);
+
+    expect(resRegistration.body).toEqual({
+      errorsMessages: [
+        {
+          message: 'User with the same login already exists.',
+          field: 'login',
+        },
+      ],
+    });
 
     const { items }: PaginatedViewDto<UserViewDto> =
       await usersTestManager.getAll();
@@ -113,17 +121,25 @@ describe('AuthController - registration() (POST: /auth)', () => {
   });
 
   it('should not be registered if a user with such data already exists (email).', async () => {
-    const [dto]: UserInputDto[] = TestDtoFactory.generateUserInputDto(1);
     const [user]: UserViewDto[] = await usersTestManager.createUser(1);
 
     const resRegistration: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/registration`)
       .send({
-        login: dto.login,
+        login: 'newUser',
         email: user.email,
-        password: dto.password,
+        password: 'qwerty',
       })
       .expect(400);
+
+    expect(resRegistration.body).toEqual({
+      errorsMessages: [
+        {
+          message: 'User with the same email already exists.',
+          field: 'email',
+        },
+      ],
+    });
 
     const { items }: PaginatedViewDto<UserViewDto> =
       await usersTestManager.getAll();

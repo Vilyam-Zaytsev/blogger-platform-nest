@@ -2,6 +2,19 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateBlogDto, UpdateBlogDto } from '../dto/blog.dto';
 
+export const nameConstraints = {
+  maxLength: 15,
+};
+
+export const descriptionConstraints = {
+  maxLength: 500,
+};
+
+export const websiteUrlConstraints = {
+  maxLength: 100,
+  match: /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
+};
+
 /**
  * Blog Entity Schema
  * Represents a blog with its metadata, configuration, and deletion status.
@@ -15,7 +28,7 @@ export class Blog {
    * @type {string}
    * @required
    */
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, ...nameConstraints })
   name: string;
 
   /**
@@ -25,7 +38,7 @@ export class Blog {
    * @type {string}
    * @required
    */
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, ...descriptionConstraints })
   description: string;
 
   /**
@@ -35,7 +48,7 @@ export class Blog {
    * @type {string}
    * @required
    */
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: true, ...websiteUrlConstraints })
   websiteUrl: string;
 
   /**
