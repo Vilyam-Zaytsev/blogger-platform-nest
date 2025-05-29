@@ -31,7 +31,6 @@ export class ResendRegistrationEmailUseCase
       !user ||
       user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed
     ) {
-      //TODO: как лучше формировать extensions? Так как у меня или через new Extension(message, field)?
       throw new ValidationException([
         {
           message: `The email address (${dto.email}) is incorrect or has already been verified`,
