@@ -24,7 +24,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
       inject: [CoreConfig],
       useFactory: (coreConfig: CoreConfig) => {
         return {
-          uri: coreConfig.mongoURI,
+          uri: coreConfig.mongoURL,
           dbName: coreConfig.dbName,
         };
       },
