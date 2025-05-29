@@ -11,8 +11,10 @@ import { ValidationExceptionFilter } from './core/exceptions/filters/validation-
 import { CoreModule } from './core/core.module';
 import { CoreConfig } from './core/core.config';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { AppController } from './app.controller';
 
 @Module({
+  controllers: [AppController],
   imports: [
     configModule,
     CoreModule,
