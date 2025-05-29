@@ -5,7 +5,7 @@ import { CreateUserDomainDto } from '../domain/dto/create-user.domain.dto';
 import { add } from 'date-fns';
 import { Injectable } from '@nestjs/common';
 import { CryptoService } from './services/crypto.service';
-//TODO: правильно ли, что я в фабрике создаю инстанс модели?
+
 @Injectable()
 export class UsersFactory {
   constructor(
