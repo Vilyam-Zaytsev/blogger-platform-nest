@@ -7,7 +7,7 @@ export class GetBlogQuery {
 }
 
 @QueryHandler(GetBlogQuery)
-export class GetBlogsQueryHandler
+export class GetBlogQueryHandler
   implements IQueryHandler<GetBlogQuery, BlogViewDto>
 {
   constructor(private readonly blogsQueryRepository: BlogsQueryRepository) {}

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
 import { BlogsRepository } from '../../infrastructure/blogs.repository';
 import { BlogDocument } from '../../domain/blog.entity';
 import { UpdateBlogDto } from '../../dto/blog.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
 //TODO: правильно ли я формирую UpdateBlogCommand?
 export class UpdateBlogCommand {
   constructor(

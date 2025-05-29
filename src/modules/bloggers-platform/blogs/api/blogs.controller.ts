@@ -12,28 +12,16 @@ import {
 } from '@nestjs/common';
 import { BlogInputDto } from './input-dto/blog-input.dto';
 import { BlogViewDto } from './view-dto/blog-view.dto';
-import {
-  CreateBlogCommand,
-  CreateBlogUseCase,
-} from '../application/usecases/create-blog.usecase';
+import { CreateBlogCommand } from '../application/usecases/create-blog.usecase';
 import { BlogsQueryRepository } from '../infrastructure/query/blogs.query-repository';
 import { PaginatedViewDto } from '../../../../core/dto/paginated.view-dto';
 import { GetBlogsQueryParams } from './input-dto/get-blogs-query-params.input-dto';
-import {
-  UpdateBlogCommand,
-  UpdateBlogUseCase,
-} from '../application/usecases/update-blog.usecase';
-import {
-  DeleteBlogCommand,
-  DeleteBlogUseCase,
-} from '../application/usecases/delete-blog.usecase';
+import { UpdateBlogCommand } from '../application/usecases/update-blog.usecase';
+import { DeleteBlogCommand } from '../application/usecases/delete-blog.usecase';
 import { GetPostsQueryParams } from '../../posts/api/input-dto/get-posts-query-params.input-dto';
 import { PostsQueryRepository } from '../../posts/infrastructure/query/posts.query-repository';
 import { PostViewDto } from '../../posts/api/view-dto/post-view.dto';
-import {
-  CreatePostCommand,
-  CreatePostUseCase,
-} from '../../posts/application/usecases/create-post.usecase';
+import { CreatePostCommand } from '../../posts/application/usecases/create-post.usecase';
 import { CreatePostDto } from '../../posts/dto/post.dto';
 import { CreatePostForBlogInputDto } from '../../posts/api/input-dto/create-post-for-blog-input.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -46,10 +34,6 @@ import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validat
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private readonly createBlogUseCase: CreateBlogUseCase,
-    private readonly updateBlogUseCase: UpdateBlogUseCase,
-    private readonly deleteBlogUseCase: DeleteBlogUseCase,
-    private readonly createPostUseCase: CreatePostUseCase,
     private readonly blogsQueryRepository: BlogsQueryRepository,
     private readonly postsQueryRepository: PostsQueryRepository,
     private readonly commandBus: CommandBus,
