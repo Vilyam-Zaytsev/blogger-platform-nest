@@ -1,0 +1,22 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main  # триггер при пуше в ветку main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run deployment script on VPS via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}         # IP или домен VPS
+          username: ${{ secrets.VPS_USER }}     # пользователь на VPS (root или другой)
+          key: ${{ secrets.VPS_SSH_KEY }}       # приватный SSH ключ (без пароля)
+          port: ${{ secrets.VPS_SSH_PORT }}     # SSH порт, обычно 22
+          script: |
+            cd /opt/blogger-platform-nest
+            ./deploy.sh
