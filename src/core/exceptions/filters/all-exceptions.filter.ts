@@ -14,7 +14,6 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    console.log(JSON.stringify(exception, null, 2));
     const message: string = exception.message || 'Unknown exception occurred.';
     const status: number = HttpStatus.INTERNAL_SERVER_ERROR;
     const responseBody: ErrorResponseBody = this.buildResponseBody(
@@ -30,17 +29,17 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
     message: string,
   ): ErrorResponseBody {
     //TODO: Replace with getter from configService. will be in the following lessons
-    // const isProduction: boolean = process.env.NODE_ENV === 'production';
-    //
-    // if (isProduction) {
-    //   return {
-    //     timestamp: new Date().toISOString(),
-    //     path: null,
-    //     message: 'Some error occurred',
-    //     extensions: [],
-    //     code: DomainExceptionCode.InternalServerError,
-    //   };
-    // }
+    const isProduction: boolean = process.env.NODE_ENV === 'production';
+
+    if (isProduction) {
+      return {
+        timestamp: new Date().toISOString(),
+        path: null,
+        message: 'Some error occurred',
+        extensions: [],
+        code: DomainExceptionCode.InternalServerError,
+      };
+    }
 
     return {
       timestamp: new Date().toISOString(),
