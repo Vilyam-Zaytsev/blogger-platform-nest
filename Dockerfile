@@ -5,7 +5,7 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 # Копируем package.json и yarn.lock для установки зависимостей
-COPY package.json yarn.lock ./
+COPY package.json ./
 
 # Устанавливаем зависимости (используем yarn, если вы им пользуетесь)
 RUN yarn install --frozen-lockfile
