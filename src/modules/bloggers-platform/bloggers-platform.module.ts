@@ -16,6 +16,9 @@ import { UpdatePostUseCase } from './posts/application/usecases/update-post.usec
 import { DeletePostUseCase } from './posts/application/usecases/delete-post.usecase';
 import { GetPostsForBlogQueryHandler } from './blogs/application/queries/get-posts-for-blog.query-handler';
 import { GetBlogQueryHandler } from './blogs/application/queries/get-blog.query-handler';
+import { GetBlogsQueryHandler } from './blogs/application/queries/get-blogs.query-handler';
+import { GetPostsQueryHandler } from './posts/application/queries/get-posts.query-handler';
+import { GetPostQueryHandler } from './posts/application/queries/get-post.query-handler';
 
 @Module({
   imports: [
@@ -24,21 +27,29 @@ import { GetBlogQueryHandler } from './blogs/application/queries/get-blog.query-
   ],
   controllers: [BlogsController, PostsController],
   providers: [
-    //blogs
+    //---blogs---//
+    //repo
     BlogsRepository,
     BlogsQueryRepository,
+    //use-cases
     CreateBlogUseCase,
     UpdateBlogUseCase,
     DeleteBlogUseCase,
-    //posts
+    //query-handlers
+    GetBlogsQueryHandler,
+    GetBlogQueryHandler,
+    GetPostsForBlogQueryHandler,
+    //---posts---//
+    //repo
     PostsRepository,
     PostsQueryRepository,
+    //use-cases
     CreatePostUseCase,
     UpdatePostUseCase,
     DeletePostUseCase,
     //query-handlers
-    GetBlogQueryHandler,
-    GetPostsForBlogQueryHandler,
+    GetPostsQueryHandler,
+    GetPostQueryHandler,
   ],
   exports: [],
 })
