@@ -60,6 +60,12 @@ export class CoreConfig {
   })
   sendInternalServerErrorDetails: boolean;
 
+  // @IsBoolean({
+  //   message:
+  //     'Set the Env TEST_LOGGING_ENABLED variable to enable/disable logging of information about test results, for example: true, available values: true, false, 0, 1',
+  // })
+  // testLoggingEnabled: boolean;
+
   constructor(private configService: ConfigService<any, true>) {
     this.port = Number(this.configService.get('PORT'));
 
@@ -85,6 +91,15 @@ export class CoreConfig {
       configValidationUtility.convertToBoolean(
         this.configService.get('SEND_INTERNAL_SERVER_ERROR_DETAILS'),
       ) as boolean;
+
+    // this.testLoggingEnabled = configValidationUtility.convertToBoolean(
+    //   this.configService.get('TEST_LOGGING_ENABLED'),
+    // ) as boolean;
+    //
+    // console.log(
+    //   'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+    //   this.configService.get('TEST_LOGGING_ENABLED'),
+    // );
 
     configValidationUtility.validateConfig(this);
   }
