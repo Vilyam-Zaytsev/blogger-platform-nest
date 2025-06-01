@@ -15,6 +15,7 @@ describe('AuthController - me() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
 
   beforeAll(async () => {
@@ -35,6 +36,7 @@ describe('AuthController - me() (POST: /auth)', () => {
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
   });
@@ -69,11 +71,13 @@ describe('AuthController - me() (POST: /auth)', () => {
       }),
     );
 
-    TestLoggers.logE2E(
-      resMe.body,
-      resMe.statusCode,
-      'Test №1: AuthController - me() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resMe.body,
+        resMe.statusCode,
+        'Test №1: AuthController - me() (POST: /auth)',
+      );
+    }
   });
 
   it('should return a 401 error if the user is logged in (sending an invalid access token)', async () => {
@@ -92,10 +96,12 @@ describe('AuthController - me() (POST: /auth)', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(401);
 
-    TestLoggers.logE2E(
-      resMe.body,
-      resMe.statusCode,
-      'Test №2: AuthController - me() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resMe.body,
+        resMe.statusCode,
+        'Test №2: AuthController - me() (POST: /auth)',
+      );
+    }
   });
 });

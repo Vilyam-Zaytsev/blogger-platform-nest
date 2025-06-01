@@ -16,6 +16,7 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
   let sendEmailMock: jest.Mock;
 
@@ -25,6 +26,7 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
 
@@ -58,11 +60,13 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(2);
 
-    TestLoggers.logE2E(
-      resRegistrationEmailResending.body,
-      resRegistrationEmailResending.statusCode,
-      'Test №1: AuthController - registrationEmailResending() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistrationEmailResending.body,
+        resRegistrationEmailResending.statusCode,
+        'Test №1: AuthController - registrationEmailResending() (POST: /auth)',
+      );
+    }
   });
 
   it('should not resend the verification code if the user has sent incorrect data - an empty object is passed', async () => {
@@ -83,11 +87,13 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
 
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistrationEmailResending.body,
-      resRegistrationEmailResending.statusCode,
-      'Test №3: AuthController - registrationEmailResending() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistrationEmailResending.body,
+        resRegistrationEmailResending.statusCode,
+        'Test №3: AuthController - registrationEmailResending() (POST: /auth)',
+      );
+    }
   });
 
   it('should not resend the verification code if the user has sent incorrect data - email: empty line', async () => {
@@ -110,11 +116,13 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
 
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistrationEmailResending.body,
-      resRegistrationEmailResending.statusCode,
-      'Test №4: AuthController - registrationEmailResending() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistrationEmailResending.body,
+        resRegistrationEmailResending.statusCode,
+        'Test №4: AuthController - registrationEmailResending() (POST: /auth)',
+      );
+    }
   });
 
   it('should not resend the verification code if the user has sent incorrect data - email: incorrect', async () => {
@@ -138,11 +146,13 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
 
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistrationEmailResending.body,
-      resRegistrationEmailResending.statusCode,
-      'Test №5: AuthController - registrationEmailResending() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistrationEmailResending.body,
+        resRegistrationEmailResending.statusCode,
+        'Test №5: AuthController - registrationEmailResending() (POST: /auth)',
+      );
+    }
   });
 
   it('should not resend the verification code if the user has sent incorrect data - email: type number', async () => {
@@ -164,11 +174,13 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
 
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistrationEmailResending.body,
-      resRegistrationEmailResending.statusCode,
-      'Test №6: AuthController - registrationEmailResending() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistrationEmailResending.body,
+        resRegistrationEmailResending.statusCode,
+        'Test №6: AuthController - registrationEmailResending() (POST: /auth)',
+      );
+    }
   });
 
   it('should not resend the verification code if the user has already confirmed the account', async () => {
@@ -192,10 +204,12 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
 
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistrationEmailResending.body,
-      resRegistrationEmailResending.statusCode,
-      'Test №7: AuthController - registrationEmailResending() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistrationEmailResending.body,
+        resRegistrationEmailResending.statusCode,
+        'Test №7: AuthController - registrationEmailResending() (POST: /auth)',
+      );
+    }
   });
 });

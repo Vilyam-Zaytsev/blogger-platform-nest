@@ -15,6 +15,7 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
   let appTestManager: AppTestManager;
   let blogsTestManager: BlogsTestManager;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
 
   beforeAll(async () => {
@@ -23,6 +24,7 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     blogsTestManager = new BlogsTestManager(server, adminCredentials);
   });
@@ -67,11 +69,13 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
 
     expect(blog).toEqual(foundBlog);
 
-    TestLoggers.logE2E<BlogViewDto>(
-      blog,
-      resCreateBlog.statusCode,
-      'Test №1: BlogsController - createBlog() (POST: /blogs)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E<BlogViewDto>(
+        blog,
+        resCreateBlog.statusCode,
+        'Test №1: BlogsController - createBlog() (POST: /blogs)',
+      );
+    }
   });
 
   it('should not create a blog if the admin is not authenticated.', async () => {
@@ -98,11 +102,13 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
 
     expect(foundBlogs.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateBlog.body,
-      resCreateBlog.statusCode,
-      'Test №2: BlogsController - createBlog() (POST: /blogs)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateBlog.body,
+        resCreateBlog.statusCode,
+        'Test №2: BlogsController - createBlog() (POST: /blogs)',
+      );
+    }
   });
 
   it('should not create a blog if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -141,11 +147,13 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
 
     expect(foundBlogs.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateBlog.body,
-      resCreateBlog.statusCode,
-      'Test №3: BlogsController - createBlog() (POST: /blogs)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateBlog.body,
+        resCreateBlog.statusCode,
+        'Test №3: BlogsController - createBlog() (POST: /blogs)',
+      );
+    }
   });
 
   it('should not create a blog if the data in the request body is incorrect (name: empty line, description: empty line, website Url: empty line).', async () => {
@@ -190,11 +198,13 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
 
     expect(foundBlogs.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateBlog.body,
-      resCreateBlog.statusCode,
-      'Test №4: BlogsController - createBlog() (POST: /blogs)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateBlog.body,
+        resCreateBlog.statusCode,
+        'Test №4: BlogsController - createBlog() (POST: /blogs)',
+      );
+    }
   });
 
   it('should not create a blog if the data in the request body is incorrect (name: exceeds max length, description: exceeds max length, website Url: exceeds max length).', async () => {
@@ -242,11 +252,13 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
 
     expect(foundBlogs.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateBlog.body,
-      resCreateBlog.statusCode,
-      'Test №5: BlogsController - createBlog() (POST: /blogs)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateBlog.body,
+        resCreateBlog.statusCode,
+        'Test №5: BlogsController - createBlog() (POST: /blogs)',
+      );
+    }
   });
 
   it('should not create a blog if the data in the request body is incorrect (name: type number, description: type number, website Url: type number).', async () => {
@@ -290,11 +302,13 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
 
     expect(foundBlogs.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateBlog.body,
-      resCreateBlog.statusCode,
-      'Test №6: BlogsController - createBlog() (POST: /blogs)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateBlog.body,
+        resCreateBlog.statusCode,
+        'Test №6: BlogsController - createBlog() (POST: /blogs)',
+      );
+    }
   });
 
   it('should not create a blog if the data in the request body is incorrect (invalid url).', async () => {
@@ -333,10 +347,12 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
 
     expect(foundBlogs.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateBlog.body,
-      resCreateBlog.statusCode,
-      'Test №7: BlogsController - createBlog() (POST: /blogs)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateBlog.body,
+        resCreateBlog.statusCode,
+        'Test №7: BlogsController - createBlog() (POST: /blogs)',
+      );
+    }
   });
 });

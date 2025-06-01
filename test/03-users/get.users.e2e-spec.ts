@@ -15,6 +15,7 @@ describe('UsersController - getUser() (GET: /users)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
 
   beforeAll(async () => {
@@ -23,6 +24,7 @@ describe('UsersController - getUser() (GET: /users)', () => {
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
   });
@@ -47,7 +49,7 @@ describe('UsersController - getUser() (GET: /users)', () => {
       )
       .expect(200);
 
-    expect({
+    expect(resGetUsers.body).toEqual({
       pageCount: 0,
       page: 1,
       pageSize: 10,
@@ -55,11 +57,13 @@ describe('UsersController - getUser() (GET: /users)', () => {
       items: [],
     });
 
-    TestLoggers.logE2E(
-      resGetUsers.body,
-      resGetUsers.statusCode,
-      'Test №1: UsersController - getUser() (GET: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №1: UsersController - getUser() (GET: /users)',
+      );
+    }
   });
 
   it('should return a 401 error if the admin is not authenticated', async () => {
@@ -74,15 +78,17 @@ describe('UsersController - getUser() (GET: /users)', () => {
       )
       .expect(401);
 
-    TestLoggers.logE2E(
-      resGetUsers.body,
-      resGetUsers.statusCode,
-      'Test №2: UsersController - getUser() (GET: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №2: UsersController - getUser() (GET: /users)',
+      );
+    }
   });
 
   it('should return an array with a single user, the admin is authenticated.', async () => {
-    const newUsers: UserViewDto[] = await usersTestManager.createUser(1);
+    const [user]: UserViewDto[] = await usersTestManager.createUser(1);
 
     const resGetUsers: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/users`)
@@ -98,14 +104,16 @@ describe('UsersController - getUser() (GET: /users)', () => {
     const bodyFromGetRequest: PaginatedViewDto<UserViewDto> =
       resGetUsers.body as PaginatedViewDto<UserViewDto>;
 
-    expect(bodyFromGetRequest.items[0]).toEqual(newUsers[0]);
+    expect(bodyFromGetRequest.items[0]).toEqual(user);
     expect(bodyFromGetRequest.items.length).toEqual(1);
 
-    TestLoggers.logE2E(
-      resGetUsers.body,
-      resGetUsers.statusCode,
-      'Test №3: UsersController - getUser() (GET: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №3: UsersController - getUser() (GET: /users)',
+      );
+    }
   });
 
   it('should return an array with a three users, the admin is authenticated.', async () => {
@@ -133,10 +141,12 @@ describe('UsersController - getUser() (GET: /users)', () => {
     expect(bodyFromGetRequest.items).toEqual(filteredNewUsers);
     expect(bodyFromGetRequest.items.length).toEqual(3);
 
-    TestLoggers.logE2E(
-      resGetUsers.body,
-      resGetUsers.statusCode,
-      'Test №4: UsersController - getUser() (GET: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №4: UsersController - getUser() (GET: /users)',
+      );
+    }
   });
 });

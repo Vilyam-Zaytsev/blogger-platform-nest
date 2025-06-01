@@ -40,7 +40,7 @@ type ExtendedLikesInfo = {
 };
 
 //TODO: вынести в отдельный файл!!!
-enum LikeStatus {
+export enum LikeStatus {
   None = 'None',
   Like = 'Like',
   Dislike = 'Dislike',

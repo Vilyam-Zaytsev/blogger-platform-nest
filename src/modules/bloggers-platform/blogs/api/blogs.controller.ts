@@ -32,7 +32,6 @@ import { GetBlogsQuery } from '../application/queries/get-blogs.query-handler';
 import { GetPostsForBlogQuery } from '../application/queries/get-posts-for-blog.query-handler';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
 import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
-import { async } from 'rxjs';
 import { Public } from '../../../user-accounts/decorators/public.decorator';
 
 @Controller('blogs')

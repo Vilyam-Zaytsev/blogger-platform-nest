@@ -19,10 +19,9 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
   let usersTestManager: UsersTestManager;
   let usersRepository: UsersRepository;
   let adminCredentials: AdminCredentials;
-  // let cryptoService: CryptoService;
+  let testLoggingEnabled: boolean;
   let server: Server;
   let sendEmailMock: jest.Mock;
-  // let spyOnGenerateUUID: jest.SpyInstance<string, []>;
 
   beforeAll(async () => {
     appTestManager = new AppTestManager();
@@ -30,23 +29,20 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
     usersRepository = appTestManager.app.get(UsersRepository);
-    // cryptoService = appTestManager.app.get(CryptoService);
 
     sendEmailMock = jest
       .spyOn(EmailService.prototype, 'sendEmail')
       .mockResolvedValue() as jest.Mock<Promise<void>, [string, EmailTemplate]>;
-
-    // spyOnGenerateUUID = jest.spyOn(cryptoService, 'generateUUID');
   });
 
   beforeEach(async () => {
     await appTestManager.cleanupDb();
 
     sendEmailMock.mockClear();
-    // spyOnGenerateUUID.mockClear();
   });
 
   afterAll(async () => {
@@ -79,9 +75,6 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
       }),
     );
 
-    // const [{ value: capturedConfirmationCode }]: { value?: string }[] =
-    //   spyOnGenerateUUID.mock.results;
-
     const resRegistrationConfirmation: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/registration-confirmation`)
       .send({
@@ -113,11 +106,13 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
-    TestLoggers.logE2E(
-      resRegistrationConfirmation.body,
-      resRegistrationConfirmation.statusCode,
-      'Test №1: AuthController - registrationConfirmation() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistrationConfirmation.body,
+        resRegistrationConfirmation.statusCode,
+        'Test №1: AuthController - registrationConfirmation() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be confirmed if the user has sent an incorrect verification code.', async () => {
@@ -168,11 +163,13 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
-    TestLoggers.logE2E(
-      resRegistrationConfirmation.body,
-      resRegistrationConfirmation.statusCode,
-      'Test №3: AuthController - registrationConfirmation() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistrationConfirmation.body,
+        resRegistrationConfirmation.statusCode,
+        'Test №3: AuthController - registrationConfirmation() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be confirmed if the user has sent an incorrect verification code (the code has already been used', async () => {
@@ -240,10 +237,12 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
-    TestLoggers.logE2E(
-      resRegistrationConfirmation.body,
-      resRegistrationConfirmation.statusCode,
-      'Test №4: AuthController - registrationConfirmation() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistrationConfirmation.body,
+        resRegistrationConfirmation.statusCode,
+        'Test №4: AuthController - registrationConfirmation() (POST: /auth)',
+      );
+    }
   });
 });

@@ -17,6 +17,7 @@ describe('AuthController - registration() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
   let sendEmailMock: jest.Mock;
 
@@ -26,6 +27,7 @@ describe('AuthController - registration() (POST: /auth)', () => {
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
 
@@ -77,11 +79,13 @@ describe('AuthController - registration() (POST: /auth)', () => {
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
-    TestLoggers.logE2E(
-      resRegistration.body,
-      resRegistration.statusCode,
-      'Test №1: AuthController - registration() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistration.body,
+        resRegistration.statusCode,
+        'Test №1: AuthController - registration() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be registered if a user with such data already exists (login).', async () => {
@@ -113,11 +117,13 @@ describe('AuthController - registration() (POST: /auth)', () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistration.body,
-      resRegistration.statusCode,
-      'Test №3: AuthController - registration() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistration.body,
+        resRegistration.statusCode,
+        'Test №3: AuthController - registration() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be registered if a user with such data already exists (email).', async () => {
@@ -149,11 +155,13 @@ describe('AuthController - registration() (POST: /auth)', () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistration.body,
-      resRegistration.statusCode,
-      'Test №4: AuthController - registration() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistration.body,
+        resRegistration.statusCode,
+        'Test №4: AuthController - registration() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be registered a user if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -188,11 +196,13 @@ describe('AuthController - registration() (POST: /auth)', () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistration.body,
-      resRegistration.statusCode,
-      'Test №5: AuthController - registration() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistration.body,
+        resRegistration.statusCode,
+        'Test №5: AuthController - registration() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be registered a user if the data in the request body is incorrect (login: empty line, email: empty line, password: empty line).', async () => {
@@ -233,11 +243,13 @@ describe('AuthController - registration() (POST: /auth)', () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistration.body,
-      resRegistration.statusCode,
-      'Test №6: AuthController - registration() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistration.body,
+        resRegistration.statusCode,
+        'Test №6: AuthController - registration() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be registered a user if the data in the request body is incorrect (login: less than the minimum length, email: incorrect, password: less than the minimum length).', async () => {
@@ -279,11 +291,13 @@ describe('AuthController - registration() (POST: /auth)', () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistration.body,
-      resRegistration.statusCode,
-      'Test №7: AuthController - registration() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistration.body,
+        resRegistration.statusCode,
+        'Test №7: AuthController - registration() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be registered a user if the data in the request body is incorrect (login: exceeds max length,  email: incorrect, password: exceeds max length).', async () => {
@@ -325,11 +339,13 @@ describe('AuthController - registration() (POST: /auth)', () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistration.body,
-      resRegistration.statusCode,
-      'Test №8: AuthController - registration() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistration.body,
+        resRegistration.statusCode,
+        'Test №8: AuthController - registration() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be registered a user if the data in the request body is incorrect (login: type number,  email: type number, password: type number).', async () => {
@@ -368,10 +384,12 @@ describe('AuthController - registration() (POST: /auth)', () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-    TestLoggers.logE2E(
-      resRegistration.body,
-      resRegistration.statusCode,
-      'Test №9: AuthController - registration() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRegistration.body,
+        resRegistration.statusCode,
+        'Test №9: AuthController - registration() (POST: /auth)',
+      );
+    }
   });
 });
