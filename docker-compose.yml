@@ -3,11 +3,17 @@ version: '3.8'
 services:
   app:
     container_name: nestjs_app
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: vilyam365/blogger-platform:latest # ← используем образ с Docker Hub
     ports:
       - "3000:3000"
     env_file:
       - ./src/env/.env.production
+    restart: always
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --cleanup --interval 30
     restart: always
