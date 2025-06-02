@@ -96,6 +96,6 @@ import { GetPostsForBlogQueryHandler } from '../bloggers-platform/blogs/applicat
     //repo
     AuthQueryRepository,
   ],
-  exports: [],
+  exports: [BasicStrategy],
 })
 export class UserAccountsModule {}

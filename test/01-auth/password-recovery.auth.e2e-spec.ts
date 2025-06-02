@@ -16,6 +16,7 @@ describe('AuthController - passwordRecovery() (POST: /auth)', () => {
   let usersTestManager: UsersTestManager;
   let usersRepository: UsersRepository;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
   let sendEmailMock: jest.Mock;
 
@@ -25,6 +26,7 @@ describe('AuthController - passwordRecovery() (POST: /auth)', () => {
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
     usersRepository = appTestManager.app.get(UsersRepository);
@@ -99,11 +101,13 @@ describe('AuthController - passwordRecovery() (POST: /auth)', () => {
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
-    TestLoggers.logE2E(
-      resPasswordRecovery.body,
-      resPasswordRecovery.statusCode,
-      'Test №1: AuthController - passwordRecovery() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resPasswordRecovery.body,
+        resPasswordRecovery.statusCode,
+        'Test №1: AuthController - passwordRecovery() (POST: /auth)',
+      );
+    }
   });
 
   it(
@@ -154,11 +158,13 @@ describe('AuthController - passwordRecovery() (POST: /auth)', () => {
 
       expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-      TestLoggers.logE2E(
-        resPasswordRecovery.body,
-        resPasswordRecovery.statusCode,
-        'Test №3: AuthController - passwordRecovery() (POST: /auth)',
-      );
+      if (testLoggingEnabled) {
+        TestLoggers.logE2E(
+          resPasswordRecovery.body,
+          resPasswordRecovery.statusCode,
+          'Test №3: AuthController - passwordRecovery() (POST: /auth)',
+        );
+      }
     },
   );
 
@@ -220,11 +226,13 @@ describe('AuthController - passwordRecovery() (POST: /auth)', () => {
 
       expect(sendEmailMock).toHaveBeenCalledTimes(0);
 
-      TestLoggers.logE2E(
-        resPasswordRecovery.body,
-        resPasswordRecovery.statusCode,
-        'Test №4: AuthController - passwordRecovery() (POST: /auth)',
-      );
+      if (testLoggingEnabled) {
+        TestLoggers.logE2E(
+          resPasswordRecovery.body,
+          resPasswordRecovery.statusCode,
+          'Test №4: AuthController - passwordRecovery() (POST: /auth)',
+        );
+      }
     },
   );
 });

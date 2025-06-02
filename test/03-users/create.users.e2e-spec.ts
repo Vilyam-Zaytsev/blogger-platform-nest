@@ -16,6 +16,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
 
   beforeAll(async () => {
@@ -24,6 +25,7 @@ describe('UsersController - createUser() (POST: /users)', () => {
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
   });
@@ -68,11 +70,13 @@ describe('UsersController - createUser() (POST: /users)', () => {
     expect(users.items).toHaveLength(1);
     expect(users.items[0]).toEqual(user);
 
-    TestLoggers.logE2E<UserViewDto>(
-      user,
-      resCreateUser.statusCode,
-      'Test №1: UsersController - createUser() (POST: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E<UserViewDto>(
+        user,
+        resCreateUser.statusCode,
+        'Test №1: UsersController - createUser() (POST: /users)',
+      );
+    }
   });
 
   it('should not create a user if the admin is not authenticated.', async () => {
@@ -107,11 +111,13 @@ describe('UsersController - createUser() (POST: /users)', () => {
 
     expect(users.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateUser.body,
-      resCreateUser.statusCode,
-      'Test №2: UsersController - createUser() (POST: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateUser.body,
+        resCreateUser.statusCode,
+        'Test №2: UsersController - createUser() (POST: /users)',
+      );
+    }
   });
 
   it('should not create a user if the data in the request body is incorrect (an empty object is passed).', async () => {
@@ -150,11 +156,13 @@ describe('UsersController - createUser() (POST: /users)', () => {
 
     expect(users.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateUser.body,
-      resCreateUser.statusCode,
-      'Test №3: UsersController - createUser() (POST: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateUser.body,
+        resCreateUser.statusCode,
+        'Test №3: UsersController - createUser() (POST: /users)',
+      );
+    }
   });
 
   it('should not create a user if the data in the request body is incorrect (login: empty line, email: empty line, password: empty line).', async () => {
@@ -199,11 +207,13 @@ describe('UsersController - createUser() (POST: /users)', () => {
 
     expect(users.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateUser.body,
-      resCreateUser.statusCode,
-      'Test №4: UsersController - createUser() (POST: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateUser.body,
+        resCreateUser.statusCode,
+        'Test №4: UsersController - createUser() (POST: /users)',
+      );
+    }
   });
 
   it('should not create a user if the data in the request body is incorrect (login: less than the minimum length, email: incorrect, password: less than the minimum length', async () => {
@@ -249,11 +259,13 @@ describe('UsersController - createUser() (POST: /users)', () => {
 
     expect(users.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateUser.body,
-      resCreateUser.statusCode,
-      'Test №5: UsersController - createUser() (POST: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateUser.body,
+        resCreateUser.statusCode,
+        'Test №5: UsersController - createUser() (POST: /users)',
+      );
+    }
   });
 
   it('should not create a user if the data in the request body is incorrect (login: exceeds max length,  email: incorrect, password: exceeds max length).', async () => {
@@ -299,11 +311,13 @@ describe('UsersController - createUser() (POST: /users)', () => {
 
     expect(users.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateUser.body,
-      resCreateUser.statusCode,
-      'Test №6: UsersController - createUser() (POST: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateUser.body,
+        resCreateUser.statusCode,
+        'Test №6: UsersController - createUser() (POST: /users)',
+      );
+    }
   });
 
   it('should not create a user if the data in the request body is incorrect (login: type number,  email: type number, password: type number).', async () => {
@@ -346,10 +360,12 @@ describe('UsersController - createUser() (POST: /users)', () => {
 
     expect(users.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resCreateUser.body,
-      resCreateUser.statusCode,
-      'Test №7: UsersController - createUser() (POST: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreateUser.body,
+        resCreateUser.statusCode,
+        'Test №7: UsersController - createUser() (POST: /users)',
+      );
+    }
   });
 });

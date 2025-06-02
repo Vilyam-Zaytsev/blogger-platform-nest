@@ -19,11 +19,13 @@ import { GetBlogQueryHandler } from './blogs/application/queries/get-blog.query-
 import { GetBlogsQueryHandler } from './blogs/application/queries/get-blogs.query-handler';
 import { GetPostsQueryHandler } from './posts/application/queries/get-posts.query-handler';
 import { GetPostQueryHandler } from './posts/application/queries/get-post.query-handler';
+import { UserAccountsModule } from '../user-accounts/user-accounts.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
+    UserAccountsModule,
   ],
   controllers: [BlogsController, PostsController],
   providers: [

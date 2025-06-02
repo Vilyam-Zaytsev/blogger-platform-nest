@@ -1,6 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Blog, BlogDocument, BlogModelType } from '../domain/blog.entity';
-import { NotFoundException } from '@nestjs/common';
+import { DomainException } from '../../../../core/exceptions/damain-exceptions';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private BlogModel: BlogModelType) {}
@@ -12,7 +13,10 @@ export class BlogsRepository {
     });
 
     if (!blog) {
-      throw new NotFoundException('Blog not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: `The blog with ID (${id}) does not exist`,
+      });
     }
 
     return blog;

@@ -17,6 +17,7 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
   let usersTestManager: UsersTestManager;
   let usersRepository: UsersRepository;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
   let sendEmailMock: jest.Mock;
 
@@ -29,6 +30,7 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
     usersRepository = appTestManager.app.get(UsersRepository);
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     sendEmailMock = jest
       .spyOn(EmailService.prototype, 'sendEmail')
@@ -105,11 +107,13 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
-    TestLoggers.logE2E(
-      resNewPassword.body,
-      resNewPassword.statusCode,
-      'Test №1: AuthController - newPassword() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resNewPassword.body,
+        resNewPassword.statusCode,
+        'Test №1: AuthController - newPassword() (POST: /auth)',
+      );
+    }
   });
 
   it('should not update the password if the user has sent incorrect data: (newPassword: less than 6 characters)', async () => {
@@ -177,11 +181,13 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
-    TestLoggers.logE2E(
-      resNewPassword.body,
-      resNewPassword.statusCode,
-      'Test №3: AuthController - newPassword() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resNewPassword.body,
+        resNewPassword.statusCode,
+        'Test №3: AuthController - newPassword() (POST: /auth)',
+      );
+    }
   });
 
   it('should not update the password if the user has sent incorrect data: (newPassword: more than 20 characters)', async () => {
@@ -250,11 +256,13 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
-    TestLoggers.logE2E(
-      resNewPassword.body,
-      resNewPassword.statusCode,
-      'Test №4: AuthController - newPassword() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resNewPassword.body,
+        resNewPassword.statusCode,
+        'Test №4: AuthController - newPassword() (POST: /auth)',
+      );
+    }
   });
 
   it('should not update the password if the user has sent incorrect data: (recoveryCode)', async () => {
@@ -312,10 +320,12 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);
 
-    TestLoggers.logE2E(
-      resNewPassword.body,
-      resNewPassword.statusCode,
-      'Test №5: AuthController - newPassword() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resNewPassword.body,
+        resNewPassword.statusCode,
+        'Test №5: AuthController - newPassword() (POST: /auth)',
+      );
+    }
   });
 });

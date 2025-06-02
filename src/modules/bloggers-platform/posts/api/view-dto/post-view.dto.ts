@@ -32,7 +32,7 @@ export class PostViewDto {
   }
 }
 
-type ExtendedLikesInfo = {
+export type ExtendedLikesInfo = {
   likesCount: number;
   dislikesCount: number;
   myStatus: LikeStatus;
@@ -40,7 +40,7 @@ type ExtendedLikesInfo = {
 };
 
 //TODO: вынести в отдельный файл!!!
-enum LikeStatus {
+export enum LikeStatus {
   None = 'None',
   Like = 'Like',
   Dislike = 'Dislike',

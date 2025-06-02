@@ -12,6 +12,7 @@ describe('AuthController - login() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
 
   beforeAll(async () => {
@@ -20,6 +21,7 @@ describe('AuthController - login() (POST: /auth)', () => {
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
   });
@@ -50,11 +52,13 @@ describe('AuthController - login() (POST: /auth)', () => {
     expect(resLogin.headers['set-cookie']).toBeDefined();
     expect(resLogin.headers['set-cookie'][0]).toMatch(/refreshToken=.*;/);
 
-    TestLoggers.logE2E(
-      resLogin.body,
-      resLogin.statusCode,
-      'Test №1: AuthController - login() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resLogin.body,
+        resLogin.statusCode,
+        'Test №1: AuthController - login() (POST: /auth)',
+      );
+    }
   });
 
   it('should not log in if the user has sent invalid data (loginOrEmail: "undefined", password: "undefined")', async () => {
@@ -80,11 +84,13 @@ describe('AuthController - login() (POST: /auth)', () => {
 
     expect(resLogin.headers['set-cookie']).toBeUndefined();
 
-    TestLoggers.logE2E(
-      resLogin.body,
-      resLogin.statusCode,
-      'Test №3: AuthController - login() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resLogin.body,
+        resLogin.statusCode,
+        'Test №3: AuthController - login() (POST: /auth)',
+      );
+    }
   });
 
   it('should not log in if the user has sent invalid data (loginOrEmail: type number, password: type number)', async () => {
@@ -113,11 +119,13 @@ describe('AuthController - login() (POST: /auth)', () => {
 
     expect(resLogin.headers['set-cookie']).toBeUndefined();
 
-    TestLoggers.logE2E(
-      resLogin.body,
-      resLogin.statusCode,
-      'Test №4: AuthController - login() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resLogin.body,
+        resLogin.statusCode,
+        'Test №4: AuthController - login() (POST: /auth)',
+      );
+    }
   });
 
   it('should not log in if the user has sent invalid data (loginOrEmail: empty line, password: empty line)', async () => {
@@ -148,11 +156,13 @@ describe('AuthController - login() (POST: /auth)', () => {
 
     expect(resLogin.headers['set-cookie']).toBeUndefined();
 
-    TestLoggers.logE2E(
-      resLogin.body,
-      resLogin.statusCode,
-      'Test №5: AuthController - login() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resLogin.body,
+        resLogin.statusCode,
+        'Test №5: AuthController - login() (POST: /auth)',
+      );
+    }
   });
 
   it('should not log in if the user has sent invalid data (loginOrEmail: exceeds max length, password: exceeds max length)', async () => {
@@ -184,11 +194,13 @@ describe('AuthController - login() (POST: /auth)', () => {
 
     expect(resLogin.headers['set-cookie']).toBeUndefined();
 
-    TestLoggers.logE2E(
-      resLogin.body,
-      resLogin.statusCode,
-      'Test №6: AuthController - login() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resLogin.body,
+        resLogin.statusCode,
+        'Test №6: AuthController - login() (POST: /auth)',
+      );
+    }
   });
 
   it('should not log in if the user has sent incorrect data (loginOrEmail: exceeds the minimum length)', async () => {
@@ -220,11 +232,13 @@ describe('AuthController - login() (POST: /auth)', () => {
 
     expect(resLogin.headers['set-cookie']).toBeUndefined();
 
-    TestLoggers.logE2E(
-      resLogin.body,
-      resLogin.statusCode,
-      'Test №7: AuthController - login() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resLogin.body,
+        resLogin.statusCode,
+        'Test №7: AuthController - login() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be authorized if the user has sent incorrect data (loginOrEmail: non-existent login)', async () => {
@@ -242,11 +256,13 @@ describe('AuthController - login() (POST: /auth)', () => {
 
     expect(resLogin.headers['set-cookie']).toBeUndefined();
 
-    TestLoggers.logE2E(
-      resLogin.body,
-      resLogin.statusCode,
-      'Test №8: AuthController - login() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resLogin.body,
+        resLogin.statusCode,
+        'Test №8: AuthController - login() (POST: /auth)',
+      );
+    }
   });
 
   it('should not be authorized if the user has sent incorrect data (password: invalid password).', async () => {
@@ -262,10 +278,12 @@ describe('AuthController - login() (POST: /auth)', () => {
 
     expect(resLogin.headers['set-cookie']).toBeUndefined();
 
-    TestLoggers.logE2E(
-      resLogin.body,
-      resLogin.statusCode,
-      'Test №9: AuthController - login() (POST: /auth)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resLogin.body,
+        resLogin.statusCode,
+        'Test №9: AuthController - login() (POST: /auth)',
+      );
+    }
   });
 });

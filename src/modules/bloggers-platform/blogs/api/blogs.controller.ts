@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogInputDto } from './input-dto/blog-input.dto';
 import { BlogViewDto } from './view-dto/blog-view.dto';
@@ -30,8 +31,11 @@ import { GetBlogQuery } from '../application/queries/get-blog.query-handler';
 import { GetBlogsQuery } from '../application/queries/get-blogs.query-handler';
 import { GetPostsForBlogQuery } from '../application/queries/get-posts-for-blog.query-handler';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
+import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
+import { Public } from '../../../user-accounts/decorators/public.decorator';
 
 @Controller('blogs')
+@UseGuards(BasicAuthGuard)
 export class BlogsController {
   constructor(
     private readonly blogsQueryRepository: BlogsQueryRepository,
@@ -40,6 +44,7 @@ export class BlogsController {
     private readonly queryBus: QueryBus,
   ) {}
   @Get()
+  @Public()
   async getAll(
     @Query() query: GetBlogsQueryParams,
   ): Promise<PaginatedViewDto<BlogViewDto>> {
@@ -47,11 +52,13 @@ export class BlogsController {
   }
 
   @Get(':id')
+  @Public()
   async getById(@Param() params: IdInputDto): Promise<BlogViewDto> {
     return this.queryBus.execute(new GetBlogQuery(params.id));
   }
 
   @Get(':blogId/posts')
+  @Public()
   async getPostsForBlog(
     @Param('blogId', ObjectIdValidationPipe) blogId: string,
     @Query() query: GetPostsQueryParams,

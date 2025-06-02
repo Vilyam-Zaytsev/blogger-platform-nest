@@ -14,6 +14,7 @@ describe('UsersController - deleteUser() (DELETE: /users)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
 
   beforeAll(async () => {
@@ -22,6 +23,7 @@ describe('UsersController - deleteUser() (DELETE: /users)', () => {
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
   });
@@ -54,11 +56,13 @@ describe('UsersController - deleteUser() (DELETE: /users)', () => {
 
     expect(users.items).toHaveLength(0);
 
-    TestLoggers.logE2E(
-      resDeleteUser.body,
-      resDeleteUser.statusCode,
-      'Test №1: UsersController - deleteUser() (DELETE: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resDeleteUser.body,
+        resDeleteUser.statusCode,
+        'Test №1: UsersController - deleteUser() (DELETE: /users)',
+      );
+    }
   });
 
   it('should not delete user, the admin is not authenticated.', async () => {
@@ -82,11 +86,13 @@ describe('UsersController - deleteUser() (DELETE: /users)', () => {
     expect(users.items[0]).toEqual<UserViewDto>(newUsers[0]);
     expect(users.items).toHaveLength(1);
 
-    TestLoggers.logE2E(
-      resDeleteUser.body,
-      resDeleteUser.statusCode,
-      'Test №2: UsersController - deleteUser() (DELETE: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resDeleteUser.body,
+        resDeleteUser.statusCode,
+        'Test №2: UsersController - deleteUser() (DELETE: /users)',
+      );
+    }
   });
 
   it('should return a 404 error if the user was not found by the passed ID in the parameters.', async () => {
@@ -110,10 +116,12 @@ describe('UsersController - deleteUser() (DELETE: /users)', () => {
     expect(users.items[0]).toEqual<UserViewDto>(newUsers[0]);
     expect(users.items).toHaveLength(1);
 
-    TestLoggers.logE2E(
-      resDeleteUser.body,
-      resDeleteUser.statusCode,
-      'Test №3: UsersController - deleteUser() (DELETE: /users)',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resDeleteUser.body,
+        resDeleteUser.statusCode,
+        'Test №3: UsersController - deleteUser() (DELETE: /users)',
+      );
+    }
   });
 });

@@ -19,6 +19,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let testLoggingEnabled: boolean;
   let server: Server;
 
   beforeAll(async () => {
@@ -27,6 +28,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
 
     adminCredentials = appTestManager.getAdminData();
     server = appTestManager.getServer();
+    testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     usersTestManager = new UsersTestManager(server, adminCredentials);
   });
@@ -72,11 +74,13 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     });
     expect(bodyFromGetRequest.items.length).toEqual(10);
 
-    TestLoggers.logE2E(
-      resGetUsers.body,
-      resGetUsers.statusCode,
-      'Test №1: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №1: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
+      );
+    }
   });
 
   it('should use client-provided pagination values to return the correct subset of data(1).', async () => {
@@ -123,11 +127,13 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     });
     expect(bodyFromGetRequest.items.length).toEqual(3);
 
-    TestLoggers.logE2E(
-      resGetUsers.body,
-      resGetUsers.statusCode,
-      'Test №2: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №2: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
+      );
+    }
   });
 
   it('should use client-provided pagination values to return the correct subset of data(2).', async () => {
@@ -172,11 +178,13 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     });
     expect(bodyFromGetRequest.items.length).toEqual(2);
 
-    TestLoggers.logE2E(
-      resGetUsers.body,
-      resGetUsers.statusCode,
-      'Test №3: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №3: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
+      );
+    }
   });
 
   it('should use the values provided by the client to search for users by the occurrence of the substring (the  "login" field).', async () => {
@@ -217,11 +225,13 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     });
     expect(bodyFromGetRequest.items.length).toEqual(3);
 
-    TestLoggers.logE2E(
-      resGetUsers.body,
-      resGetUsers.statusCode,
-      'Test №4: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №4: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
+      );
+    }
   });
 
   it('should use the values provided by the client to search for users by the occurrence of the substring (the "email" field).', async () => {
@@ -262,11 +272,13 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     });
     expect(bodyFromGetRequest.items.length).toEqual(3);
 
-    TestLoggers.logE2E(
-      resGetUsers.body,
-      resGetUsers.statusCode,
-      'Test №5: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №5: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
+      );
+    }
   });
 
   it('should use the values provided by the client to search for users by the occurrence of the substring (the "login" and "email" fields).', async () => {
@@ -309,10 +321,12 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     });
     expect(bodyFromGetRequest.items.length).toEqual(4);
 
-    TestLoggers.logE2E(
-      resGetUsers.body,
-      resGetUsers.statusCode,
-      'Test №6: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
-    );
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №6: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
+      );
+    }
   });
 });
