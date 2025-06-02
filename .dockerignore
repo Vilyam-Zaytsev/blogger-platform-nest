@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+test
+.git
+Dockerfile
+docker-compose*
+README.md
