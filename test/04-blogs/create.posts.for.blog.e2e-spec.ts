@@ -16,6 +16,7 @@ import {
 import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
 import { HttpStatus } from '@nestjs/common';
 import { PostsTestManager } from '../managers/posts.test-manager';
+import { ObjectId } from 'mongodb';
 
 describe('BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)', () => {
   let appTestManager: AppTestManager;
@@ -102,6 +103,288 @@ describe('BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)', 
         bodyFromCreateRequest,
         resCreatePosts.statusCode,
         'Test №1: BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)',
+      );
+    }
+  });
+
+  it('should not create a post if the admin is not authenticated.', async () => {
+    const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+
+    const [dto]: PostInputDto[] = TestDtoFactory.generatePostInputDto(
+      1,
+      blog.id,
+    );
+
+    const resCreatePosts: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/blogs/${blog.id}/posts`)
+      .send({
+        title: dto.title,
+        shortDescription: dto.shortDescription,
+        content: dto.content,
+      })
+      .set(
+        'Authorization',
+        TestUtils.encodingAdminDataInBase64(
+          'incorrect_login',
+          'incorrect_password',
+        ),
+      )
+      .expect(HttpStatus.UNAUTHORIZED);
+
+    const allPosts: PaginatedViewDto<PostViewDto> =
+      await postsTestManager.getAll();
+
+    expect(allPosts.items).toHaveLength(0);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreatePosts.body,
+        resCreatePosts.statusCode,
+        'Test №2: BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)',
+      );
+    }
+  });
+
+  it('should not create a post if the data in the request body is incorrect (an empty object is passed).', async () => {
+    const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+
+    const resCreatePosts: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/blogs/${blog.id}/posts`)
+      .send({})
+      .set(
+        'Authorization',
+        TestUtils.encodingAdminDataInBase64(
+          adminCredentials.login,
+          adminCredentials.password,
+        ),
+      )
+      .expect(HttpStatus.BAD_REQUEST);
+
+    expect(resCreatePosts.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'content',
+          message: 'content must be a string; Received value: undefined',
+        },
+        {
+          field: 'shortDescription',
+          message:
+            'shortDescription must be a string; Received value: undefined',
+        },
+        {
+          field: 'title',
+          message: 'title must be a string; Received value: undefined',
+        },
+      ],
+    });
+
+    const allPosts: PaginatedViewDto<PostViewDto> =
+      await postsTestManager.getAll();
+
+    expect(allPosts.items).toHaveLength(0);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreatePosts.body,
+        resCreatePosts.statusCode,
+        'Test №3: BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)',
+      );
+    }
+  });
+
+  it('should not create a post if the data in the request body is incorrect (title: empty line, shortDescription: empty line, content: empty line).', async () => {
+    const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+
+    const resCreatePosts: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/blogs/${blog.id}/posts`)
+      .send({
+        title: '   ',
+        shortDescription: '   ',
+        content: '   ',
+      })
+      .set(
+        'Authorization',
+        TestUtils.encodingAdminDataInBase64(
+          adminCredentials.login,
+          adminCredentials.password,
+        ),
+      )
+      .expect(HttpStatus.BAD_REQUEST);
+
+    expect(resCreatePosts.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'content',
+          message:
+            'content must be longer than or equal to 1 characters; Received value: ',
+        },
+        {
+          field: 'shortDescription',
+          message:
+            'shortDescription must be longer than or equal to 1 characters; Received value: ',
+        },
+        {
+          field: 'title',
+          message:
+            'title must be longer than or equal to 1 characters; Received value: ',
+        },
+      ],
+    });
+
+    const allPosts: PaginatedViewDto<PostViewDto> =
+      await postsTestManager.getAll();
+
+    expect(allPosts.items).toHaveLength(0);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreatePosts.body,
+        resCreatePosts.statusCode,
+        'Test №4: BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)',
+      );
+    }
+  });
+
+  it('should not create a post if the data in the request body is incorrect (title: exceeds max length, shortDescription: exceeds max length, content: exceeds max length).', async () => {
+    const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+
+    const title: string = TestUtils.generateRandomString(31);
+    const shortDescription: string = TestUtils.generateRandomString(101);
+    const content: string = TestUtils.generateRandomString(1001);
+
+    const resCreatePosts: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/blogs/${blog.id}/posts`)
+      .send({
+        title,
+        shortDescription,
+        content,
+      })
+      .set(
+        'Authorization',
+        TestUtils.encodingAdminDataInBase64(
+          adminCredentials.login,
+          adminCredentials.password,
+        ),
+      )
+      .expect(HttpStatus.BAD_REQUEST);
+
+    expect(resCreatePosts.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'content',
+          message: `content must be shorter than or equal to 1000 characters; Received value: ${content}`,
+        },
+        {
+          field: 'shortDescription',
+          message: `shortDescription must be shorter than or equal to 100 characters; Received value: ${shortDescription}`,
+        },
+        {
+          field: 'title',
+          message: `title must be shorter than or equal to 30 characters; Received value: ${title}`,
+        },
+      ],
+    });
+
+    const allPosts: PaginatedViewDto<PostViewDto> =
+      await postsTestManager.getAll();
+
+    expect(allPosts.items).toHaveLength(0);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreatePosts.body,
+        resCreatePosts.statusCode,
+        'Test №5: BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)',
+      );
+    }
+  });
+
+  it('should not create a post if the data in the request body is incorrect (title: type number, shortDescription: type number, content: type number).', async () => {
+    const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+
+    const resCreatePosts: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/blogs/${blog.id}/posts`)
+      .send({
+        title: 123,
+        shortDescription: 123,
+        content: 123,
+      })
+      .set(
+        'Authorization',
+        TestUtils.encodingAdminDataInBase64(
+          adminCredentials.login,
+          adminCredentials.password,
+        ),
+      )
+      .expect(HttpStatus.BAD_REQUEST);
+
+    expect(resCreatePosts.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'content',
+          message: `content must be a string; Received value: 123`,
+        },
+        {
+          field: 'shortDescription',
+          message: `shortDescription must be a string; Received value: 123`,
+        },
+        {
+          field: 'title',
+          message: `title must be a string; Received value: 123`,
+        },
+      ],
+    });
+
+    const allPosts: PaginatedViewDto<PostViewDto> =
+      await postsTestManager.getAll();
+
+    expect(allPosts.items).toHaveLength(0);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreatePosts.body,
+        resCreatePosts.statusCode,
+        'Test №6: BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)',
+      );
+    }
+  });
+
+  it.only('should not create a post if the data in the request body is incorrect (blogId: incorrect).', async () => {
+    const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+
+    const [dto]: PostInputDto[] = TestDtoFactory.generatePostInputDto(
+      1,
+      blog.id,
+    );
+
+    const incorrectBlogId: string = new ObjectId().toString();
+
+    const resCreatePosts: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/blogs/${incorrectBlogId}/posts`)
+      .send({
+        title: dto.title,
+        shortDescription: dto.shortDescription,
+        content: dto.content,
+      })
+      .set(
+        'Authorization',
+        TestUtils.encodingAdminDataInBase64(
+          adminCredentials.login,
+          adminCredentials.password,
+        ),
+      )
+      .expect(HttpStatus.NOT_FOUND);
+
+    const allPosts: PaginatedViewDto<PostViewDto> =
+      await postsTestManager.getAll();
+
+    expect(allPosts.items).toHaveLength(0);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resCreatePosts.body,
+        resCreatePosts.statusCode,
+        'Test №7: BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)',
       );
     }
   });
