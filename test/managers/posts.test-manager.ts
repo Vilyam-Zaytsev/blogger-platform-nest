@@ -4,7 +4,16 @@ import { Server } from 'http';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
 import { AdminCredentials } from '../types';
 import { GetPostsQueryParams } from '../../src/modules/bloggers-platform/posts/api/input-dto/get-posts-query-params.input-dto';
-import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
+import {
+  ExtendedLikesInfo,
+  LikeStatus,
+  PostViewDto,
+} from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
+import { BlogInputDto } from '../../src/modules/bloggers-platform/blogs/api/input-dto/blog-input.dto';
+import { TestUtils } from '../helpers/test.utils';
+import { BlogViewDto } from '../../src/modules/bloggers-platform/blogs/api/view-dto/blog-view.dto';
+import { TestDtoFactory } from '../helpers/test.dto-factory';
+import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
 
 export class PostsTestManager {
   constructor(
@@ -12,39 +21,48 @@ export class PostsTestManager {
     private readonly adminCredentials: AdminCredentials,
   ) {}
 
-  // async createBlog(quantity: number): Promise<BlogViewDto[]> {
-  //   const newBlogs: BlogViewDto[] = [];
-  //   const dtos: BlogInputDto[] = TestDtoFactory.generateBlogInputDto(quantity);
-  //
-  //   for (let i = 0; i < quantity; i++) {
-  //     const blog: BlogInputDto = dtos[i];
-  //
-  //     const response: Response = await request(this.server)
-  //       .post(`/${GLOBAL_PREFIX}/blogs`)
-  //       .send(blog)
-  //       .set(
-  //         'Authorization',
-  //         TestUtils.encodingAdminDataInBase64(
-  //           this.adminCredentials.login,
-  //           this.adminCredentials.password,
-  //         ),
-  //       )
-  //       .expect(201);
-  //
-  //     const newBlog: BlogViewDto = response.body as BlogViewDto;
-  //
-  //     expect(typeof newBlog.id).toBe('string');
-  //     expect(new Date(newBlog.createdAt).toString()).not.toBe('Invalid Date');
-  //     expect(newBlog.name).toBe(blog.name);
-  //     expect(newBlog.description).toBe(blog.description);
-  //     expect(newBlog.websiteUrl).toBe(blog.websiteUrl);
-  //     expect(typeof newBlog.isMembership).toBe('boolean');
-  //
-  //     newBlogs.push(newBlog);
-  //   }
-  //
-  //   return newBlogs;
-  // }
+  async createPost(quantity: number, blogId: string): Promise<PostViewDto[]> {
+    const newPosts: PostViewDto[] = [];
+    const dtos: PostInputDto[] = TestDtoFactory.generatePostInputDto(
+      quantity,
+      blogId,
+    );
+
+    for (let i = 0; i < quantity; i++) {
+      const dto: PostInputDto = dtos[i];
+
+      const response: Response = await request(this.server)
+        .post(`/${GLOBAL_PREFIX}/posts`)
+        .send(dto)
+        .set(
+          'Authorization',
+          TestUtils.encodingAdminDataInBase64(
+            this.adminCredentials.login,
+            this.adminCredentials.password,
+          ),
+        )
+        .expect(201);
+
+      const newPost: PostViewDto = response.body as PostViewDto;
+
+      expect(typeof newPost.id).toBe('string');
+      expect(new Date(newPost.createdAt).toString()).not.toBe('Invalid Date');
+      expect(newPost.title).toBe(dto.title);
+      expect(newPost.shortDescription).toBe(dto.shortDescription);
+      expect(newPost.content).toBe(dto.content);
+      expect(newPost.blogId).toBe(dto.blogId);
+      expect(typeof newPost.blogName).toBe('string');
+      expect(typeof newPost.extendedLikesInfo).toBe('object');
+      expect(newPost.extendedLikesInfo.likesCount).toBe(0);
+      expect(newPost.extendedLikesInfo.dislikesCount).toBe(0);
+      expect(newPost.extendedLikesInfo.myStatus).toBe(LikeStatus.None);
+      expect(Array.isArray(newPost.extendedLikesInfo.newestLikes)).toBe(true);
+
+      newPosts.push(newPost);
+    }
+
+    return newPosts;
+  }
 
   async getAll(
     query: Partial<GetPostsQueryParams> = {},

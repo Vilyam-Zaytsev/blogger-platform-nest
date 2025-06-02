@@ -349,7 +349,7 @@ describe('BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)', 
     }
   });
 
-  it.only('should not create a post if the data in the request body is incorrect (blogId: incorrect).', async () => {
+  it('should not create a post if the data in the request body is incorrect (blogId: incorrect).', async () => {
     const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
 
     const [dto]: PostInputDto[] = TestDtoFactory.generatePostInputDto(

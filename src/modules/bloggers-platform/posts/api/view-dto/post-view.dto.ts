@@ -32,7 +32,7 @@ export class PostViewDto {
   }
 }
 
-type ExtendedLikesInfo = {
+export type ExtendedLikesInfo = {
   likesCount: number;
   dislikesCount: number;
   myStatus: LikeStatus;
