@@ -1,5 +1,6 @@
 import { PostDocument } from '../../domain/post.entity';
 import { LastLike } from '../../domain/last-likes.schema';
+import { LikeStatus } from '../../../likes/domain/like.entity';
 
 export class PostViewDto {
   id: string;
@@ -38,10 +39,3 @@ export type ExtendedLikesInfo = {
   myStatus: LikeStatus;
   newestLikes: LastLike[];
 };
-
-//TODO: вынести в отдельный файл!!!
-export enum LikeStatus {
-  None = 'None',
-  Like = 'Like',
-  Dislike = 'Dislike',
-}
