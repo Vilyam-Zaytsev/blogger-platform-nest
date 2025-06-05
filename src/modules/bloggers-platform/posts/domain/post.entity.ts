@@ -1,9 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ReactionsCount, ReactionsCountSchema } from './reactions-count.schema';
+import {
+  ReactionChange,
+  ReactionsCount,
+  ReactionsCountSchema,
+} from './reactions-count.schema';
 import { LastLike, LastLikeSchema } from './last-likes.schema';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDomainDto } from './dto/create-post.domain.dto';
 import { UpdatePostDto } from '../dto/post.dto';
+import { LikeStatus } from '../../likes/domain/like.entity';
 
 export const titleConstraints = {
   maxLength: 30,
@@ -178,6 +183,39 @@ export class Post {
       throw new Error('Entity already deleted');
     }
     this.deletedAt = new Date();
+  }
+
+  /**
+   * Updates the count of likes and dislikes based on the current and previous user reaction.
+   *
+   * This method adjusts the `reactionsCount` object by decrementing the count of the previous reaction
+   * (if it exists) and incrementing the count of the current reaction (if it exists).
+   * It is typically used when a user adds, removes, or changes their reaction (like/dislike) to a post or comment.
+   *
+   * @param {ReactionChange} delta - An object containing the current and previous reactions.
+   * @param {'Like' | 'Dislike' | null} delta.currentReaction - The new reaction provided by the user, or `null` if removed.
+   * @param {'Like' | 'Dislike' | null} delta.previousReaction - The old reaction that is being replaced or removed, or `null` if none existed.
+   *
+   * @throws Will not throw, but assumes `reactionsCount` contains valid numeric keys `likesCount` and `dislikesCount`.
+   */
+  updateReactionsCount(delta: ReactionChange) {
+    const { currentReaction, previousReaction } = delta;
+
+    const currentReactionKey: string | null = currentReaction
+      ? `${currentReaction.toLowerCase()}Count`
+      : null;
+
+    const previousReactionKey: string | null = previousReaction
+      ? `${previousReaction.toLowerCase()}Count`
+      : null;
+
+    if (previousReactionKey && currentReaction !== LikeStatus.None) {
+      this.reactionsCount[previousReactionKey] -= 1;
+    }
+
+    if (currentReactionKey && currentReaction !== LikeStatus.None) {
+      this.reactionsCount[currentReactionKey] += 1;
+    }
   }
 }
 

@@ -7,7 +7,6 @@ export const ExtractUserFromRequest = createParamDecorator(
     const request: Request = context.switchToHttp().getRequest<Request>();
 
     const user = request.user;
-
     if (!user) {
       throw new Error('There is no user information in the request object');
     }

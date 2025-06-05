@@ -5,3 +5,5 @@ export class CreateLikeDto {
   userId: string;
   parentId: string;
 }
+
+export class UpdateReactionDto extends CreateLikeDto {}

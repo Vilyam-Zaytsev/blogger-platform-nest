@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PostInputDto } from './input-dto/post-input.dto';
 import { PostViewDto } from './view-dto/post-view.dto';
@@ -22,6 +23,14 @@ import { IdInputDto } from '../../../user-accounts/api/input-dto/id.input-dto';
 import { GetPostsQuery } from '../application/queries/get-posts.query-handler';
 import { GetPostQuery } from '../application/queries/get-post.query-handler';
 import { UpdatePostCommand } from '../application/usecases/update-post.usecase';
+import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
+import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
+import { LikeInputDto } from '../../likes/api/input-dto/like-input.dto';
+import { ExtractUserFromRequest } from '../../../user-accounts/guards/decorators/extract-user-from-request.decorator';
+import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.dto';
+import { UpdatePostReactionsCommand } from '../application/usecases/update-post-reaction.usecase';
+import { UpdateReactionDto } from '../../likes/dto/like.dto';
+import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
 
 @Controller('posts')
 export class PostsController {
@@ -43,6 +52,7 @@ export class PostsController {
   }
 
   @Post()
+  @UseGuards(BasicAuthGuard)
   async createPost(@Body() body: PostInputDto): Promise<PostViewDto> {
     const postId: string = await this.commandBus.execute(
       new CreatePostCommand(body),
@@ -53,6 +63,7 @@ export class PostsController {
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BasicAuthGuard)
   async updatePost(
     @Param() params: IdInputDto,
     @Body() body: PostInputDto,
@@ -60,8 +71,28 @@ export class PostsController {
     await this.commandBus.execute(new UpdatePostCommand(body, params.id));
   }
 
+  @Put(':postId/like-status')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async updateReactions(
+    @ExtractUserFromRequest() user: UserContextDto,
+    @Param('postId', ObjectIdValidationPipe) postId: string,
+    @Body() body: LikeInputDto,
+  ): Promise<void> {
+    const updateReactionDto: UpdateReactionDto = {
+      status: body.likeStatus,
+      userId: user.id,
+      parentId: postId,
+    };
+
+    await this.commandBus.execute(
+      new UpdatePostReactionsCommand(updateReactionDto),
+    );
+  }
+
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BasicAuthGuard)
   async deletePost(@Param() params: IdInputDto): Promise<void> {
     await this.commandBus.execute(new DeletePostCommand(params.id));
   }

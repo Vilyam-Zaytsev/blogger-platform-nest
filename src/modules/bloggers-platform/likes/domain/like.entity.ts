@@ -42,6 +42,10 @@ export class Like {
 
     return like as LikeDocument;
   }
+
+  updateStatus(status: LikeStatus) {
+    this.status = status;
+  }
 }
 
 export const LikeSchema = SchemaFactory.createForClass(Like);
