@@ -34,7 +34,9 @@ export class UpdateReactionUseCase
         currentReaction: status,
         previousReaction: null,
       };
-    } else if (like.status === status) {
+    }
+
+    if (like.status === status) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: `User (${userId}) has already set this reaction (${status}) for the target (${parentId})`,
