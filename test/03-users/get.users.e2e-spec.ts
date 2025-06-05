@@ -50,7 +50,7 @@ describe('UsersController - getUser() (GET: /users)', () => {
       .expect(200);
 
     expect(resGetUsers.body).toEqual({
-      pageCount: 0,
+      pagesCount: 0,
       page: 1,
       pageSize: 10,
       totalCount: 0,
