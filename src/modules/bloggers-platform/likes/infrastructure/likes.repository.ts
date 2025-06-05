@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Like, LikeDocument, LikeModelType } from '../domain/like.entity';
+import {
+  Like,
+  LikeDocument,
+  LikeModelType,
+  LikeStatus,
+} from '../domain/like.entity';
 import { DomainException } from '../../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
-import { PostDocument } from '../../posts/domain/post.entity';
 
 @Injectable()
 export class LikesRepository {
@@ -34,6 +38,15 @@ export class LikesRepository {
       userId,
       parentId,
       deletedAt: null,
+    });
+  }
+
+  async getLikesByParentIdsAndStatusLike(
+    parentIds: string[],
+  ): Promise<LikeDocument[]> {
+    return this.LikeModel.find({
+      parentId: { $in: parentIds },
+      status: LikeStatus.Like,
     });
   }
 

@@ -31,6 +31,8 @@ import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.d
 import { UpdatePostReactionsCommand } from '../application/usecases/update-post-reaction.usecase';
 import { UpdateReactionDto } from '../../likes/dto/like.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
+import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
+import { ExtractUserIfExistsFromRequest } from '../../../user-accounts/guards/decorators/extract-user-if-exists-from-request.decorator';
 
 @Controller('posts')
 export class PostsController {
@@ -40,10 +42,12 @@ export class PostsController {
     private readonly queryBus: QueryBus,
   ) {}
   @Get()
+  @UseGuards(OptionalJwtAuthGuard)
   async getAll(
+    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
     @Query() query: GetPostsQueryParams,
   ): Promise<PaginatedViewDto<PostViewDto>> {
-    return this.queryBus.execute(new GetPostsQuery(query));
+    return this.queryBus.execute(new GetPostsQuery(query, user));
   }
 
   @Get(':id')
