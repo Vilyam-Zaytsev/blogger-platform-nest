@@ -18,7 +18,7 @@ export class ReactionsCount {
    * @default 0
    */
   @Prop({ type: Number, default: 0 })
-  likeCount: number;
+  likesCount: number;
 
   /**
    * Total number of dislikes.
@@ -28,7 +28,7 @@ export class ReactionsCount {
    * @default 0
    */
   @Prop({ type: Number, default: 0 })
-  dislikeCount: number;
+  dislikesCount: number;
 }
 
 export const ReactionsCountSchema =
@@ -37,4 +37,8 @@ export const ReactionsCountSchema =
 export type ReactionChange = {
   currentReaction: LikeStatus | null;
   previousReaction: LikeStatus | null;
+};
+
+export type HasReactions = {
+  reactionsCount: ReactionsCount;
 };

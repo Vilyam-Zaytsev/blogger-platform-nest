@@ -8,7 +8,10 @@ import { LastLike, LastLikeSchema } from './last-likes.schema';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDomainDto } from './dto/create-post.domain.dto';
 import { UpdatePostDto } from '../dto/post.dto';
-import { LikeStatus } from '../../likes/domain/like.entity';
+import {
+  makeDeleted,
+  recalculateReactionsCount,
+} from '../../../../core/utils/entity.common-utils';
 
 export const titleConstraints = {
   maxLength: 30,
@@ -178,11 +181,8 @@ export class Post {
    *
    * @throws {Error} If the entity has already been soft-deleted.
    */
-  makeDeleted() {
-    if (this.deletedAt !== null) {
-      throw new Error('Entity already deleted');
-    }
-    this.deletedAt = new Date();
+  delete() {
+    makeDeleted.call(this);
   }
 
   /**
@@ -199,23 +199,7 @@ export class Post {
    * @throws Will not throw, but assumes `reactionsCount` contains valid numeric keys `likesCount` and `dislikesCount`.
    */
   updateReactionsCount(delta: ReactionChange) {
-    const { currentReaction, previousReaction } = delta;
-
-    const currentReactionKey: string | null = currentReaction
-      ? `${currentReaction.toLowerCase()}Count`
-      : null;
-
-    const previousReactionKey: string | null = previousReaction
-      ? `${previousReaction.toLowerCase()}Count`
-      : null;
-
-    if (previousReactionKey && currentReaction !== LikeStatus.None) {
-      this.reactionsCount[previousReactionKey] -= 1;
-    }
-
-    if (currentReactionKey && currentReaction !== LikeStatus.None) {
-      this.reactionsCount[currentReactionKey] += 1;
-    }
+    recalculateReactionsCount.call(this, delta);
   }
 }
 
