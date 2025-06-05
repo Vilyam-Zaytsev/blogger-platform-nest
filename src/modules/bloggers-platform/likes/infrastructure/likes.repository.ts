@@ -41,12 +41,9 @@ export class LikesRepository {
     });
   }
 
-  async getLikesByParentIdsAndStatusLike(
-    parentIds: string[],
-  ): Promise<LikeDocument[]> {
+  async getReactionsByParentIds(parentIds: string[]): Promise<LikeDocument[]> {
     return this.LikeModel.find({
       parentId: { $in: parentIds },
-      status: LikeStatus.Like,
     });
   }
 

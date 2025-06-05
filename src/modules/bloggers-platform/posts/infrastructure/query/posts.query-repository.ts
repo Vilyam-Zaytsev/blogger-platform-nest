@@ -50,13 +50,13 @@ export class PostsQueryRepository {
 
     const postsIds: string[] = posts.map((post) => post._id.toString());
 
-    const allLikesForPosts: LikeDocument[] =
-      await this.likesRepository.getLikesByParentIdsAndStatusLike(postsIds);
+    const allReactionsForPosts: LikeDocument[] =
+      await this.likesRepository.getReactionsByParentIds(postsIds);
 
     const mapUserReactionsForPosts: Map<string, LikeStatus> = new Map();
 
     if (user) {
-      allLikesForPosts.reduce<Map<string, LikeStatus>>(
+      allReactionsForPosts.reduce<Map<string, LikeStatus>>(
         (
           acc: Map<string, LikeStatus>,
           like: LikeDocument,
@@ -64,8 +64,6 @@ export class PostsQueryRepository {
           if (like.userId === user.id) {
             acc.set(like.parentId, like.status);
           }
-
-          acc.set(like.parentId, LikeStatus.None);
 
           return acc;
         },
