@@ -4,7 +4,7 @@ import {
   ReactionsCount,
   ReactionsCountSchema,
 } from './reactions-count.schema';
-import { LastLike, LastLikeSchema } from './last-likes.schema';
+import { NewestLikes, NewestLikesSchema } from './last-likes.schema';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDomainDto } from './dto/create-post.domain.dto';
 import { UpdatePostDto } from '../dto/post.dto';
@@ -97,11 +97,11 @@ export class Post {
    * List of the most recent likes.
    * Each entry includes user ID, login, and the timestamp of the like.
    *
-   * @type {LastLike[]}
+   * @type {NewestLikes[]}
    * @default []
    */
-  @Prop({ type: [LastLikeSchema], default: [] })
-  lastLikes: LastLike[];
+  @Prop({ type: [NewestLikesSchema], default: [] })
+  newestLikes: NewestLikes[];
 
   /**
    * Timestamp indicating when the post was created.
@@ -150,7 +150,7 @@ export class Post {
     post.blogId = blogId;
     post.blogName = dto.blogName;
     post.reactionsCount = new ReactionsCount();
-    post.lastLikes = [];
+    post.newestLikes = [];
 
     return post as PostDocument;
   }

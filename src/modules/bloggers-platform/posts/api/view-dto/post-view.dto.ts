@@ -1,5 +1,5 @@
 import { PostDocument } from '../../domain/post.entity';
-import { LastLike } from '../../domain/last-likes.schema';
+import { NewestLikes } from '../../domain/last-likes.schema';
 import { LikeStatus } from '../../../likes/domain/like.entity';
 
 export class PostViewDto {
@@ -25,7 +25,7 @@ export class PostViewDto {
       likesCount: post.reactionsCount.likesCount,
       dislikesCount: post.reactionsCount.dislikesCount,
       myStatus: LikeStatus.None,
-      newestLikes: post.lastLikes,
+      newestLikes: post.newestLikes,
     };
     dto.createdAt = post.createdAt.toISOString();
 
@@ -37,5 +37,5 @@ export type ExtendedLikesInfo = {
   likesCount: number;
   dislikesCount: number;
   myStatus: LikeStatus;
-  newestLikes: LastLike[];
+  newestLikes: NewestLikes[];
 };
