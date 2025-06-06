@@ -1,4 +1,4 @@
-import { LikeStatus } from '../../../posts/api/view-dto/post-view.dto';
+import { LikeStatus } from '../../../likes/domain/like.entity';
 
 export type CommentatorInfo = {
   userId: string;

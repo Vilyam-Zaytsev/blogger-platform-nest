@@ -20,11 +20,17 @@ import { GetBlogsQueryHandler } from './blogs/application/queries/get-blogs.quer
 import { GetPostsQueryHandler } from './posts/application/queries/get-posts.query-handler';
 import { GetPostQueryHandler } from './posts/application/queries/get-post.query-handler';
 import { UserAccountsModule } from '../user-accounts/user-accounts.module';
+import { LikesRepository } from './likes/infrastructure/likes.repository';
+import { Like, LikeSchema } from './likes/domain/like.entity';
+import { UpdatePostReactionUseCase } from './posts/application/usecases/update-post-reaction.usecase';
+import { UpdateReactionUseCase } from './likes/application/usecases/update-reactions.usecase';
+import { CreateLikeUseCase } from './likes/application/usecases/create-like.usecase';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
+    MongooseModule.forFeature([{ name: Like.name, schema: LikeSchema }]),
     UserAccountsModule,
   ],
   controllers: [BlogsController, PostsController],
@@ -43,15 +49,22 @@ import { UserAccountsModule } from '../user-accounts/user-accounts.module';
     GetPostsForBlogQueryHandler,
     //---posts---//
     //repo
+    LikesRepository,
     PostsRepository,
     PostsQueryRepository,
     //use-cases
     CreatePostUseCase,
     UpdatePostUseCase,
     DeletePostUseCase,
+    UpdatePostReactionUseCase,
+
     //query-handlers
     GetPostsQueryHandler,
     GetPostQueryHandler,
+    //---likes---//
+    //use-cases
+    UpdateReactionUseCase,
+    CreateLikeUseCase,
   ],
   exports: [],
 })

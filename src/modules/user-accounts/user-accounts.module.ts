@@ -30,8 +30,6 @@ import { NewPasswordUseCase } from './application/usecases/new-password.usecase'
 import { GetMeQueryHandler } from './application/queries/auth/get-me.query-handler';
 import { AuthQueryRepository } from './infrastructure/query/auth.query-repository';
 import { GetUsersQueryHandler } from './application/queries/users/get-users.query-handler';
-import { GetBlogQueryHandler } from '../bloggers-platform/blogs/application/queries/get-blog.query-handler';
-import { GetPostsForBlogQueryHandler } from '../bloggers-platform/blogs/application/queries/get-posts-for-blog.query-handler';
 
 @Module({
   imports: [
@@ -96,6 +94,6 @@ import { GetPostsForBlogQueryHandler } from '../bloggers-platform/blogs/applicat
     //repo
     AuthQueryRepository,
   ],
-  exports: [BasicStrategy],
+  exports: [BasicStrategy, UsersRepository],
 })
 export class UserAccountsModule {}

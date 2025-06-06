@@ -22,7 +22,6 @@ export class GetPostsForBlogQueryHandler
     queryParams,
     blogId,
   }: GetPostsForBlogQuery): Promise<PaginatedViewDto<PostViewDto>> {
-    console.log(GetPostsForBlogQuery, blogId);
     return this.postsQueryRepository.getPostsByBlogId(queryParams, blogId);
   }
 }

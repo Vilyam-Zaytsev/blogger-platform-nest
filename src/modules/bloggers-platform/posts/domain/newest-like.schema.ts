@@ -1,14 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 /**
- * LastLike Embedded Schema
+ * NewestLikes Embedded Schema
  *
  * Represents metadata about the most recent like on an entity (e.g., post or comment).
  * Includes the timestamp, user ID, and login of the user who performed the like action.
  * This schema is embedded and does not have its own _id.
  */
 @Schema({ _id: false })
-export class LastLike {
+export class NewestLike {
   /**
    * Timestamp of when the like was added.
    * Represents the exact moment the user liked the entity.
@@ -17,7 +17,7 @@ export class LastLike {
    * @required
    */
   @Prop({ type: Date, required: true })
-  addedAr: Date;
+  addedAt: Date;
 
   /**
    * ID of the user who added the like.
@@ -40,4 +40,4 @@ export class LastLike {
   login: string;
 }
 
-export const LastLikeSchema = SchemaFactory.createForClass(LastLike);
+export const NewestLikeSchema = SchemaFactory.createForClass(NewestLike);

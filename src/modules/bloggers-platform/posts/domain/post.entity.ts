@@ -1,9 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ReactionsCount, ReactionsCountSchema } from './reactions-count.schema';
-import { LastLike, LastLikeSchema } from './last-likes.schema';
+import { NewestLike, NewestLikeSchema } from './newest-like.schema';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDomainDto } from './dto/create-post.domain.dto';
 import { UpdatePostDto } from '../dto/post.dto';
+import {
+  appendLatestReaction,
+  makeDeleted,
+  recalculateReactionsCount,
+} from '../../../../core/utils/entity.common-utils';
+import { ReactionChange } from '../../likes/domain/like.entity';
 
 export const titleConstraints = {
   maxLength: 30,
@@ -89,11 +95,11 @@ export class Post {
    * List of the most recent likes.
    * Each entry includes user ID, login, and the timestamp of the like.
    *
-   * @type {LastLike[]}
+   * @type {NewestLike[]}
    * @default []
    */
-  @Prop({ type: [LastLikeSchema], default: [] })
-  lastLikes: LastLike[];
+  @Prop({ type: [NewestLikeSchema], default: [] })
+  newestLikes: NewestLike[];
 
   /**
    * Timestamp indicating when the post was created.
@@ -142,7 +148,7 @@ export class Post {
     post.blogId = blogId;
     post.blogName = dto.blogName;
     post.reactionsCount = new ReactionsCount();
-    post.lastLikes = [];
+    post.newestLikes = [];
 
     return post as PostDocument;
   }
@@ -173,11 +179,43 @@ export class Post {
    *
    * @throws {Error} If the entity has already been soft-deleted.
    */
-  makeDeleted() {
-    if (this.deletedAt !== null) {
-      throw new Error('Entity already deleted');
-    }
-    this.deletedAt = new Date();
+  delete() {
+    makeDeleted.call(this);
+  }
+
+  /**
+   * Updates the count of likes and dislikes based on the current and previous user reaction.
+   *
+   * This method adjusts the `reactionsCount` object by decrementing the count of the previous reaction
+   * (if it exists) and incrementing the count of the current reaction (if it exists).
+   * It is typically used when a user adds, removes, or changes their reaction (like/dislike) to a post or comment.
+   *
+   * @param {ReactionChange} delta - An object containing the current and previous reactions.
+   * @param {'Like' | 'Dislike' | null} delta.currentReaction - The new reaction provided by the user, or `null` if removed.
+   * @param {'Like' | 'Dislike' | null} delta.previousReaction - The old reaction that is being replaced or removed, or `null` if none existed.
+   *
+   * @throws Will not throw, but assumes `reactionsCount` contains valid numeric keys `likesCount` and `dislikesCount`.
+   */
+  updateReactionsCount(delta: ReactionChange) {
+    recalculateReactionsCount.call(this, delta);
+  }
+
+  /**
+   * Updates the list of the three most recent likes for an entity.
+   *
+   * This method maintains a list of the latest three likes (in `this.newestLikes`),
+   * ensuring that it reflects the most recent user interactions. It prepends the new like to the beginning of the array.
+   *
+   * If there are already three entries in the list, it removes the oldest one (at the end),
+   * then adds the new one to the beginning, keeping the array size at a maximum of three.
+   *
+   * ⚠️ Note: The current implementation adds the new like twice if `this.newestLikes.length < 3`,
+   * which might lead to incorrect state (duplicate entries). Consider fixing the logic if deduplication or strict count is required.
+   *
+   * @param {NewestLike} newestLike - The new like object to add to the recent likes list.
+   */
+  updateNewestLikes(newestLike: NewestLike) {
+    appendLatestReaction.call(this, newestLike);
   }
 }
 

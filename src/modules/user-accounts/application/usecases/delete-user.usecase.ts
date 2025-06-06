@@ -16,7 +16,7 @@ export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
       dto.id,
     );
 
-    user.makeDeleted();
+    user.delete();
 
     return await this.usersRepository.save(user);
   }

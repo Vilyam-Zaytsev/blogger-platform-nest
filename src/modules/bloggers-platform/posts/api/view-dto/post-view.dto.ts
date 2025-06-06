@@ -1,5 +1,6 @@
 import { PostDocument } from '../../domain/post.entity';
-import { LastLike } from '../../domain/last-likes.schema';
+import { NewestLike } from '../../domain/newest-like.schema';
+import { LikeStatus } from '../../../likes/domain/like.entity';
 
 export class PostViewDto {
   id: string;
@@ -11,7 +12,7 @@ export class PostViewDto {
   extendedLikesInfo: ExtendedLikesInfo;
   createdAt: string;
 
-  static mapToView(post: PostDocument): PostViewDto {
+  static mapToView(post: PostDocument, myStatus: LikeStatus): PostViewDto {
     const dto = new this();
 
     dto.id = post._id.toString();
@@ -23,8 +24,8 @@ export class PostViewDto {
     dto.extendedLikesInfo = {
       likesCount: post.reactionsCount.likesCount,
       dislikesCount: post.reactionsCount.dislikesCount,
-      myStatus: LikeStatus.None,
-      newestLikes: post.lastLikes,
+      myStatus,
+      newestLikes: post.newestLikes,
     };
     dto.createdAt = post.createdAt.toISOString();
 
@@ -36,12 +37,5 @@ export type ExtendedLikesInfo = {
   likesCount: number;
   dislikesCount: number;
   myStatus: LikeStatus;
-  newestLikes: LastLike[];
+  newestLikes: NewestLike[];
 };
-
-//TODO: вынести в отдельный файл!!!
-export enum LikeStatus {
-  None = 'None',
-  Like = 'Like',
-  Dislike = 'Dislike',
-}

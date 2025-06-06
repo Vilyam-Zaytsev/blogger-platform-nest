@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateBlogDto, UpdateBlogDto } from '../dto/blog.dto';
+import { makeDeleted } from '../../../../core/utils/entity.common-utils';
 
 export const nameConstraints = {
   maxLength: 15,
@@ -120,11 +121,8 @@ export class Blog {
    *
    * @throws {Error} If the entity has already been soft-deleted.
    */
-  makeDeleted() {
-    if (this.deletedAt !== null) {
-      throw new Error('Entity already deleted');
-    }
-    this.deletedAt = new Date();
+  delete() {
+    makeDeleted.call(this);
   }
 
   /**
