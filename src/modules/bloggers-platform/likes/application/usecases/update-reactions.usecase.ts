@@ -1,11 +1,14 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateReactionDto } from '../../dto/like.dto';
 import { LikesRepository } from '../../infrastructure/likes.repository';
-import { LikeDocument, LikeStatus } from '../../domain/like.entity';
+import {
+  LikeDocument,
+  LikeStatus,
+  ReactionUpdateResult,
+} from '../../domain/like.entity';
 import { CreateLikeCommand } from './create-like.usecase';
 import { DomainException } from '../../../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
-import { ReactionChange } from '../../../posts/domain/reactions-count.schema';
 
 export class UpdateReactionsCommand {
   constructor(public readonly dto: UpdateReactionDto) {}
@@ -20,19 +23,26 @@ export class UpdateReactionUseCase
     private readonly commandBus: CommandBus,
   ) {}
 
-  async execute({ dto }: UpdateReactionsCommand): Promise<ReactionChange> {
+  async execute({
+    dto,
+  }: UpdateReactionsCommand): Promise<ReactionUpdateResult> {
     const { status, userId, parentId } = dto;
 
     const like: LikeDocument | null =
       await this.likesRepository.getLikeByUserIdAndParentId(userId, parentId);
 
     if (!like) {
-      await this.commandBus.execute(new CreateLikeCommand(dto));
+      const currentReactionId: string = await this.commandBus.execute(
+        new CreateLikeCommand(dto),
+      );
 
       //TODO: что если status 'None'?
       return {
-        currentReaction: status,
-        previousReaction: null,
+        delta: {
+          currentReaction: status,
+          previousReaction: null,
+        },
+        currentReactionId,
       };
     }
 
@@ -49,8 +59,11 @@ export class UpdateReactionUseCase
     await this.likesRepository.save(like);
 
     return {
-      currentReaction: status,
-      previousReaction,
+      delta: {
+        currentReaction: status,
+        previousReaction,
+      },
+      currentReactionId: null,
     };
   }
 }

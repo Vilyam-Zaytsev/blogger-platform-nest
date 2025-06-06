@@ -55,3 +55,14 @@ LikeSchema.loadClass(Like);
 export type LikeDocument = HydratedDocument<Like>;
 
 export type LikeModelType = Model<LikeDocument> & typeof Like;
+
+//TODO: нормально ли тут хранить ReactionChange и ReactionUpdateResult?
+export type ReactionChange = {
+  currentReaction: LikeStatus | null;
+  previousReaction: LikeStatus | null;
+};
+
+export type ReactionUpdateResult = {
+  delta: ReactionChange;
+  currentReactionId: string | null;
+};

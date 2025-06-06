@@ -94,6 +94,6 @@ import { GetUsersQueryHandler } from './application/queries/users/get-users.quer
     //repo
     AuthQueryRepository,
   ],
-  exports: [BasicStrategy],
+  exports: [BasicStrategy, UsersRepository],
 })
 export class UserAccountsModule {}

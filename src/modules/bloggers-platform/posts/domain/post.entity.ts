@@ -1,17 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import {
-  ReactionChange,
-  ReactionsCount,
-  ReactionsCountSchema,
-} from './reactions-count.schema';
-import { NewestLikes, NewestLikesSchema } from './last-likes.schema';
+import { ReactionsCount, ReactionsCountSchema } from './reactions-count.schema';
+import { NewestLike, NewestLikeSchema } from './newest-like.schema';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDomainDto } from './dto/create-post.domain.dto';
 import { UpdatePostDto } from '../dto/post.dto';
 import {
+  appendLatestReaction,
   makeDeleted,
   recalculateReactionsCount,
 } from '../../../../core/utils/entity.common-utils';
+import { ReactionChange } from '../../likes/domain/like.entity';
 
 export const titleConstraints = {
   maxLength: 30,
@@ -97,11 +95,11 @@ export class Post {
    * List of the most recent likes.
    * Each entry includes user ID, login, and the timestamp of the like.
    *
-   * @type {NewestLikes[]}
+   * @type {NewestLike[]}
    * @default []
    */
-  @Prop({ type: [NewestLikesSchema], default: [] })
-  newestLikes: NewestLikes[];
+  @Prop({ type: [NewestLikeSchema], default: [] })
+  newestLikes: NewestLike[];
 
   /**
    * Timestamp indicating when the post was created.
@@ -200,6 +198,24 @@ export class Post {
    */
   updateReactionsCount(delta: ReactionChange) {
     recalculateReactionsCount.call(this, delta);
+  }
+
+  /**
+   * Updates the list of the three most recent likes for an entity.
+   *
+   * This method maintains a list of the latest three likes (in `this.newestLikes`),
+   * ensuring that it reflects the most recent user interactions. It prepends the new like to the beginning of the array.
+   *
+   * If there are already three entries in the list, it removes the oldest one (at the end),
+   * then adds the new one to the beginning, keeping the array size at a maximum of three.
+   *
+   * ⚠️ Note: The current implementation adds the new like twice if `this.newestLikes.length < 3`,
+   * which might lead to incorrect state (duplicate entries). Consider fixing the logic if deduplication or strict count is required.
+   *
+   * @param {NewestLike} newestLike - The new like object to add to the recent likes list.
+   */
+  updateNewestLikes(newestLike: NewestLike) {
+    appendLatestReaction.call(this, newestLike);
   }
 }
 

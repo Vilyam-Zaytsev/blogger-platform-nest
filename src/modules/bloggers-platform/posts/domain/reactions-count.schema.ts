@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { LikeStatus } from '../../likes/domain/like.entity';
 
 /**
  * ReactionsCount Embedded Schema
@@ -33,11 +32,6 @@ export class ReactionsCount {
 
 export const ReactionsCountSchema =
   SchemaFactory.createForClass(ReactionsCount);
-
-export type ReactionChange = {
-  currentReaction: LikeStatus | null;
-  previousReaction: LikeStatus | null;
-};
 
 export type HasReactions = {
   reactionsCount: ReactionsCount;

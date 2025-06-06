@@ -1,11 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  Like,
-  LikeDocument,
-  LikeModelType,
-  LikeStatus,
-} from '../domain/like.entity';
+import { Like, LikeDocument, LikeModelType } from '../domain/like.entity';
 import { DomainException } from '../../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 

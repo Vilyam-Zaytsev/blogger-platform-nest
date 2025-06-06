@@ -47,7 +47,6 @@ export class PostsController {
     @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
     @Query() query: GetPostsQueryParams,
   ): Promise<PaginatedViewDto<PostViewDto>> {
-    console.log('PostsController: ', user);
     return this.queryBus.execute(new GetPostsQuery(query, user));
   }
 

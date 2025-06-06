@@ -8,7 +8,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
  * This schema is embedded and does not have its own _id.
  */
 @Schema({ _id: false })
-export class NewestLikes {
+export class NewestLike {
   /**
    * Timestamp of when the like was added.
    * Represents the exact moment the user liked the entity.
@@ -40,4 +40,4 @@ export class NewestLikes {
   login: string;
 }
 
-export const NewestLikesSchema = SchemaFactory.createForClass(NewestLikes);
+export const NewestLikeSchema = SchemaFactory.createForClass(NewestLike);

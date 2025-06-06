@@ -1,10 +1,11 @@
+import { HasReactions } from '../../modules/bloggers-platform/posts/domain/reactions-count.schema';
 import {
-  HasReactions,
+  LikeStatus,
   ReactionChange,
-} from '../../modules/bloggers-platform/posts/domain/reactions-count.schema';
-import { LikeStatus } from '../../modules/bloggers-platform/likes/domain/like.entity';
+} from '../../modules/bloggers-platform/likes/domain/like.entity';
 import { DomainException } from '../exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../exceptions/domain-exception-codes';
+import { NewestLike } from '../../modules/bloggers-platform/posts/domain/newest-like.schema';
 
 /**
  * Adjusts the reactions count of an entity based on the change in user reaction.
@@ -60,4 +61,26 @@ export function makeDeleted(this: { deletedAt: Date | null }) {
   }
 
   this.deletedAt = new Date();
+}
+
+/**
+ * Appends a new like reaction to the beginning of the `newestLikes` list,
+ * maintaining a maximum of 3 recent entries.
+ *
+ * This function ensures that the most recent like appears first in the list.
+ * If the list already contains 3 elements, it removes the oldest (last) one
+ * before inserting the new like at the beginning.
+ *
+ * @param {NewestLike} newestLike - The newest like to be added to the list.
+ */
+export function appendLatestReaction(
+  this: { newestLikes: NewestLike[] },
+  newestLike: NewestLike,
+) {
+  if (this.newestLikes.length < 3) {
+    this.newestLikes.unshift(newestLike);
+  }
+
+  this.newestLikes.pop();
+  this.newestLikes.unshift(newestLike);
 }
