@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModelType } from '../../domain/post.entity';
 import { PostViewDto } from '../../api/view-dto/post-view.dto';
@@ -9,6 +9,8 @@ import { BlogsRepository } from '../../../blogs/infrastructure/blogs.repository'
 import { UserContextDto } from '../../../../user-accounts/guards/dto/user-context.dto';
 import { LikeDocument, LikeStatus } from '../../../likes/domain/like.entity';
 import { LikesRepository } from '../../../likes/infrastructure/likes.repository';
+import { DomainException } from '../../../../../core/exceptions/damain-exceptions';
+import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class PostsQueryRepository {
@@ -26,7 +28,10 @@ export class PostsQueryRepository {
     });
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: `The post with ID (${id}) does not exist`,
+      });
     }
 
     //TODO:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
