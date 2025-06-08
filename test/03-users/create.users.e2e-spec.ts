@@ -11,11 +11,13 @@ import { DomainExceptionCode } from '../../src/core/exceptions/domain-exception-
 import { AppTestManager } from '../managers/app.test-manager';
 import { AdminCredentials } from '../types';
 import { Server } from 'http';
+import { HttpStatus } from '@nestjs/common';
 
 describe('UsersController - createUser() (POST: /users)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
 
@@ -23,11 +25,15 @@ describe('UsersController - createUser() (POST: /users)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    usersTestManager = new UsersTestManager(server, adminCredentials);
+    usersTestManager = new UsersTestManager(server, adminCredentialsInBase64);
   });
 
   beforeEach(async () => {
@@ -43,36 +49,31 @@ describe('UsersController - createUser() (POST: /users)', () => {
 
     const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
-      .send({
-        login: dto.login,
-        email: dto.email,
-        password: dto.password,
-      })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(201);
+      .send(dto)
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.CREATED);
 
-    const user: UserViewDto = resCreateUser.body as UserViewDto;
+    const bodyFromCreateResponse: UserViewDto =
+      resCreateUser.body as UserViewDto;
 
-    expect(typeof user.id).toBe('string');
-    expect(new Date(user.createdAt).toString()).not.toBe('Invalid Date');
-    expect(user.login).toBe(dto.login);
-    expect(user.email).toBe(dto.email);
+    expect(bodyFromCreateResponse).toEqual({
+      id: expect.any(String),
+      email: dto.email,
+      login: dto.login,
+      createdAt: expect.stringMatching(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+      ),
+    });
 
     const users: PaginatedViewDto<UserViewDto> =
       await usersTestManager.getAll();
 
     expect(users.items).toHaveLength(1);
-    expect(users.items[0]).toEqual(user);
+    expect(users.items[0]).toEqual(bodyFromCreateResponse);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E<UserViewDto>(
-        user,
+        bodyFromCreateResponse,
         resCreateUser.statusCode,
         'Test №1: UsersController - createUser() (POST: /users)',
       );
@@ -84,27 +85,9 @@ describe('UsersController - createUser() (POST: /users)', () => {
 
     const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
-      .send({
-        login: dto.login,
-        email: dto.email,
-        password: dto.password,
-      })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          'incorrect_login',
-          'incorrect_password',
-        ),
-      )
-      .expect(401);
-
-    expect(resCreateUser.body).toEqual({
-      timestamp: expect.any(String),
-      path: '/api/users',
-      message: 'unauthorised',
-      code: DomainExceptionCode.Unauthorized,
-      extensions: [],
-    });
+      .send(dto)
+      .set('Authorization', 'incorrect admin credentials')
+      .expect(HttpStatus.UNAUTHORIZED);
 
     const users: PaginatedViewDto<UserViewDto> =
       await usersTestManager.getAll();
@@ -124,14 +107,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
     const resCreateUser: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/users`)
       .send({})
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(400);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resCreateUser.body).toEqual({
       errorsMessages: [
@@ -173,14 +150,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
         email: '   ',
         password: '   ',
       })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(400);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resCreateUser.body).toEqual({
       errorsMessages: [
@@ -228,14 +199,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
         email,
         password,
       })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(400);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resCreateUser.body).toEqual({
       errorsMessages: [
@@ -280,14 +245,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
         email,
         password,
       })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(400);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resCreateUser.body).toEqual({
       errorsMessages: [
@@ -328,14 +287,8 @@ describe('UsersController - createUser() (POST: /users)', () => {
         email: 123,
         password: 123,
       })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(400);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resCreateUser.body).toEqual({
       errorsMessages: [

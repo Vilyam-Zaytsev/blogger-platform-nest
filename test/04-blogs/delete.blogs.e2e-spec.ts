@@ -15,6 +15,7 @@ describe('BlogsController - deleteBlog() (POST: /blogs)', () => {
   let appTestManager: AppTestManager;
   let blogsTestManager: BlogsTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
 
@@ -22,11 +23,15 @@ describe('BlogsController - deleteBlog() (POST: /blogs)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    blogsTestManager = new BlogsTestManager(server, adminCredentials);
+    blogsTestManager = new BlogsTestManager(server, adminCredentialsInBase64);
   });
 
   beforeEach(async () => {
@@ -42,19 +47,13 @@ describe('BlogsController - deleteBlog() (POST: /blogs)', () => {
 
     const resDeleteBlog: Response = await request(server)
       .delete(`/${GLOBAL_PREFIX}/blogs/${blog.id}`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
+      .set('Authorization', adminCredentialsInBase64)
       .expect(HttpStatus.NO_CONTENT);
 
-    const foundBlogs: PaginatedViewDto<BlogViewDto> =
+    const blogs: PaginatedViewDto<BlogViewDto> =
       await blogsTestManager.getAll();
 
-    expect(foundBlogs.items).toHaveLength(0);
+    expect(blogs.items).toHaveLength(0);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -70,18 +69,12 @@ describe('BlogsController - deleteBlog() (POST: /blogs)', () => {
 
     const resDeleteBlog: Response = await request(server)
       .delete(`/${GLOBAL_PREFIX}/blogs/${blog.id}`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          'incorrect_login',
-          'incorrect_password',
-        ),
-      )
+      .set('Authorization', 'incorrect admin credentials')
       .expect(HttpStatus.UNAUTHORIZED);
 
-    const foundBlog: BlogViewDto = await blogsTestManager.getById(blog.id);
+    const blogs: BlogViewDto = await blogsTestManager.getById(blog.id);
 
-    expect(foundBlog).toEqual(blog);
+    expect(blogs).toEqual(blog);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -98,18 +91,12 @@ describe('BlogsController - deleteBlog() (POST: /blogs)', () => {
 
     const resDeleteBlog: Response = await request(server)
       .delete(`/${GLOBAL_PREFIX}/blogs/${incorrectId}`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
+      .set('Authorization', adminCredentialsInBase64)
       .expect(HttpStatus.NOT_FOUND);
 
-    const foundBlog: BlogViewDto = await blogsTestManager.getById(blog.id);
+    const blogs: BlogViewDto = await blogsTestManager.getById(blog.id);
 
-    expect(foundBlog).toEqual(blog);
+    expect(blogs).toEqual(blog);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(

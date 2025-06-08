@@ -2,23 +2,17 @@ import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import request, { Response } from 'supertest';
 import { Server } from 'http';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
-import { AdminCredentials } from '../types';
 import { GetPostsQueryParams } from '../../src/modules/bloggers-platform/posts/api/input-dto/get-posts-query-params.input-dto';
-import {
-  ExtendedLikesInfo,
-  LikeStatus,
-  PostViewDto,
-} from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
-import { BlogInputDto } from '../../src/modules/bloggers-platform/blogs/api/input-dto/blog-input.dto';
-import { TestUtils } from '../helpers/test.utils';
-import { BlogViewDto } from '../../src/modules/bloggers-platform/blogs/api/view-dto/blog-view.dto';
+import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
 import { TestDtoFactory } from '../helpers/test.dto-factory';
 import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
+import { LikeStatus } from '../../src/modules/bloggers-platform/likes/domain/like.entity';
+import { HttpStatus } from '@nestjs/common';
 
 export class PostsTestManager {
   constructor(
     private readonly server: Server,
-    private readonly adminCredentials: AdminCredentials,
+    private readonly adminCredentialsInBase64: string,
   ) {}
 
   async createPost(quantity: number, blogId: string): Promise<PostViewDto[]> {
@@ -34,14 +28,8 @@ export class PostsTestManager {
       const response: Response = await request(this.server)
         .post(`/${GLOBAL_PREFIX}/posts`)
         .send(dto)
-        .set(
-          'Authorization',
-          TestUtils.encodingAdminDataInBase64(
-            this.adminCredentials.login,
-            this.adminCredentials.password,
-          ),
-        )
-        .expect(201);
+        .set('Authorization', this.adminCredentialsInBase64)
+        .expect(HttpStatus.CREATED);
 
       const newPost: PostViewDto = response.body as PostViewDto;
 
@@ -70,7 +58,7 @@ export class PostsTestManager {
     const response: Response = await request(this.server)
       .get(`/${GLOBAL_PREFIX}/posts`)
       .query(query)
-      .expect(200);
+      .expect(HttpStatus.OK);
 
     return response.body as PaginatedViewDto<PostViewDto>;
   }

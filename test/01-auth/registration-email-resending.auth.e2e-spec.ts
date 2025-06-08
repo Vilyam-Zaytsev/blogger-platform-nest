@@ -11,11 +11,13 @@ import { EmailService } from '../../src/modules/notifications/email.service';
 import { EmailTemplate } from '../../src/modules/notifications/templates/types';
 import { TestUtils } from '../helpers/test.utils';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
+import { HttpStatus } from '@nestjs/common';
 
 describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
   let sendEmailMock: jest.Mock;
@@ -24,11 +26,15 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    usersTestManager = new UsersTestManager(server, adminCredentials);
+    usersTestManager = new UsersTestManager(server, adminCredentialsInBase64);
 
     sendEmailMock = jest
       .spyOn(EmailService.prototype, 'sendEmail')
@@ -55,7 +61,7 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
       .send({
         email: dto.email,
       })
-      .expect(204);
+      .expect(HttpStatus.NO_CONTENT);
 
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(2);
@@ -73,7 +79,7 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
     const resRegistrationEmailResending: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/registration-email-resending`)
       .send({})
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistrationEmailResending.body).toEqual({
       errorsMessages: [
@@ -102,7 +108,7 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
       .send({
         email: '   ',
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistrationEmailResending.body).toEqual({
       errorsMessages: [
@@ -133,7 +139,7 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
       .send({
         email,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistrationEmailResending.body).toEqual({
       errorsMessages: [
@@ -161,7 +167,7 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
       .send({
         email: 123,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistrationEmailResending.body).toEqual({
       errorsMessages: [
@@ -191,7 +197,7 @@ describe('AuthController - registrationEmailResending() (POST: /auth)', () => {
       .send({
         email: user.email,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistrationEmailResending.body).toEqual({
       errorsMessages: [

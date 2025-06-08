@@ -10,12 +10,15 @@ import { UserDocument } from '../../src/modules/user-accounts/domain/user.entity
 import { UsersRepository } from '../../src/modules/user-accounts/infrastructure/users.repository';
 import request, { Response } from 'supertest';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
+import { TestUtils } from '../helpers/test.utils';
+import { HttpStatus } from '@nestjs/common';
 
 describe('AuthController - passwordRecovery() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let usersRepository: UsersRepository;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
   let sendEmailMock: jest.Mock;
@@ -24,11 +27,15 @@ describe('AuthController - passwordRecovery() (POST: /auth)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    usersTestManager = new UsersTestManager(server, adminCredentials);
+    usersTestManager = new UsersTestManager(server, adminCredentialsInBase64);
     usersRepository = appTestManager.app.get(UsersRepository);
 
     sendEmailMock = jest
@@ -75,7 +82,7 @@ describe('AuthController - passwordRecovery() (POST: /auth)', () => {
       .send({
         email: user.email,
       })
-      .expect(204);
+      .expect(HttpStatus.NO_CONTENT);
 
     const found_user_2: UserDocument | null = await usersRepository.getByEmail(
       user.email,
@@ -141,7 +148,7 @@ describe('AuthController - passwordRecovery() (POST: /auth)', () => {
         .send({
           email: 'incorrect-email@example.com',
         })
-        .expect(204);
+        .expect(HttpStatus.NO_CONTENT);
 
       const found_user_2: UserDocument | null =
         await usersRepository.getByEmail(user.email);
@@ -199,7 +206,7 @@ describe('AuthController - passwordRecovery() (POST: /auth)', () => {
         .send({
           email: 'invalid-email',
         })
-        .expect(400);
+        .expect(HttpStatus.BAD_REQUEST);
 
       expect(resPasswordRecovery.body).toEqual({
         errorsMessages: [

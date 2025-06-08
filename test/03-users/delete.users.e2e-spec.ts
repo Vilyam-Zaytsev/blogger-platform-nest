@@ -9,11 +9,13 @@ import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.v
 import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { TestLoggers } from '../helpers/test.loggers';
 import { ObjectId } from 'mongodb';
+import { HttpStatus } from '@nestjs/common';
 
 describe('UsersController - deleteUser() (DELETE: /users)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
 
@@ -21,11 +23,15 @@ describe('UsersController - deleteUser() (DELETE: /users)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    usersTestManager = new UsersTestManager(server, adminCredentials);
+    usersTestManager = new UsersTestManager(server, adminCredentialsInBase64);
   });
 
   beforeEach(async () => {
@@ -37,24 +43,20 @@ describe('UsersController - deleteUser() (DELETE: /users)', () => {
   });
 
   it('should delete user, the admin is authenticated.', async () => {
-    const newUsers: UserViewDto[] = await usersTestManager.createUser(1);
-    const userId: string = newUsers[0].id;
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+
+    const users_1: PaginatedViewDto<UserViewDto> =
+      await usersTestManager.getAll();
+    expect(users_1.items).toHaveLength(1);
 
     const resDeleteUser: Response = await request(server)
-      .delete(`/${GLOBAL_PREFIX}/users/${userId}`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(204);
+      .delete(`/${GLOBAL_PREFIX}/users/${createdUser.id}`)
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.NO_CONTENT);
 
-    const users: PaginatedViewDto<UserViewDto> =
+    const users_2: PaginatedViewDto<UserViewDto> =
       await usersTestManager.getAll();
-
-    expect(users.items).toHaveLength(0);
+    expect(users_2.items).toHaveLength(0);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -66,24 +68,17 @@ describe('UsersController - deleteUser() (DELETE: /users)', () => {
   });
 
   it('should not delete user, the admin is not authenticated.', async () => {
-    const newUsers: UserViewDto[] = await usersTestManager.createUser(1);
-    const userId: string = newUsers[0].id;
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
 
     const resDeleteUser: Response = await request(server)
-      .delete(`/${GLOBAL_PREFIX}/users/${userId}`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          'incorrect_login',
-          'incorrect_password',
-        ),
-      )
-      .expect(401);
+      .delete(`/${GLOBAL_PREFIX}/users/${createdUser.id}`)
+      .set('Authorization', 'incorrect admin credentials')
+      .expect(HttpStatus.UNAUTHORIZED);
 
     const users: PaginatedViewDto<UserViewDto> =
       await usersTestManager.getAll();
 
-    expect(users.items[0]).toEqual<UserViewDto>(newUsers[0]);
+    expect(users.items[0]).toEqual<UserViewDto>(createdUser);
     expect(users.items).toHaveLength(1);
 
     if (testLoggingEnabled) {
@@ -96,24 +91,18 @@ describe('UsersController - deleteUser() (DELETE: /users)', () => {
   });
 
   it('should return a 404 error if the user was not found by the passed ID in the parameters.', async () => {
-    const newUsers: UserViewDto[] = await usersTestManager.createUser(1);
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
     const incorrectUserId: string = new ObjectId().toString();
 
     const resDeleteUser: Response = await request(server)
       .delete(`/${GLOBAL_PREFIX}/users/${incorrectUserId}`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(404);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.NOT_FOUND);
 
     const users: PaginatedViewDto<UserViewDto> =
       await usersTestManager.getAll();
 
-    expect(users.items[0]).toEqual<UserViewDto>(newUsers[0]);
+    expect(users.items[0]).toEqual<UserViewDto>(createdUser);
     expect(users.items).toHaveLength(1);
 
     if (testLoggingEnabled) {

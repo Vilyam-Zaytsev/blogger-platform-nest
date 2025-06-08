@@ -14,11 +14,13 @@ import {
   UsersSortBy,
 } from '../../src/modules/user-accounts/api/input-dto/get-users-query-params.input-dto';
 import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
+import { HttpStatus } from '@nestjs/common';
 
 describe('UsersController - getUser() (GET: /users (pagination, sort, search in term))', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
 
@@ -26,11 +28,15 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    usersTestManager = new UsersTestManager(server, adminCredentials);
+    usersTestManager = new UsersTestManager(server, adminCredentialsInBase64);
   });
 
   beforeEach(async () => {
@@ -42,37 +48,33 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
   });
 
   it('should use default pagination values when none are provided by the client.', async () => {
-    const newUsers: UserViewDto[] = await usersTestManager.createUser(12);
+    const createdUsers: UserViewDto[] = await usersTestManager.createUser(12);
 
     const resGetUsers: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/users`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(200);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.OK);
 
-    const bodyFromGetRequest: PaginatedViewDto<UserViewDto> =
+    const bodyFromGetResponse: PaginatedViewDto<UserViewDto> =
       resGetUsers.body as PaginatedViewDto<UserViewDto>;
 
     const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
+    const filteredCreatedUsers: UserViewDto[] = new Filter<UserViewDto>(
+      createdUsers,
+    )
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
       .getResult();
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 2,
       page: 1,
       pageSize: 10,
       totalCount: 12,
-      items: filteredNewUsers,
+      items: filteredCreatedUsers,
     });
-    expect(bodyFromGetRequest.items.length).toEqual(10);
+    expect(bodyFromGetResponse.items.length).toEqual(10);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -84,27 +86,7 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
   });
 
   it('should use client-provided pagination values to return the correct subset of data(1).', async () => {
-    const newUsers: UserViewDto[] = await usersTestManager.createUser(12);
-
-    const resGetUsers: Response = await request(server)
-      .get(`/${GLOBAL_PREFIX}/users`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .query({
-        pageNumber: 2,
-        pageSize: 3,
-        sortBy: UsersSortBy.Login,
-        sortDirection: SortDirection.Ascending,
-      })
-      .expect(200);
-
-    const bodyFromGetRequest: PaginatedViewDto<UserViewDto> =
-      resGetUsers.body as PaginatedViewDto<UserViewDto>;
+    const createdUsers: UserViewDto[] = await usersTestManager.createUser(12);
 
     const query: GetUsersQueryParams = new GetUsersQueryParams();
     query.pageSize = 3;
@@ -112,20 +94,31 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
     query.sortBy = UsersSortBy.Login;
     query.sortDirection = SortDirection.Ascending;
 
-    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
+    const resGetUsers: Response = await request(server)
+      .get(`/${GLOBAL_PREFIX}/users`)
+      .set('Authorization', adminCredentialsInBase64)
+      .query(query)
+      .expect(HttpStatus.OK);
+
+    const bodyFromGetResponse: PaginatedViewDto<UserViewDto> =
+      resGetUsers.body as PaginatedViewDto<UserViewDto>;
+
+    const filteredCreatedUsers: UserViewDto[] = new Filter<UserViewDto>(
+      createdUsers,
+    )
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
       .getResult();
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 4,
       page: 2,
       pageSize: 3,
       totalCount: 12,
-      items: filteredNewUsers,
+      items: filteredCreatedUsers,
     });
-    expect(bodyFromGetRequest.items.length).toEqual(3);
+    expect(bodyFromGetResponse.items.length).toEqual(3);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -137,46 +130,38 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
   });
 
   it('should use client-provided pagination values to return the correct subset of data(2).', async () => {
-    const newUsers: UserViewDto[] = await usersTestManager.createUser(12);
-
-    const resGetUsers: Response = await request(server)
-      .get(`/${GLOBAL_PREFIX}/users`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .query({
-        pageNumber: 6,
-        pageSize: 2,
-        sortDirection: SortDirection.Ascending,
-      })
-      .expect(200);
-
-    const bodyFromGetRequest: PaginatedViewDto<UserViewDto> =
-      resGetUsers.body as PaginatedViewDto<UserViewDto>;
+    const createdUsers: UserViewDto[] = await usersTestManager.createUser(12);
 
     const query: GetUsersQueryParams = new GetUsersQueryParams();
     query.pageSize = 2;
     query.pageNumber = 6;
     query.sortDirection = SortDirection.Ascending;
 
-    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
+    const resGetUsers: Response = await request(server)
+      .get(`/${GLOBAL_PREFIX}/users`)
+      .set('Authorization', adminCredentialsInBase64)
+      .query(query)
+      .expect(HttpStatus.OK);
+
+    const bodyFromGetResponse: PaginatedViewDto<UserViewDto> =
+      resGetUsers.body as PaginatedViewDto<UserViewDto>;
+
+    const filteredCreatedUsers: UserViewDto[] = new Filter<UserViewDto>(
+      createdUsers,
+    )
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
       .getResult();
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 6,
       page: 6,
       pageSize: 2,
       totalCount: 12,
-      items: filteredNewUsers,
+      items: filteredCreatedUsers,
     });
-    expect(bodyFromGetRequest.items.length).toEqual(2);
+    expect(bodyFromGetResponse.items.length).toEqual(2);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -188,42 +173,39 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
   });
 
   it('should use the values provided by the client to search for users by the occurrence of the substring (the  "login" field).', async () => {
-    const newUsers: UserViewDto[] = await usersTestManager.createUser(12);
+    const createdUsers: UserViewDto[] = await usersTestManager.createUser(12);
+
+    const query: GetUsersQueryParams = new GetUsersQueryParams();
+    query.searchLoginTerm = 'r1';
+
+    const searchFilter: TestSearchFilter = {
+      login: query.searchLoginTerm,
+    };
 
     const resGetUsers: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/users`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .query({
-        searchLoginTerm: 'r1',
-      })
-      .expect(200);
+      .set('Authorization', adminCredentialsInBase64)
+      .query(query)
+      .expect(HttpStatus.OK);
 
-    const bodyFromGetRequest: PaginatedViewDto<UserViewDto> =
+    const bodyFromGetResponse: PaginatedViewDto<UserViewDto> =
       resGetUsers.body as PaginatedViewDto<UserViewDto>;
 
-    const searchFilter: TestSearchFilter = {
-      login: 'r1',
-    };
-    const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
+    const filteredCreatedUsers: UserViewDto[] = new Filter<UserViewDto>(
+      createdUsers,
+    )
       .filter(searchFilter)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 1,
       page: 1,
       pageSize: 10,
       totalCount: 3,
-      items: filteredNewUsers,
+      items: filteredCreatedUsers,
     });
-    expect(bodyFromGetRequest.items.length).toEqual(3);
+    expect(bodyFromGetResponse.items.length).toEqual(3);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -235,42 +217,39 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
   });
 
   it('should use the values provided by the client to search for users by the occurrence of the substring (the "email" field).', async () => {
-    const newUsers: UserViewDto[] = await usersTestManager.createUser(12);
+    const createdUsers: UserViewDto[] = await usersTestManager.createUser(12);
+
+    const query: GetUsersQueryParams = new GetUsersQueryParams();
+    query.searchEmailTerm = 'r1';
+
+    const searchFilter: TestSearchFilter = {
+      email: query.searchEmailTerm,
+    };
 
     const resGetUsers: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/users`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .query({
-        searchEmailTerm: 'r1',
-      })
-      .expect(200);
+      .set('Authorization', adminCredentialsInBase64)
+      .query(query)
+      .expect(HttpStatus.OK);
 
-    const bodyFromGetRequest: PaginatedViewDto<UserViewDto> =
+    const bodyFromGetResponse: PaginatedViewDto<UserViewDto> =
       resGetUsers.body as PaginatedViewDto<UserViewDto>;
 
-    const searchFilter: TestSearchFilter = {
-      email: 'r1',
-    };
-    const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
+    const filteredCreatedUsers: UserViewDto[] = new Filter<UserViewDto>(
+      createdUsers,
+    )
       .filter(searchFilter)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 1,
       page: 1,
       pageSize: 10,
       totalCount: 3,
-      items: filteredNewUsers,
+      items: filteredCreatedUsers,
     });
-    expect(bodyFromGetRequest.items.length).toEqual(3);
+    expect(bodyFromGetResponse.items.length).toEqual(3);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -282,44 +261,41 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
   });
 
   it('should use the values provided by the client to search for users by the occurrence of the substring (the "login" and "email" fields).', async () => {
-    const newUsers: UserViewDto[] = await usersTestManager.createUser(12);
+    const createdUsers: UserViewDto[] = await usersTestManager.createUser(12);
+
+    const query: GetUsersQueryParams = new GetUsersQueryParams();
+    query.searchLoginTerm = 'r1';
+    query.searchEmailTerm = 'r5';
+
+    const searchFilter: TestSearchFilter = {
+      login: query.searchLoginTerm,
+      email: query.searchEmailTerm,
+    };
 
     const resGetUsers: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/users`)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .query({
-        searchLoginTerm: 'r1',
-        searchEmailTerm: 'r5',
-      })
-      .expect(200);
+      .set('Authorization', adminCredentialsInBase64)
+      .query(query)
+      .expect(HttpStatus.OK);
 
-    const bodyFromGetRequest: PaginatedViewDto<UserViewDto> =
+    const bodyFromGetResponse: PaginatedViewDto<UserViewDto> =
       resGetUsers.body as PaginatedViewDto<UserViewDto>;
 
-    const searchFilter: TestSearchFilter = {
-      login: 'r1',
-      email: 'r5',
-    };
-    const query: GetUsersQueryParams = new GetUsersQueryParams();
-    const filteredNewUsers: UserViewDto[] = new Filter<UserViewDto>(newUsers)
+    const filteredCreatedUsers: UserViewDto[] = new Filter<UserViewDto>(
+      createdUsers,
+    )
       .filter(searchFilter)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 1,
       page: 1,
       pageSize: 10,
       totalCount: 4,
-      items: filteredNewUsers,
+      items: filteredCreatedUsers,
     });
-    expect(bodyFromGetRequest.items.length).toEqual(4);
+    expect(bodyFromGetResponse.items.length).toEqual(4);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(

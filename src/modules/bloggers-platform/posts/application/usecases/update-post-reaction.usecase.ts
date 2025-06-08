@@ -36,6 +36,7 @@ export class UpdatePostReactionUseCase
     const { delta, currentReactionId }: ReactionUpdateResult =
       await this.commandBus.execute(new UpdateReactionsCommand(dto));
 
+    //TODO:добавить комментарий с объяснением данной логики.
     if (currentReactionId && delta.currentReaction === LikeStatus.Like) {
       const [like, user] = await Promise.all([
         this.likesRepository.getByIdOrNotFoundFail(currentReactionId),

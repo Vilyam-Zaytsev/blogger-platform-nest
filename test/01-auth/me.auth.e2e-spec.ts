@@ -10,11 +10,13 @@ import { TestUtils } from '../helpers/test.utils';
 import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from '../../src/modules/user-accounts/constans/auth-tokens.inject-constants';
 import { UserAccountsConfig } from '../../src/modules/user-accounts/config/user-accounts.config';
 import { JwtService } from '@nestjs/jwt';
+import { HttpStatus } from '@nestjs/common';
 
 describe('AuthController - me() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
 
@@ -34,11 +36,15 @@ describe('AuthController - me() (POST: /auth)', () => {
         }),
     );
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    usersTestManager = new UsersTestManager(server, adminCredentials);
+    usersTestManager = new UsersTestManager(server, adminCredentialsInBase64);
   });
 
   beforeEach(async () => {
@@ -50,24 +56,24 @@ describe('AuthController - me() (POST: /auth)', () => {
   });
 
   it('should return information about the user if the user is logged in (sends a valid access token)', async () => {
-    const users: UserViewDto[] = await usersTestManager.createUser(1);
+    const [user]: UserViewDto[] = await usersTestManager.createUser(1);
 
-    const [resultLogin]: TestResultLogin[] = await usersTestManager.login(
-      users.map((u) => u.login),
-    );
+    const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
+      user.login,
+    ]);
 
     const accessToken: string = resultLogin.authTokens.accessToken;
 
     const resMe: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/auth/me`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .expect(200);
+      .expect(HttpStatus.OK);
 
     expect(resMe.body).toEqual(
       expect.objectContaining({
-        email: users[0].email,
-        login: users[0].login,
-        userId: users[0].id,
+        email: user.email,
+        login: user.login,
+        userId: user.id,
       }),
     );
 
@@ -81,11 +87,11 @@ describe('AuthController - me() (POST: /auth)', () => {
   });
 
   it('should return a 401 error if the user is logged in (sending an invalid access token)', async () => {
-    const users: UserViewDto[] = await usersTestManager.createUser(1);
+    const [user]: UserViewDto[] = await usersTestManager.createUser(1);
 
-    const [resultLogin]: TestResultLogin[] = await usersTestManager.login(
-      users.map((u) => u.login),
-    );
+    const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
+      user.login,
+    ]);
 
     const accessToken: string = resultLogin.authTokens.accessToken;
 
@@ -94,7 +100,7 @@ describe('AuthController - me() (POST: /auth)', () => {
     const resMe: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/auth/me`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .expect(401);
+      .expect(HttpStatus.UNAUTHORIZED);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(

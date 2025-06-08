@@ -2,17 +2,17 @@ import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import request, { Response } from 'supertest';
 import { Server } from 'http';
-import { TestUtils } from '../helpers/test.utils';
 import { GetUsersQueryParams } from '../../src/modules/user-accounts/api/input-dto/get-users-query-params.input-dto';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
 import { UserInputDto } from '../../src/modules/user-accounts/api/input-dto/user.input-dto';
 import { TestDtoFactory } from '../helpers/test.dto-factory';
-import { AdminCredentials, TestResultLogin } from '../types';
+import { TestResultLogin } from '../types';
+import { HttpStatus } from '@nestjs/common';
 
 export class UsersTestManager {
   constructor(
     private readonly server: Server,
-    private readonly adminCredentials: AdminCredentials,
+    private readonly adminCredentialsInBase64: string,
   ) {}
 
   async createUser(quantity: number): Promise<UserViewDto[]> {
@@ -25,14 +25,8 @@ export class UsersTestManager {
       const response: Response = await request(this.server)
         .post(`/${GLOBAL_PREFIX}/users`)
         .send(user)
-        .set(
-          'Authorization',
-          TestUtils.encodingAdminDataInBase64(
-            this.adminCredentials.login,
-            this.adminCredentials.password,
-          ),
-        )
-        .expect(201);
+        .set('Authorization', this.adminCredentialsInBase64)
+        .expect(HttpStatus.CREATED);
 
       const newUser: UserViewDto = response.body as UserViewDto;
 
@@ -51,7 +45,7 @@ export class UsersTestManager {
     return await request(this.server)
       .post(`/${GLOBAL_PREFIX}/auth/registration`)
       .send(dto)
-      .expect(204);
+      .expect(HttpStatus.NO_CONTENT);
   }
 
   async login(loginsOrEmails: string[]): Promise<TestResultLogin[]> {
@@ -64,7 +58,7 @@ export class UsersTestManager {
           loginOrEmail: loginsOrEmails[i],
           password: 'qwerty',
         })
-        .expect(200);
+        .expect(HttpStatus.OK);
 
       expect(res.body).toEqual(
         expect.objectContaining({
@@ -97,14 +91,8 @@ export class UsersTestManager {
     const response: Response = await request(this.server)
       .get(`/${GLOBAL_PREFIX}/users`)
       .query(query)
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          this.adminCredentials.login,
-          this.adminCredentials.password,
-        ),
-      )
-      .expect(200);
+      .set('Authorization', this.adminCredentialsInBase64)
+      .expect(HttpStatus.OK);
 
     return response.body as PaginatedViewDto<UserViewDto>;
   }
@@ -115,6 +103,6 @@ export class UsersTestManager {
       .send({
         email,
       })
-      .expect(204);
+      .expect(HttpStatus.NO_CONTENT);
   }
 }

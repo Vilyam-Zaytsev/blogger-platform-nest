@@ -11,11 +11,13 @@ import { HttpStatus } from '@nestjs/common';
 import { Filter } from '../helpers/filter';
 import { GetBlogsQueryParams } from '../../src/modules/bloggers-platform/blogs/api/input-dto/get-blogs-query-params.input-dto';
 import { ObjectId } from 'mongodb';
+import { TestUtils } from '../helpers/test.utils';
 
 describe('BlogsController - getBlog() (GET: /blogs)', () => {
   let appTestManager: AppTestManager;
   let blogsTestManager: BlogsTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
 
@@ -23,11 +25,15 @@ describe('BlogsController - getBlog() (GET: /blogs)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    blogsTestManager = new BlogsTestManager(server, adminCredentials);
+    blogsTestManager = new BlogsTestManager(server, adminCredentialsInBase64);
   });
 
   beforeEach(async () => {
@@ -61,26 +67,26 @@ describe('BlogsController - getBlog() (GET: /blogs)', () => {
   });
 
   it('should return an array with a single blog.', async () => {
-    const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const blogs: BlogViewDto[] = await blogsTestManager.createBlog(1);
 
     const resGetBlogs: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/blogs`)
       .expect(HttpStatus.OK);
 
-    const bodyFromGetRequest: PaginatedViewDto<BlogViewDto> =
+    const bodyFromGetResponse: PaginatedViewDto<BlogViewDto> =
       resGetBlogs.body as PaginatedViewDto<BlogViewDto>;
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 1,
       page: 1,
       pageSize: 10,
       totalCount: 1,
-      items: [blog],
+      items: blogs,
     });
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
-        resGetBlogs.body,
+        bodyFromGetResponse,
         resGetBlogs.statusCode,
         'Test №2: BlogsController - getBlog() (GET: /blogs)',
       );
@@ -88,28 +94,26 @@ describe('BlogsController - getBlog() (GET: /blogs)', () => {
   });
 
   it('should return an array with a three blogs.', async () => {
-    const createdBlogs: BlogViewDto[] = await blogsTestManager.createBlog(3);
+    const blogs: BlogViewDto[] = await blogsTestManager.createBlog(3);
 
     const resGetBlogs: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/blogs`)
       .expect(HttpStatus.OK);
 
-    const bodyFromGetRequest: PaginatedViewDto<BlogViewDto> =
+    const bodyFromGetResponse: PaginatedViewDto<BlogViewDto> =
       resGetBlogs.body as PaginatedViewDto<BlogViewDto>;
 
     const query: GetBlogsQueryParams = new GetBlogsQueryParams();
-    const filteredNewBlogs: BlogViewDto[] = new Filter<BlogViewDto>(
-      createdBlogs,
-    )
+    const filteredCreatedBlogs: BlogViewDto[] = new Filter<BlogViewDto>(blogs)
       .sort({ [query.sortBy]: query.sortDirection })
       .getResult();
 
-    expect(bodyFromGetRequest.items).toEqual(filteredNewBlogs);
-    expect(bodyFromGetRequest.items.length).toEqual(3);
+    expect(bodyFromGetResponse.items).toEqual(filteredCreatedBlogs);
+    expect(bodyFromGetResponse.items.length).toEqual(3);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
-        resGetBlogs.body,
+        bodyFromGetResponse,
         resGetBlogs.statusCode,
         'Test №3: BlogsController - getBlog() (GET: /blogs)',
       );

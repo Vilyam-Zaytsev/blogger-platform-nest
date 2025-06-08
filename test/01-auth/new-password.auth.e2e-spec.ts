@@ -11,12 +11,14 @@ import { UsersRepository } from '../../src/modules/user-accounts/infrastructure/
 import request, { Response } from 'supertest';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
 import { TestUtils } from '../helpers/test.utils';
+import { HttpStatus } from '@nestjs/common';
 
 describe('AuthController - newPassword() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let usersRepository: UsersRepository;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
   let sendEmailMock: jest.Mock;
@@ -25,10 +27,14 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
 
-    usersTestManager = new UsersTestManager(server, adminCredentials);
+    usersTestManager = new UsersTestManager(server, adminCredentialsInBase64);
     usersRepository = appTestManager.app.get(UsersRepository);
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
@@ -79,7 +85,7 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
         newPassword: 'qwerty',
         recoveryCode: found_user_1.passwordRecovery.recoveryCode,
       })
-      .expect(204);
+      .expect(HttpStatus.NO_CONTENT);
 
     const found_user_2: UserDocument | null = await usersRepository.getByEmail(
       user.email,
@@ -148,7 +154,7 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
         newPassword: 'qwert',
         recoveryCode: found_user_1.passwordRecovery.recoveryCode,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resNewPassword.body).toEqual({
       errorsMessages: [
@@ -224,7 +230,7 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
         newPassword: password,
         recoveryCode: found_user_1.passwordRecovery.recoveryCode,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resNewPassword.body).toEqual({
       errorsMessages: [
@@ -297,7 +303,7 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
         newPassword: 'qwerty',
         recoveryCode: 'incorrect-recovery-code',
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     const found_user_2: UserDocument | null = await usersRepository.getByEmail(
       user.email,

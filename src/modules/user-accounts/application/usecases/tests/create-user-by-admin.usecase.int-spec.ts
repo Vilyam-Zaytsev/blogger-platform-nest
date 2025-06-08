@@ -32,7 +32,7 @@ describe('CreateUserByAdminUseCase (integration)', () => {
       CreateUserByAdminUseCase,
     );
     usersRepository = appTestManager.app.get<UsersRepository>(UsersRepository);
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
     server = appTestManager.getServer();
     usersTestManager = new UsersTestManager(server, adminCredentials);
 
