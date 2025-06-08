@@ -7,13 +7,16 @@ import { AdminCredentials } from '../types';
 import { Server } from 'http';
 import { BlogViewDto } from 'src/modules/bloggers-platform/blogs/api/view-dto/blog-view.dto';
 import { BlogsTestManager } from '../managers/blogs.test-manager';
-import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { HttpStatus } from '@nestjs/common';
+import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
+import { PostsTestManager } from '../managers/posts.test-manager';
+import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { ObjectId } from 'mongodb';
 
-describe('BlogsController - deleteBlog() (DELETE: /blogs)', () => {
+describe('PostsController - deletePost() (DELETE: /posts)', () => {
   let appTestManager: AppTestManager;
   let blogsTestManager: BlogsTestManager;
+  let postsTestManager: PostsTestManager;
   let adminCredentials: AdminCredentials;
   let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
@@ -32,6 +35,7 @@ describe('BlogsController - deleteBlog() (DELETE: /blogs)', () => {
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
     blogsTestManager = new BlogsTestManager(server, adminCredentialsInBase64);
+    postsTestManager = new PostsTestManager(server, adminCredentialsInBase64);
   });
 
   beforeEach(async () => {
@@ -42,67 +46,70 @@ describe('BlogsController - deleteBlog() (DELETE: /blogs)', () => {
     await appTestManager.close();
   });
 
-  it('should delete blog, the admin is authenticated.', async () => {
+  it('should delete post, the admin is authenticated.', async () => {
     const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [post]: PostViewDto[] = await postsTestManager.createPost(1, blog.id);
 
-    const resDeleteBlog: Response = await request(server)
-      .delete(`/${GLOBAL_PREFIX}/blogs/${blog.id}`)
+    const resDeletePost: Response = await request(server)
+      .delete(`/${GLOBAL_PREFIX}/posts/${post.id}`)
       .set('Authorization', adminCredentialsInBase64)
       .expect(HttpStatus.NO_CONTENT);
 
-    const blogs: PaginatedViewDto<BlogViewDto> =
-      await blogsTestManager.getAll();
+    const posts: PaginatedViewDto<PostViewDto> =
+      await postsTestManager.getAll();
 
-    expect(blogs.items).toHaveLength(0);
+    expect(posts.items).toHaveLength(0);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
-        resDeleteBlog.body,
-        resDeleteBlog.statusCode,
-        'Test №1: BlogsController - deleteBlog() (DELETE: /blogs)',
+        resDeletePost.body,
+        resDeletePost.statusCode,
+        'Test №1: PostsController - deletePost() (DELETE: /posts)',
       );
     }
   });
 
   it('should not delete blog, the admin is not authenticated.', async () => {
     const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [post]: PostViewDto[] = await postsTestManager.createPost(1, blog.id);
 
-    const resDeleteBlog: Response = await request(server)
-      .delete(`/${GLOBAL_PREFIX}/blogs/${blog.id}`)
+    const resDeletePost: Response = await request(server)
+      .delete(`/${GLOBAL_PREFIX}/posts/${post.id}`)
       .set('Authorization', 'incorrect admin credentials')
       .expect(HttpStatus.UNAUTHORIZED);
 
-    const blogs: BlogViewDto = await blogsTestManager.getById(blog.id);
+    const posts: PostViewDto = await postsTestManager.getById(post.id);
 
-    expect(blogs).toEqual(blog);
+    expect(posts).toEqual(post);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
-        resDeleteBlog.body,
-        resDeleteBlog.statusCode,
-        'Test №2: BlogsController - deleteBlog() (DELETE: /blogs)',
+        resDeletePost.body,
+        resDeletePost.statusCode,
+        'Test №2: PostsController - deletePost() (DELETE: /posts)',
       );
     }
   });
 
   it('should return a 404 error if the blog was not found by the passed ID in the parameters.', async () => {
     const [blog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [post]: PostViewDto[] = await postsTestManager.createPost(1, blog.id);
     const incorrectId: string = new ObjectId().toString();
 
-    const resDeleteBlog: Response = await request(server)
-      .delete(`/${GLOBAL_PREFIX}/blogs/${incorrectId}`)
+    const resDeletePost: Response = await request(server)
+      .delete(`/${GLOBAL_PREFIX}/posts/${incorrectId}`)
       .set('Authorization', adminCredentialsInBase64)
       .expect(HttpStatus.NOT_FOUND);
 
-    const blogs: BlogViewDto = await blogsTestManager.getById(blog.id);
+    const posts: PostViewDto = await postsTestManager.getById(post.id);
 
-    expect(blogs).toEqual(blog);
+    expect(posts).toEqual(post);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
-        resDeleteBlog.body,
-        resDeleteBlog.statusCode,
-        'Test №3: BlogsController - deleteBlog() (DELETE: /blogs)',
+        resDeletePost.body,
+        resDeletePost.statusCode,
+        'Test №3: PostsController - deletePost() (DELETE: /posts)',
       );
     }
   });
