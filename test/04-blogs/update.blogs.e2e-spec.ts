@@ -9,8 +9,9 @@ import { BlogInputDto } from '../../src/modules/bloggers-platform/blogs/api/inpu
 import { BlogViewDto } from 'src/modules/bloggers-platform/blogs/api/view-dto/blog-view.dto';
 import { BlogsTestManager } from '../managers/blogs.test-manager';
 import { HttpStatus } from '@nestjs/common';
+import { ObjectId } from 'mongodb';
 
-describe('BlogsController - updateBlog() (POST: /blogs)', () => {
+describe('BlogsController - updateBlog() (PUT: /blogs)', () => {
   let appTestManager: AppTestManager;
   let blogsTestManager: BlogsTestManager;
   let adminCredentials: AdminCredentials;
@@ -75,7 +76,7 @@ describe('BlogsController - updateBlog() (POST: /blogs)', () => {
       TestLoggers.logE2E(
         resUpdateBlog.body,
         resUpdateBlog.statusCode,
-        'Test №1: BlogsController - updateBlog() (POST: /blogs)',
+        'Test №1: BlogsController - updateBlog() (PUT: /blogs)',
       );
     }
   });
@@ -103,7 +104,7 @@ describe('BlogsController - updateBlog() (POST: /blogs)', () => {
       TestLoggers.logE2E(
         resUpdateBlog.body,
         resUpdateBlog.statusCode,
-        'Test №2: BlogsController - updateBlog() (POST: /blogs)',
+        'Test №2: BlogsController - updateBlog() (PUT: /blogs)',
       );
     }
   });
@@ -144,7 +145,7 @@ describe('BlogsController - updateBlog() (POST: /blogs)', () => {
       TestLoggers.logE2E(
         resUpdateBlog.body,
         resUpdateBlog.statusCode,
-        'Test №3: BlogsController - updateBlog() (POST: /blogs)',
+        'Test №3: BlogsController - updateBlog() (PUT: /blogs)',
       );
     }
   });
@@ -191,7 +192,7 @@ describe('BlogsController - updateBlog() (POST: /blogs)', () => {
       TestLoggers.logE2E(
         resUpdateBlog.body,
         resUpdateBlog.statusCode,
-        'Test №4: BlogsController - updateBlog() (POST: /blogs)',
+        'Test №4: BlogsController - updateBlog() (PUT: /blogs)',
       );
     }
   });
@@ -240,7 +241,7 @@ describe('BlogsController - updateBlog() (POST: /blogs)', () => {
       TestLoggers.logE2E(
         resUpdateBlog.body,
         resUpdateBlog.statusCode,
-        'Test №5: BlogsController - updateBlog() (POST: /blogs)',
+        'Test №5: BlogsController - updateBlog() (PUT: /blogs)',
       );
     }
   });
@@ -285,7 +286,7 @@ describe('BlogsController - updateBlog() (POST: /blogs)', () => {
       TestLoggers.logE2E(
         resUpdateBlog.body,
         resUpdateBlog.statusCode,
-        'Test №6: BlogsController - updateBlog() (POST: /blogs)',
+        'Test №6: BlogsController - updateBlog() (PUT: /blogs)',
       );
     }
   });
@@ -324,7 +325,37 @@ describe('BlogsController - updateBlog() (POST: /blogs)', () => {
       TestLoggers.logE2E(
         resUpdateBlog.body,
         resUpdateBlog.statusCode,
-        'Test №7: BlogsController - updateBlog() (POST: /blogs)',
+        'Test №7: BlogsController - updateBlog() (PUT: /blogs)',
+      );
+    }
+  });
+
+  it('should return a 404 error if the blog does not exist.', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+
+    const dto: BlogInputDto = {
+      name: 'updateName',
+      description: 'update description',
+      websiteUrl: 'https://update.websiteUrl.com',
+    };
+
+    const incorrectId: string = new ObjectId().toString();
+
+    const resUpdateBlog: Response = await request(server)
+      .put(`/${GLOBAL_PREFIX}/blogs/${incorrectId}`)
+      .send(dto)
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.NOT_FOUND);
+
+    const blog: BlogViewDto = await blogsTestManager.getById(createdBlog.id);
+
+    expect(createdBlog).toEqual(blog);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resUpdateBlog.body,
+        resUpdateBlog.statusCode,
+        'Test №9: BlogsController - updateBlog() (PUT: /blogs)',
       );
     }
   });

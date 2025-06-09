@@ -8,10 +8,7 @@ import { Server } from 'http';
 import { BlogViewDto } from 'src/modules/bloggers-platform/blogs/api/view-dto/blog-view.dto';
 import { BlogsTestManager } from '../managers/blogs.test-manager';
 import { HttpStatus } from '@nestjs/common';
-import {
-  ExtendedLikesInfo,
-  PostViewDto,
-} from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
+import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
 import { PostsTestManager } from '../managers/posts.test-manager';
 import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
 import { LikeStatus } from '../../src/modules/bloggers-platform/likes/domain/like.entity';
