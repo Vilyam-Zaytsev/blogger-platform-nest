@@ -9,6 +9,7 @@
  *
  * @throws {Error} If the header is missing, malformed, not base64 encoded, or doesn't follow the expected format.
  */
+//TODO: выяснить посему параметр authHeader опциональный
 export function parseBasicAuth(authHeader?: string): [string, string] {
   if (!authHeader || !authHeader.startsWith('Basic ')) {
     throw new Error('Invalid Basic Authorization header format.');

@@ -46,6 +46,7 @@ export class UpdateReactionUseCase
       };
     }
 
+    //TODO:  что делать если статусы совпадают?
     if (like.status === status) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
