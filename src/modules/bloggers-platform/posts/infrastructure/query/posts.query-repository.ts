@@ -21,7 +21,10 @@ export class PostsQueryRepository {
     private readonly likesRepository: LikesRepository,
   ) {}
 
-  async getByIdOrNotFoundFail(id: string): Promise<PostViewDto> {
+  async getByIdOrNotFoundFail(
+    id: string,
+    user?: UserContextDto | null,
+  ): Promise<PostViewDto> {
     const post: PostDocument | null = await this.PostModel.findOne({
       _id: id,
       deletedAt: null,
@@ -34,10 +37,19 @@ export class PostsQueryRepository {
       });
     }
 
-    //TODO:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    const ЗАГЛУШКА = LikeStatus.None;
+    let userReaction: LikeStatus = LikeStatus.None;
 
-    return PostViewDto.mapToView(post, ЗАГЛУШКА);
+    if (user) {
+      const like: LikeDocument | null =
+        await this.likesRepository.getLikeByUserIdAndParentId(
+          user.id,
+          post._id.toString(),
+        );
+
+      userReaction = like ? like.status : LikeStatus.None;
+    }
+
+    return PostViewDto.mapToView(post, userReaction);
   }
 
   async getAll(

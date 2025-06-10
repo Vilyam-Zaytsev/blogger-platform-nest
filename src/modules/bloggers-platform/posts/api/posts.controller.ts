@@ -28,7 +28,7 @@ import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guar
 import { LikeInputDto } from '../../likes/api/input-dto/like-input.dto';
 import { ExtractUserFromRequest } from '../../../user-accounts/guards/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.dto';
-import { UpdatePostReactionsCommand } from '../application/usecases/update-post-reaction.usecase';
+import { UpdatePostReactionCommand } from '../application/usecases/update-post-reaction.usecase';
 import { UpdateReactionDto } from '../../likes/dto/like.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
 import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
@@ -51,8 +51,12 @@ export class PostsController {
   }
 
   @Get(':id')
-  async getById(@Param() params: IdInputDto): Promise<PostViewDto> {
-    return this.queryBus.execute(new GetPostQuery(params.id));
+  @UseGuards(OptionalJwtAuthGuard)
+  async getById(
+    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
+    @Param() params: IdInputDto,
+  ): Promise<PostViewDto> {
+    return this.queryBus.execute(new GetPostQuery(params.id, user));
   }
 
   @Post()
@@ -78,7 +82,7 @@ export class PostsController {
   @Put(':postId/like-status')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
-  async updateReactions(
+  async updateReaction(
     @ExtractUserFromRequest() user: UserContextDto,
     @Param('postId', ObjectIdValidationPipe) postId: string,
     @Body() body: LikeInputDto,
@@ -90,7 +94,7 @@ export class PostsController {
     };
 
     await this.commandBus.execute(
-      new UpdatePostReactionsCommand(updateReactionDto),
+      new UpdatePostReactionCommand(updateReactionDto),
     );
   }
 

@@ -79,6 +79,8 @@ export function appendLatestReaction(
 ) {
   if (this.newestLikes.length < 3) {
     this.newestLikes.unshift(newestLike);
+
+    return;
   }
 
   this.newestLikes.pop();
