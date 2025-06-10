@@ -4,22 +4,20 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateReactionDto } from '../../../likes/dto/like.dto';
 import { UpdateReactionsCommand } from '../../../likes/application/usecases/update-reactions.usecase';
 import {
-  LikeDocument,
   LikeStatus,
   ReactionUpdateResult,
 } from '../../../likes/domain/like.entity';
 import { LikesRepository } from '../../../likes/infrastructure/likes.repository';
 import { NewestLike } from '../../domain/newest-like.schema';
-import { UserDocument } from '../../../../user-accounts/domain/user.entity';
 import { UsersRepository } from '../../../../user-accounts/infrastructure/users.repository';
 
-export class UpdatePostReactionsCommand {
+export class UpdatePostReactionCommand {
   constructor(public readonly dto: UpdateReactionDto) {}
 }
 
-@CommandHandler(UpdatePostReactionsCommand)
+@CommandHandler(UpdatePostReactionCommand)
 export class UpdatePostReactionUseCase
-  implements ICommandHandler<UpdatePostReactionsCommand>
+  implements ICommandHandler<UpdatePostReactionCommand>
 {
   constructor(
     private readonly postsRepository: PostsRepository,
@@ -28,7 +26,7 @@ export class UpdatePostReactionUseCase
     private readonly commandBus: CommandBus,
   ) {}
 
-  async execute({ dto }: UpdatePostReactionsCommand): Promise<void> {
+  async execute({ dto }: UpdatePostReactionCommand): Promise<void> {
     const post: PostDocument = await this.postsRepository.getByIdOrNotFoundFail(
       dto.parentId,
     );
