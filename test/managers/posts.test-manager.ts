@@ -8,7 +8,6 @@ import { TestDtoFactory } from '../helpers/test.dto-factory';
 import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
 import { LikeStatus } from '../../src/modules/bloggers-platform/likes/domain/like.entity';
 import { HttpStatus } from '@nestjs/common';
-import { BlogViewDto } from '../../src/modules/bloggers-platform/blogs/api/view-dto/blog-view.dto';
 
 export class PostsTestManager {
   constructor(
@@ -64,11 +63,15 @@ export class PostsTestManager {
     return response.body as PaginatedViewDto<PostViewDto>;
   }
 
-  async getById(id: string): Promise<PostViewDto> {
-    const response: Response = await request(this.server)
-      .get(`/${GLOBAL_PREFIX}/posts/${id}`)
-      .expect(HttpStatus.OK);
+  async getById(id: string, accessToken?: string): Promise<PostViewDto> {
+    let req = request(this.server).get(`/${GLOBAL_PREFIX}/posts/${id}`);
 
-    return response.body as PostViewDto;
+    if (accessToken) {
+      req = req.set('Authorization', `Bearer ${accessToken}`);
+    }
+
+    const res: Response = await req.expect(HttpStatus.OK);
+
+    return res.body as PostViewDto;
   }
 }
