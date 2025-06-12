@@ -9,7 +9,11 @@ import {
   makeDeleted,
   recalculateReactionsCount,
 } from '../../../../core/utils/entity.common-utils';
-import { ReactionChange } from '../../likes/domain/like.entity';
+import {
+  ReactionDocument,
+  ReactionStatusDelta,
+} from '../../likes/domain/reaction.entity';
+import { UserDocument } from '../../../user-accounts/domain/user.entity';
 
 export const titleConstraints = {
   maxLength: 30,
@@ -190,14 +194,14 @@ export class Post {
    * (if it exists) and incrementing the count of the current reaction (if it exists).
    * It is typically used when a user adds, removes, or changes their reaction (like/dislike) to a post or comment.
    *
-   * @param {ReactionChange} delta - An object containing the current and previous reactions.
-   * @param {'Like' | 'Dislike' | null} delta.currentReaction - The new reaction provided by the user, or `null` if removed.
-   * @param {'Like' | 'Dislike' | null} delta.previousReaction - The old reaction that is being replaced or removed, or `null` if none existed.
+   * @param {ReactionChange} statusDelta - An object containing the current and previous reactions.
+   * @param {'Like' | 'Dislike' | null} statusDelta.currentReaction - The new reaction provided by the user, or `null` if removed.
+   * @param {'Like' | 'Dislike' | null} statusDelta.previousReaction - The old reaction that is being replaced or removed, or `null` if none existed.
    *
    * @throws Will not throw, but assumes `reactionsCount` contains valid numeric keys `likesCount` and `dislikesCount`.
    */
-  updateReactionsCount(delta: ReactionChange) {
-    recalculateReactionsCount.call(this, delta);
+  updateReactionsCount(statusDelta: ReactionStatusDelta) {
+    recalculateReactionsCount.call(this, statusDelta);
   }
 
   /**
@@ -214,8 +218,37 @@ export class Post {
    *
    * @param {NewestLike} newestLike - The new like object to add to the recent likes list.
    */
-  updateNewestLikes(newestLike: NewestLike) {
-    appendLatestReaction.call(this, newestLike);
+  updateNewestLikes(lastThreeLikes: ReactionDocument[], users: UserDocument[]) {
+    const newestLikes: NewestLike[] = lastThreeLikes.reduce(
+      (acc: NewestLike[], like: ReactionDocument): NewestLike[] => {
+        const user: UserDocument | undefined = users.find(
+          (user: UserDocument): boolean => user.id === like.userId,
+        );
+
+        const newestLike: NewestLike = {
+          addedAt: like.createdAt,
+          userId: like.userId,
+          login: user!.login,
+        };
+
+        acc.push(newestLike);
+
+        return acc;
+      },
+      [] as NewestLike[],
+    );
+
+    this.newestLikes = [...newestLikes];
+  }
+
+  // updateNewestLikes(newestLike: NewestLike) {
+  //   appendLatestReaction.call(this, newestLike);
+  // }
+
+  removeFromNewestLikes(userId: string) {
+    this.newestLikes = this.newestLikes.filter(
+      (like) => like.userId !== userId,
+    );
   }
 }
 

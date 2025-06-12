@@ -1,6 +1,6 @@
 import { PostDocument } from '../../domain/post.entity';
 import { NewestLike } from '../../domain/newest-like.schema';
-import { LikeStatus } from '../../../likes/domain/like.entity';
+import { ReactionStatus } from '../../../likes/domain/reaction.entity';
 
 export class PostViewDto {
   id: string;
@@ -12,7 +12,7 @@ export class PostViewDto {
   extendedLikesInfo: ExtendedLikesInfo;
   createdAt: string;
 
-  static mapToView(post: PostDocument, myStatus: LikeStatus): PostViewDto {
+  static mapToView(post: PostDocument, myStatus: ReactionStatus): PostViewDto {
     const dto = new this();
 
     dto.id = post._id.toString();
@@ -36,6 +36,6 @@ export class PostViewDto {
 export type ExtendedLikesInfo = {
   likesCount: number;
   dislikesCount: number;
-  myStatus: LikeStatus;
+  myStatus: ReactionStatus;
   newestLikes: NewestLike[];
 };

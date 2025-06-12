@@ -54,6 +54,10 @@ export class UsersRepository {
     });
   }
 
+  async getByIds(ids: string[]): Promise<UserDocument[]> {
+    return this.UserModel.find({ _id: { $in: ids } });
+  }
+
   async save(user: UserDocument): Promise<string> {
     const resultSave: UserDocument = await user.save();
 

@@ -6,8 +6,9 @@ import { GetPostsQueryParams } from '../../src/modules/bloggers-platform/posts/a
 import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
 import { TestDtoFactory } from '../helpers/test.dto-factory';
 import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
-import { LikeStatus } from '../../src/modules/bloggers-platform/likes/domain/like.entity';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
 import { HttpStatus } from '@nestjs/common';
+import { response } from 'express';
 
 export class PostsTestManager {
   constructor(
@@ -43,7 +44,7 @@ export class PostsTestManager {
       expect(typeof newPost.extendedLikesInfo).toBe('object');
       expect(newPost.extendedLikesInfo.likesCount).toBe(0);
       expect(newPost.extendedLikesInfo.dislikesCount).toBe(0);
-      expect(newPost.extendedLikesInfo.myStatus).toBe(LikeStatus.None);
+      expect(newPost.extendedLikesInfo.myStatus).toBe(ReactionStatus.None);
       expect(Array.isArray(newPost.extendedLikesInfo.newestLikes)).toBe(true);
 
       newPosts.push(newPost);
@@ -54,13 +55,17 @@ export class PostsTestManager {
 
   async getAll(
     query: Partial<GetPostsQueryParams> = {},
+    accessToken?: string,
   ): Promise<PaginatedViewDto<PostViewDto>> {
-    const response: Response = await request(this.server)
-      .get(`/${GLOBAL_PREFIX}/posts`)
-      .query(query)
-      .expect(HttpStatus.OK);
+    let req = request(this.server).get(`/${GLOBAL_PREFIX}/posts`).query(query);
 
-    return response.body as PaginatedViewDto<PostViewDto>;
+    if (accessToken) {
+      req = req.set('Authorization', `Bearer ${accessToken}`);
+    }
+
+    const res: Response = await req.expect(HttpStatus.OK);
+
+    return res.body as PaginatedViewDto<PostViewDto>;
   }
 
   async getById(id: string, accessToken?: string): Promise<PostViewDto> {

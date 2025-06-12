@@ -11,7 +11,7 @@ import { BlogsTestManager } from '../managers/blogs.test-manager';
 import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
 import { HttpStatus } from '@nestjs/common';
 import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
-import { LikeStatus } from '../../src/modules/bloggers-platform/likes/domain/like.entity';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
 import { PostsTestManager } from '../managers/posts.test-manager';
 import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 
@@ -75,7 +75,7 @@ describe('PostsController - createPost() (POST: /posts)', () => {
       extendedLikesInfo: {
         likesCount: 0,
         dislikesCount: 0,
-        myStatus: LikeStatus.None,
+        myStatus: ReactionStatus.None,
         newestLikes: [],
       },
       createdAt: expect.stringMatching(

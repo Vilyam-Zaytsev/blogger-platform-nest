@@ -25,11 +25,11 @@ import { GetPostQuery } from '../application/queries/get-post.query-handler';
 import { UpdatePostCommand } from '../application/usecases/update-post.usecase';
 import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
 import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
-import { LikeInputDto } from '../../likes/api/input-dto/like-input.dto';
+import { ReactionInputDto } from '../../likes/api/input-dto/reaction-input.dto';
 import { ExtractUserFromRequest } from '../../../user-accounts/guards/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.dto';
 import { UpdatePostReactionCommand } from '../application/usecases/update-post-reaction.usecase';
-import { UpdateReactionDto } from '../../likes/dto/like.dto';
+import { UpdateReactionDto } from '../../likes/dto/reaction.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
 import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
 import { ExtractUserIfExistsFromRequest } from '../../../user-accounts/guards/decorators/extract-user-if-exists-from-request.decorator';
@@ -65,7 +65,7 @@ export class PostsController {
     const postId: string = await this.commandBus.execute(
       new CreatePostCommand(body),
     );
-
+    //TODO: получать пост через query
     return this.postsQueryRepository.getByIdOrNotFoundFail(postId);
   }
 
@@ -85,7 +85,7 @@ export class PostsController {
   async updateReaction(
     @ExtractUserFromRequest() user: UserContextDto,
     @Param('postId', ObjectIdValidationPipe) postId: string,
-    @Body() body: LikeInputDto,
+    @Body() body: ReactionInputDto,
   ): Promise<void> {
     const updateReactionDto: UpdateReactionDto = {
       status: body.likeStatus,

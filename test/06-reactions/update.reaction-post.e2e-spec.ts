@@ -9,10 +9,15 @@ import { BlogViewDto } from 'src/modules/bloggers-platform/blogs/api/view-dto/bl
 import { BlogsTestManager } from '../managers/blogs.test-manager';
 import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
 import { PostsTestManager } from '../managers/posts.test-manager';
-import { LikeStatus } from '../../src/modules/bloggers-platform/likes/domain/like.entity';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
 import { UsersTestManager } from '../managers/users.test-manager';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import { HttpStatus } from '@nestjs/common';
+import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
+import { Filter } from '../helpers/filter';
+import { GetPostsQueryParams } from '../../src/modules/bloggers-platform/posts/api/input-dto/get-posts-query-params.input-dto';
+import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
+import { GetBlogsQueryParams } from '../../src/modules/bloggers-platform/blogs/api/input-dto/get-blogs-query-params.input-dto';
 
 describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)', () => {
   let appTestManager: AppTestManager;
@@ -63,7 +68,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     const resUpdateReaction: Response = await request(server)
       .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
       .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
-      .send({ likeStatus: LikeStatus.Like })
+      .send({ likeStatus: ReactionStatus.Like })
       .expect(HttpStatus.NO_CONTENT);
 
     //The 'myStatus' field must be 'None' because the user requesting the comment is not authenticated.
@@ -76,7 +81,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost_1.extendedLikesInfo).toEqual({
       likesCount: 1,
       dislikesCount: 0,
-      myStatus: LikeStatus.None,
+      myStatus: ReactionStatus.None,
       newestLikes: [
         {
           addedAt: expect.stringMatching(
@@ -98,7 +103,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost_2.extendedLikesInfo).toEqual({
       likesCount: 1,
       dislikesCount: 0,
-      myStatus: LikeStatus.Like,
+      myStatus: ReactionStatus.Like,
       newestLikes: [
         {
           addedAt: expect.stringMatching(
@@ -136,7 +141,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       const res: Response = await request(server)
         .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
         .set('Authorization', `Bearer ${resultLogin[i].authTokens.accessToken}`)
-        .send({ likeStatus: LikeStatus.Like })
+        .send({ likeStatus: ReactionStatus.Like })
         .expect(HttpStatus.NO_CONTENT);
 
       resUpdateReaction.push(res);
@@ -152,7 +157,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost_1.extendedLikesInfo).toEqual({
       likesCount: 2,
       dislikesCount: 0,
-      myStatus: LikeStatus.None,
+      myStatus: ReactionStatus.None,
       newestLikes: [
         {
           addedAt: expect.stringMatching(
@@ -183,7 +188,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       expect(foundPost.extendedLikesInfo).toEqual({
         likesCount: 2,
         dislikesCount: 0,
-        myStatus: LikeStatus.Like,
+        myStatus: ReactionStatus.Like,
         newestLikes: [
           {
             addedAt: expect.stringMatching(
@@ -229,7 +234,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       const res: Response = await request(server)
         .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
         .set('Authorization', `Bearer ${resultLogin[i].authTokens.accessToken}`)
-        .send({ likeStatus: LikeStatus.Like })
+        .send({ likeStatus: ReactionStatus.Like })
         .expect(HttpStatus.NO_CONTENT);
 
       resUpdateReaction.push(res);
@@ -245,7 +250,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost_1.extendedLikesInfo).toEqual({
       likesCount: 3,
       dislikesCount: 0,
-      myStatus: LikeStatus.None,
+      myStatus: ReactionStatus.None,
       newestLikes: [
         {
           addedAt: expect.stringMatching(
@@ -283,7 +288,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       expect(foundPost.extendedLikesInfo).toEqual({
         likesCount: 3,
         dislikesCount: 0,
-        myStatus: LikeStatus.Like,
+        myStatus: ReactionStatus.Like,
         newestLikes: [
           {
             addedAt: expect.stringMatching(
@@ -337,7 +342,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       await request(server)
         .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
         .set('Authorization', `Bearer ${resultLogin[i].authTokens.accessToken}`)
-        .send({ likeStatus: LikeStatus.Like })
+        .send({ likeStatus: ReactionStatus.Like })
         .expect(HttpStatus.NO_CONTENT);
     }
 
@@ -351,7 +356,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost_1.extendedLikesInfo).toEqual({
       likesCount: 3,
       dislikesCount: 0,
-      myStatus: LikeStatus.None,
+      myStatus: ReactionStatus.None,
       newestLikes: [
         {
           addedAt: expect.stringMatching(
@@ -389,7 +394,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       expect(foundPost.extendedLikesInfo).toEqual({
         likesCount: 3,
         dislikesCount: 0,
-        myStatus: LikeStatus.Like,
+        myStatus: ReactionStatus.Like,
         newestLikes: [
           {
             addedAt: expect.stringMatching(
@@ -421,7 +426,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     const resUpdateReaction_2: Response = await request(server)
       .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
       .set('Authorization', `Bearer ${resultLogin[3].authTokens.accessToken}`)
-      .send({ likeStatus: LikeStatus.Like })
+      .send({ likeStatus: ReactionStatus.Like })
       .expect(HttpStatus.NO_CONTENT);
 
     const foundPost: PostViewDto = await postsTestManager.getById(
@@ -432,7 +437,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost.extendedLikesInfo).toEqual({
       likesCount: 4,
       dislikesCount: 0,
-      myStatus: LikeStatus.Like,
+      myStatus: ReactionStatus.Like,
       newestLikes: [
         {
           addedAt: expect.stringMatching(
@@ -481,7 +486,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     const resUpdateReaction: Response = await request(server)
       .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
       .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
-      .send({ likeStatus: LikeStatus.Dislike })
+      .send({ likeStatus: ReactionStatus.Dislike })
       .expect(HttpStatus.NO_CONTENT);
 
     //The 'myStatus' field must be 'None' because the user requesting the comment is not authenticated.
@@ -494,7 +499,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost_1.extendedLikesInfo).toEqual({
       likesCount: 0,
       dislikesCount: 1,
-      myStatus: LikeStatus.None,
+      myStatus: ReactionStatus.None,
       newestLikes: [],
     });
 
@@ -508,7 +513,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost_2.extendedLikesInfo).toEqual({
       likesCount: 0,
       dislikesCount: 1,
-      myStatus: LikeStatus.Dislike,
+      myStatus: ReactionStatus.Dislike,
       newestLikes: [],
     });
 
@@ -538,7 +543,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       const res: Response = await request(server)
         .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
         .set('Authorization', `Bearer ${resultLogin[i].authTokens.accessToken}`)
-        .send({ likeStatus: LikeStatus.Dislike })
+        .send({ likeStatus: ReactionStatus.Dislike })
         .expect(HttpStatus.NO_CONTENT);
 
       resUpdateReaction.push(res);
@@ -553,7 +558,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost_1.extendedLikesInfo).toEqual({
       likesCount: 0,
       dislikesCount: 2,
-      myStatus: LikeStatus.None,
+      myStatus: ReactionStatus.None,
       newestLikes: [],
     });
 
@@ -568,7 +573,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       expect(foundPost.extendedLikesInfo).toEqual({
         likesCount: 0,
         dislikesCount: 2,
-        myStatus: LikeStatus.Dislike,
+        myStatus: ReactionStatus.Dislike,
         newestLikes: [],
       });
     }
@@ -595,10 +600,10 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
 
     //None to Like
 
-    const resUpdateReaction_1: Response = await request(server)
+    const resUpdateReaction: Response = await request(server)
       .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
       .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
-      .send({ likeStatus: LikeStatus.Like })
+      .send({ likeStatus: ReactionStatus.Like })
       .expect(HttpStatus.NO_CONTENT);
 
     const foundPost_1: PostViewDto = await postsTestManager.getById(
@@ -609,7 +614,7 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost_1.extendedLikesInfo).toEqual({
       likesCount: 1,
       dislikesCount: 0,
-      myStatus: LikeStatus.Like,
+      myStatus: ReactionStatus.Like,
       newestLikes: [
         {
           addedAt: expect.stringMatching(
@@ -623,10 +628,10 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
 
     // Like to Dislike
 
-    const resUpdateReaction_2: Response = await request(server)
+    await request(server)
       .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
       .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
-      .send({ likeStatus: LikeStatus.Dislike })
+      .send({ likeStatus: ReactionStatus.Dislike })
       .expect(HttpStatus.NO_CONTENT);
 
     const foundPost_2: PostViewDto = await postsTestManager.getById(
@@ -637,15 +642,426 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     expect(foundPost_2.extendedLikesInfo).toEqual({
       likesCount: 0,
       dislikesCount: 1,
-      myStatus: LikeStatus.Dislike,
+      myStatus: ReactionStatus.Dislike,
+      newestLikes: [],
+    });
+
+    // Dislike to Like
+
+    await request(server)
+      .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
+      .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
+      .send({ likeStatus: ReactionStatus.Like })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const foundPost_3: PostViewDto = await postsTestManager.getById(
+      createdPost.id,
+      resultLogin.authTokens.accessToken,
+    );
+
+    expect(foundPost_3.extendedLikesInfo).toEqual({
+      likesCount: 1,
+      dislikesCount: 0,
+      myStatus: ReactionStatus.Like,
+      newestLikes: [
+        {
+          addedAt: expect.stringMatching(
+            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+          ),
+          userId: createdUser.id,
+          login: createdUser.login,
+        },
+      ],
+    });
+
+    //Like to None
+
+    await request(server)
+      .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
+      .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
+      .send({ likeStatus: ReactionStatus.None })
+      .expect(HttpStatus.NO_CONTENT);
+
+    const foundPost_4: PostViewDto = await postsTestManager.getById(
+      createdPost.id,
+      resultLogin.authTokens.accessToken,
+    );
+
+    expect(foundPost_4.extendedLikesInfo).toEqual({
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: ReactionStatus.None,
       newestLikes: [],
     });
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
-        resUpdateReaction_1.body,
-        resUpdateReaction_1.statusCode,
+        resUpdateReaction.body,
+        resUpdateReaction.statusCode,
         'Test №7: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+      );
+    }
+  });
+
+  it('1. The first five posts: user 1 - puts likes; user 2 - puts dislikes. 2. The following five posts: user 1 - dislikes; user 2 - likes.', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const createdPosts: PostViewDto[] = await postsTestManager.createPost(
+      10,
+      createdBlog.id,
+    );
+    const [createUser1, createUser2]: UserViewDto[] =
+      await usersTestManager.createUser(2);
+    const resultLogins: TestResultLogin[] = await usersTestManager.login([
+      createUser1.login,
+      createUser2.login,
+    ]);
+
+    //1. The first five posts: user 1 - puts likes; user 2 - puts dislikes.
+    //2. The following five posts: user 1 - dislikes; user 2 - likes.
+
+    for (let i = 0; i < createdPosts.length; i++) {
+      if (createdPosts.length / 2 > i) {
+        // user 1 - puts likes;
+        await request(server)
+          .put(`/${GLOBAL_PREFIX}/posts/${createdPosts[i].id}/like-status`)
+          .set(
+            'Authorization',
+            `Bearer ${resultLogins[0].authTokens.accessToken}`,
+          )
+          .send({ likeStatus: ReactionStatus.Like })
+          .expect(HttpStatus.NO_CONTENT);
+
+        // user 2 - puts dislikes
+        await request(server)
+          .put(`/${GLOBAL_PREFIX}/posts/${createdPosts[i].id}/like-status`)
+          .set(
+            'Authorization',
+            `Bearer ${resultLogins[1].authTokens.accessToken}`,
+          )
+          .send({ likeStatus: ReactionStatus.Dislike })
+          .expect(HttpStatus.NO_CONTENT);
+      } else {
+        // user 1 - puts dislikes;
+        await request(server)
+          .put(`/${GLOBAL_PREFIX}/posts/${createdPosts[i].id}/like-status`)
+          .set(
+            'Authorization',
+            `Bearer ${resultLogins[0].authTokens.accessToken}`,
+          )
+          .send({ likeStatus: ReactionStatus.Dislike })
+          .expect(HttpStatus.NO_CONTENT);
+
+        // user 2 - puts likes
+        await request(server)
+          .put(`/${GLOBAL_PREFIX}/posts/${createdPosts[i].id}/like-status`)
+          .set(
+            'Authorization',
+            `Bearer ${resultLogins[1].authTokens.accessToken}`,
+          )
+          .send({ likeStatus: ReactionStatus.Like })
+          .expect(HttpStatus.NO_CONTENT);
+      }
+    }
+
+    const foundPosts_1: PaginatedViewDto<PostViewDto> =
+      await postsTestManager.getAll({}, resultLogins[0].authTokens.accessToken);
+
+    //sorting the found posts in ascending order
+    const query: GetPostsQueryParams = new GetPostsQueryParams();
+    query.sortDirection = SortDirection.Ascending;
+    const sortedPosts: PostViewDto[] = new Filter<PostViewDto>(
+      foundPosts_1.items,
+    )
+      .sort({ [query.sortBy]: query.sortDirection })
+      .getResult();
+
+    //checking it out:
+    //1. The first five posts: likesCount: 1, dislikesCount: 1, myStatus: ReactionStatus.Like
+    //2. The following five posts: likesCount: 1, dislikesCount: 1, myStatus: ReactionStatus.Dislike
+    for (let i = 0; i < sortedPosts.length; i++) {
+      if (sortedPosts.length / 2 > i) {
+        expect(sortedPosts[i].extendedLikesInfo).toEqual({
+          likesCount: 1,
+          dislikesCount: 1,
+          myStatus: ReactionStatus.Like,
+          newestLikes: [
+            {
+              addedAt: expect.stringMatching(
+                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+              ),
+              userId: createUser1.id,
+              login: createUser1.login,
+            },
+          ],
+        });
+      } else {
+        expect(sortedPosts[i].extendedLikesInfo).toEqual({
+          likesCount: 1,
+          dislikesCount: 1,
+          myStatus: ReactionStatus.Dislike,
+          newestLikes: [
+            {
+              addedAt: expect.stringMatching(
+                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+              ),
+              userId: createUser2.id,
+              login: createUser2.login,
+            },
+          ],
+        });
+      }
+    }
+
+    const foundPosts_2: PaginatedViewDto<PostViewDto> =
+      await postsTestManager.getAll({}, resultLogins[1].authTokens.accessToken);
+
+    //sorting the found posts in ascending order
+    query.sortDirection = SortDirection.Ascending;
+    const sortedPosts_2: PostViewDto[] = new Filter<PostViewDto>(
+      foundPosts_2.items,
+    )
+      .sort({ [query.sortBy]: query.sortDirection })
+      .getResult();
+
+    //checking it out:
+    //1. The first five posts: likesCount: 1, dislikesCount: 1, myStatus: ReactionStatus.Dislike
+    //2. The following five posts: likesCount: 1, dislikesCount: 1, myStatus: ReactionStatus.Like
+    for (let i = 0; i < sortedPosts.length; i++) {
+      if (sortedPosts_2.length / 2 > i) {
+        expect(sortedPosts_2[i].extendedLikesInfo).toEqual({
+          likesCount: 1,
+          dislikesCount: 1,
+          myStatus: ReactionStatus.Dislike,
+          newestLikes: [
+            {
+              addedAt: expect.stringMatching(
+                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+              ),
+              userId: createUser1.id,
+              login: createUser1.login,
+            },
+          ],
+        });
+      } else {
+        expect(sortedPosts_2[i].extendedLikesInfo).toEqual({
+          likesCount: 1,
+          dislikesCount: 1,
+          myStatus: ReactionStatus.Like,
+          newestLikes: [
+            {
+              addedAt: expect.stringMatching(
+                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+              ),
+              userId: createUser2.id,
+              login: createUser2.login,
+            },
+          ],
+        });
+      }
+    }
+
+    const foundPosts_3: PaginatedViewDto<PostViewDto> =
+      await postsTestManager.getAll();
+
+    //sorting the found posts in ascending order
+    query.sortDirection = SortDirection.Ascending;
+    const sortedPosts_3: PostViewDto[] = new Filter<PostViewDto>(
+      foundPosts_3.items,
+    )
+      .sort({ [query.sortBy]: query.sortDirection })
+      .getResult();
+
+    //checking it out:
+    //1. The first five posts: likesCount: 1, dislikesCount: 1, myStatus: ReactionStatus.None
+    //2. The following five posts: likesCount: 1, dislikesCount: 1, myStatus: ReactionStatus.None
+    for (let i = 0; i < sortedPosts.length; i++) {
+      if (sortedPosts_3.length / 2 > i) {
+        expect(sortedPosts_3[i].extendedLikesInfo).toEqual({
+          likesCount: 1,
+          dislikesCount: 1,
+          myStatus: ReactionStatus.None,
+          newestLikes: [
+            {
+              addedAt: expect.stringMatching(
+                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+              ),
+              userId: createUser1.id,
+              login: createUser1.login,
+            },
+          ],
+        });
+      } else {
+        expect(sortedPosts_3[i].extendedLikesInfo).toEqual({
+          likesCount: 1,
+          dislikesCount: 1,
+          myStatus: ReactionStatus.None,
+          newestLikes: [
+            {
+              addedAt: expect.stringMatching(
+                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+              ),
+              userId: createUser2.id,
+              login: createUser2.login,
+            },
+          ],
+        });
+      }
+    }
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        {},
+        HttpStatus.NO_CONTENT,
+        'Test №8: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+      );
+    }
+  });
+
+  it('1. must create ten users. 2. All ten users like one post. 3.Then each user changes the like to dislike reaction. newestLikes should change along with this.', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
+      1,
+      createdBlog.id,
+    );
+    const createdUsers: UserViewDto[] = await usersTestManager.createUser(10);
+    const resultLogins: TestResultLogin[] = await usersTestManager.login(
+      createdUsers.map((user) => user.login),
+    );
+
+    //All ten users like one post.
+    for (let i = 0; i < resultLogins.length; i++) {
+      await request(server)
+        .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
+        .set(
+          'Authorization',
+          `Bearer ${resultLogins[i].authTokens.accessToken}`,
+        )
+        .send({ likeStatus: ReactionStatus.Like })
+        .expect(HttpStatus.NO_CONTENT);
+    }
+
+    const foundPost: PostViewDto = await postsTestManager.getById(
+      createdPost.id,
+    );
+
+    expect(foundPost.extendedLikesInfo).toEqual({
+      likesCount: 10,
+      dislikesCount: 0,
+      myStatus: ReactionStatus.None,
+      newestLikes: [
+        {
+          addedAt: expect.stringMatching(
+            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+          ),
+          userId: createdUsers[9].id,
+          login: createdUsers[9].login,
+        },
+        {
+          addedAt: expect.stringMatching(
+            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+          ),
+          userId: createdUsers[8].id,
+          login: createdUsers[8].login,
+        },
+        {
+          addedAt: expect.stringMatching(
+            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+          ),
+          userId: createdUsers[7].id,
+          login: createdUsers[7].login,
+        },
+      ],
+    });
+
+    for (let i = resultLogins.length - 1; i >= 0; i--) {
+      await request(server)
+        .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
+        .set(
+          'Authorization',
+          `Bearer ${resultLogins[i].authTokens.accessToken}`,
+        )
+        .send({ likeStatus: ReactionStatus.Dislike })
+        .expect(HttpStatus.NO_CONTENT);
+
+      const foundPost: PostViewDto = await postsTestManager.getById(
+        createdPost.id,
+        resultLogins[i].authTokens.accessToken,
+      );
+
+      const dislikesCount: number = resultLogins.length - i;
+
+      expect(foundPost.extendedLikesInfo).toEqual({
+        likesCount: 10 - dislikesCount,
+        dislikesCount,
+        myStatus: ReactionStatus.Dislike,
+        newestLikes: (() => {
+          if (i >= 3) {
+            return [
+              {
+                addedAt: expect.stringMatching(
+                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                ),
+                userId: createdUsers[i - 1].id,
+                login: createdUsers[i - 1].login,
+              },
+              {
+                addedAt: expect.stringMatching(
+                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                ),
+                userId: createdUsers[i - 2].id,
+                login: createdUsers[i - 2].login,
+              },
+              {
+                addedAt: expect.stringMatching(
+                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                ),
+                userId: createdUsers[i - 3].id,
+                login: createdUsers[i - 3].login,
+              },
+            ];
+          }
+
+          if (i === 2) {
+            return [
+              {
+                addedAt: expect.stringMatching(
+                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                ),
+                userId: createdUsers[i - 1].id,
+                login: createdUsers[i - 1].login,
+              },
+              {
+                addedAt: expect.stringMatching(
+                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                ),
+                userId: createdUsers[i - 2].id,
+                login: createdUsers[i - 2].login,
+              },
+            ];
+          }
+
+          if (i === 1) {
+            return [
+              {
+                addedAt: expect.stringMatching(
+                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+                ),
+                userId: createdUsers[i - 1].id,
+                login: createdUsers[i - 1].login,
+              },
+            ];
+          }
+
+          return [];
+        })(),
+      });
+    }
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        {},
+        HttpStatus.NO_CONTENT,
+        'Test №8: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       );
     }
   });

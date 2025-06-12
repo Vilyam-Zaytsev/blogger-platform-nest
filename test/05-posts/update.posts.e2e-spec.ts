@@ -11,7 +11,7 @@ import { HttpStatus } from '@nestjs/common';
 import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
 import { PostsTestManager } from '../managers/posts.test-manager';
 import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
-import { LikeStatus } from '../../src/modules/bloggers-platform/likes/domain/like.entity';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
 import { ObjectId } from 'mongodb';
 
 describe('PostsController - updatePost() (PUT: /posts)', () => {
@@ -77,7 +77,7 @@ describe('PostsController - updatePost() (PUT: /posts)', () => {
       extendedLikesInfo: {
         dislikesCount: 0,
         likesCount: 0,
-        myStatus: LikeStatus.None,
+        myStatus: ReactionStatus.None,
         newestLikes: [],
       },
       createdAt: expect.any(String),

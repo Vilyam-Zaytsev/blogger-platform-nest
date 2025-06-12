@@ -14,7 +14,7 @@ import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/inpu
 import { HttpStatus } from '@nestjs/common';
 import { PostsTestManager } from '../managers/posts.test-manager';
 import { ObjectId } from 'mongodb';
-import { LikeStatus } from '../../src/modules/bloggers-platform/likes/domain/like.entity';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
 
 describe('BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)', () => {
   let appTestManager: AppTestManager;
@@ -76,7 +76,7 @@ describe('BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)', 
       extendedLikesInfo: {
         likesCount: 0,
         dislikesCount: 0,
-        myStatus: LikeStatus.None,
+        myStatus: ReactionStatus.None,
         newestLikes: [],
       },
       createdAt: expect.stringMatching(

@@ -7,8 +7,11 @@ import { FilterQuery } from 'mongoose';
 import { GetPostsQueryParams } from '../../api/input-dto/get-posts-query-params.input-dto';
 import { BlogsRepository } from '../../../blogs/infrastructure/blogs.repository';
 import { UserContextDto } from '../../../../user-accounts/guards/dto/user-context.dto';
-import { LikeDocument, LikeStatus } from '../../../likes/domain/like.entity';
-import { LikesRepository } from '../../../likes/infrastructure/likes.repository';
+import {
+  ReactionDocument,
+  ReactionStatus,
+} from '../../../likes/domain/reaction.entity';
+import { ReactionsRepository } from '../../../likes/infrastructure/reactions-repository';
 import { DomainException } from '../../../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 
@@ -18,7 +21,7 @@ export class PostsQueryRepository {
     @InjectModel(Post.name)
     private readonly PostModel: PostModelType,
     private readonly blogsRepository: BlogsRepository,
-    private readonly likesRepository: LikesRepository,
+    private readonly likesRepository: ReactionsRepository,
   ) {}
 
   async getByIdOrNotFoundFail(
@@ -37,16 +40,16 @@ export class PostsQueryRepository {
       });
     }
 
-    let userReaction: LikeStatus = LikeStatus.None;
+    let userReaction: ReactionStatus = ReactionStatus.None;
 
     if (user) {
-      const like: LikeDocument | null =
-        await this.likesRepository.getLikeByUserIdAndParentId(
+      const like: ReactionDocument | null =
+        await this.likesRepository.getByUserIdAndParentId(
           user.id,
           post._id.toString(),
         );
 
-      userReaction = like ? like.status : LikeStatus.None;
+      userReaction = like ? like.status : ReactionStatus.None;
     }
 
     return PostViewDto.mapToView(post, userReaction);
@@ -67,17 +70,17 @@ export class PostsQueryRepository {
 
     const postsIds: string[] = posts.map((post) => post._id.toString());
 
-    const allReactionsForPosts: LikeDocument[] =
-      await this.likesRepository.getReactionsByParentIds(postsIds);
+    const allReactionsForPosts: ReactionDocument[] =
+      await this.likesRepository.getByParentIds(postsIds);
 
-    const mapUserReactionsForPosts: Map<string, LikeStatus> = new Map();
+    const mapUserReactionsForPosts: Map<string, ReactionStatus> = new Map();
 
     if (user) {
-      allReactionsForPosts.reduce<Map<string, LikeStatus>>(
+      allReactionsForPosts.reduce<Map<string, ReactionStatus>>(
         (
-          acc: Map<string, LikeStatus>,
-          like: LikeDocument,
-        ): Map<string, LikeStatus> => {
+          acc: Map<string, ReactionStatus>,
+          like: ReactionDocument,
+        ): Map<string, ReactionStatus> => {
           if (like.userId === user.id) {
             acc.set(like.parentId, like.status);
           }
@@ -90,7 +93,7 @@ export class PostsQueryRepository {
 
     const items: PostViewDto[] = posts.map(
       (post: PostDocument): PostViewDto => {
-        let myStatus: LikeStatus | undefined;
+        let myStatus: ReactionStatus | undefined;
 
         if (user) {
           const id: string = post._id.toString();
@@ -100,7 +103,7 @@ export class PostsQueryRepository {
 
         return PostViewDto.mapToView(
           post,
-          myStatus ? myStatus : LikeStatus.None,
+          myStatus ? myStatus : ReactionStatus.None,
         );
       },
     );
@@ -134,7 +137,7 @@ export class PostsQueryRepository {
     const totalCount: number = await this.PostModel.countDocuments(filter);
 
     //TODO:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    const ЗАГЛУШКА = LikeStatus.None;
+    const ЗАГЛУШКА = ReactionStatus.None;
 
     const items: PostViewDto[] = posts.map(
       (post: PostDocument): PostViewDto =>
