@@ -65,7 +65,7 @@ export class PostsController {
     const postId: string = await this.commandBus.execute(
       new CreatePostCommand(body),
     );
-    //TODO: получать пост через query
+
     return this.postsQueryRepository.getByIdOrNotFoundFail(postId);
   }
 

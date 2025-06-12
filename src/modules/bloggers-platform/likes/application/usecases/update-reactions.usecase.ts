@@ -7,8 +7,6 @@ import {
   ReactionStatusDelta,
 } from '../../domain/reaction.entity';
 import { CreateReactionCommand } from './create-reaction-use.case';
-import { DomainException } from '../../../../../core/exceptions/damain-exceptions';
-import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 import { PostsRepository } from '../../../posts/infrastructure/posts.repository';
 
 export class UpdateReactionsCommand {
@@ -40,12 +38,11 @@ export class UpdateReactionUseCase
       };
     }
 
-    //TODO:  что делать если статусы совпадают?
     if (reaction.status === status) {
-      throw new DomainException({
-        code: DomainExceptionCode.BadRequest,
-        message: `User (${userId}) has already set this reaction (${status}) for the target (${parentId})`,
-      });
+      return {
+        currentStatus: ReactionStatus.None,
+        previousStatus: ReactionStatus.None,
+      };
     }
 
     const previousStatus: ReactionStatus = reaction.status;
