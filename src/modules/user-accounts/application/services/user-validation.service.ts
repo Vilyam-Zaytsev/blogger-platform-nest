@@ -20,7 +20,7 @@ export class UserValidationService {
       this.usersRepository.getByLogin(dto.login),
       this.usersRepository.getByEmail(dto.email),
     ]);
-    //TODO: как лучше формировать extensions? Так как у меня или через new Extension(message, field)?
+
     if (byLogin) {
       throw new ValidationException([
         {

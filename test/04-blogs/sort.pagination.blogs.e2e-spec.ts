@@ -14,11 +14,13 @@ import {
   GetBlogsQueryParams,
 } from '../../src/modules/bloggers-platform/blogs/api/input-dto/get-blogs-query-params.input-dto';
 import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
+import { TestUtils } from '../helpers/test.utils';
 
 describe('BlogsController - getBlog() (GET: /blogs (pagination, sort, search in term))', () => {
   let appTestManager: AppTestManager;
   let blogsTestManager: BlogsTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
 
@@ -26,11 +28,15 @@ describe('BlogsController - getBlog() (GET: /blogs (pagination, sort, search in 
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    blogsTestManager = new BlogsTestManager(server, adminCredentials);
+    blogsTestManager = new BlogsTestManager(server, adminCredentialsInBase64);
   });
 
   beforeEach(async () => {
@@ -42,36 +48,34 @@ describe('BlogsController - getBlog() (GET: /blogs (pagination, sort, search in 
   });
 
   it('should use default pagination values when none are provided by the client.', async () => {
-    const createdBlogs: BlogViewDto[] = await blogsTestManager.createBlog(12);
+    const blogs: BlogViewDto[] = await blogsTestManager.createBlog(12);
 
     const resGetBlogs: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/blogs`)
       .expect(HttpStatus.OK);
 
-    const bodyFromGetRequest: PaginatedViewDto<BlogViewDto> =
+    const bodyFromGetResponse: PaginatedViewDto<BlogViewDto> =
       resGetBlogs.body as PaginatedViewDto<BlogViewDto>;
 
     const query: GetBlogsQueryParams = new GetBlogsQueryParams();
-    const filteredCreatedBlogs: BlogViewDto[] = new Filter<BlogViewDto>(
-      createdBlogs,
-    )
+    const filteredCreatedBlogs: BlogViewDto[] = new Filter<BlogViewDto>(blogs)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
       .getResult();
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 2,
       page: 1,
       pageSize: 10,
       totalCount: 12,
       items: filteredCreatedBlogs,
     });
-    expect(bodyFromGetRequest.items).toHaveLength(10);
+    expect(bodyFromGetResponse.items).toHaveLength(10);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
-        resGetBlogs.body,
+        bodyFromGetResponse,
         resGetBlogs.statusCode,
         'Test №1: BlogsController - getBlog() (GET: /blogs (pagination, sort, search in term))',
       );
@@ -79,7 +83,7 @@ describe('BlogsController - getBlog() (GET: /blogs (pagination, sort, search in 
   });
 
   it('should use client-provided pagination values to return the correct subset of data(1).', async () => {
-    const createdBlogs: BlogViewDto[] = await blogsTestManager.createBlog(12);
+    const blogs: BlogViewDto[] = await blogsTestManager.createBlog(12);
 
     const query: GetBlogsQueryParams = new GetBlogsQueryParams();
     query.sortBy = BlogsSortBy.Name;
@@ -92,29 +96,27 @@ describe('BlogsController - getBlog() (GET: /blogs (pagination, sort, search in 
       .query(query)
       .expect(HttpStatus.OK);
 
-    const bodyFromGetRequest: PaginatedViewDto<BlogViewDto> =
+    const bodyFromGetResponse: PaginatedViewDto<BlogViewDto> =
       resGetBlogs.body as PaginatedViewDto<BlogViewDto>;
 
-    const filteredCreatedBlogs: BlogViewDto[] = new Filter<BlogViewDto>(
-      createdBlogs,
-    )
+    const filteredCreatedBlogs: BlogViewDto[] = new Filter<BlogViewDto>(blogs)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
       .getResult();
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 4,
       page: 2,
       pageSize: 3,
       totalCount: 12,
       items: filteredCreatedBlogs,
     });
-    expect(bodyFromGetRequest.items).toHaveLength(3);
+    expect(bodyFromGetResponse.items).toHaveLength(3);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
-        resGetBlogs.body,
+        bodyFromGetResponse,
         resGetBlogs.statusCode,
         'Test №2: BlogsController - getBlog() (GET: /blogs (pagination, sort, search in term))',
       );
@@ -122,7 +124,7 @@ describe('BlogsController - getBlog() (GET: /blogs (pagination, sort, search in 
   });
 
   it('should use client-provided pagination values to return the correct subset of data(2).', async () => {
-    const createdBlogs: BlogViewDto[] = await blogsTestManager.createBlog(12);
+    const blogs: BlogViewDto[] = await blogsTestManager.createBlog(12);
 
     const query: GetBlogsQueryParams = new GetBlogsQueryParams();
     query.sortBy = BlogsSortBy.CreatedAt;
@@ -135,29 +137,27 @@ describe('BlogsController - getBlog() (GET: /blogs (pagination, sort, search in 
       .query(query)
       .expect(HttpStatus.OK);
 
-    const bodyFromGetRequest: PaginatedViewDto<BlogViewDto> =
+    const bodyFromGetResponse: PaginatedViewDto<BlogViewDto> =
       resGetBlogs.body as PaginatedViewDto<BlogViewDto>;
 
-    const filteredCreatedBlogs: BlogViewDto[] = new Filter<BlogViewDto>(
-      createdBlogs,
-    )
+    const filteredCreatedBlogs: BlogViewDto[] = new Filter<BlogViewDto>(blogs)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
       .getResult();
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 6,
       page: 6,
       pageSize: 2,
       totalCount: 12,
       items: filteredCreatedBlogs,
     });
-    expect(bodyFromGetRequest.items).toHaveLength(2);
+    expect(bodyFromGetResponse.items).toHaveLength(2);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
-        resGetBlogs.body,
+        bodyFromGetResponse,
         resGetBlogs.statusCode,
         'Test №3: BlogsController - getBlog() (GET: /blogs (pagination, sort, search in term))',
       );
@@ -165,7 +165,7 @@ describe('BlogsController - getBlog() (GET: /blogs (pagination, sort, search in 
   });
 
   it('should use client-provided pagination values to return the correct subset of data(3).', async () => {
-    const createdBlogs: BlogViewDto[] = await blogsTestManager.createBlog(12);
+    const blogs: BlogViewDto[] = await blogsTestManager.createBlog(12);
 
     const query: GetBlogsQueryParams = new GetBlogsQueryParams();
     query.sortBy = BlogsSortBy.Name;
@@ -183,30 +183,28 @@ describe('BlogsController - getBlog() (GET: /blogs (pagination, sort, search in 
       .query(query)
       .expect(HttpStatus.OK);
 
-    const bodyFromGetRequest: PaginatedViewDto<BlogViewDto> =
+    const bodyFromGetResponse: PaginatedViewDto<BlogViewDto> =
       resGetBlogs.body as PaginatedViewDto<BlogViewDto>;
 
-    const filteredCreatedBlogs: BlogViewDto[] = new Filter<BlogViewDto>(
-      createdBlogs,
-    )
+    const filteredCreatedBlogs: BlogViewDto[] = new Filter<BlogViewDto>(blogs)
       .filter(searchFilter)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize)
       .getResult();
 
-    expect(bodyFromGetRequest).toEqual({
+    expect(bodyFromGetResponse).toEqual({
       pagesCount: 3,
       page: 2,
       pageSize: 1,
       totalCount: 3,
       items: filteredCreatedBlogs,
     });
-    expect(bodyFromGetRequest.items).toHaveLength(1);
+    expect(bodyFromGetResponse.items).toHaveLength(1);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
-        resGetBlogs.body,
+        bodyFromGetResponse,
         resGetBlogs.statusCode,
         'Test №4: BlogsController - getBlog() (GET: /blogs (pagination, sort, search in term))',
       );

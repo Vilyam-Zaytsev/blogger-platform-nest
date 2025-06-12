@@ -7,11 +7,13 @@ import { AdminCredentials } from '../types';
 import { Server } from 'http';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import { TestUtils } from '../helpers/test.utils';
+import { HttpStatus } from '@nestjs/common';
 
 describe('AuthController - login() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
 
@@ -19,11 +21,15 @@ describe('AuthController - login() (POST: /auth)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    usersTestManager = new UsersTestManager(server, adminCredentials);
+    usersTestManager = new UsersTestManager(server, adminCredentialsInBase64);
   });
 
   beforeEach(async () => {
@@ -43,7 +49,7 @@ describe('AuthController - login() (POST: /auth)', () => {
         loginOrEmail: user.login,
         password: 'qwerty',
       })
-      .expect(200);
+      .expect(HttpStatus.OK);
 
     expect(resLogin.body).toEqual({
       accessToken: expect.any(String),
@@ -62,12 +68,10 @@ describe('AuthController - login() (POST: /auth)', () => {
   });
 
   it('should not log in if the user has sent invalid data (loginOrEmail: "undefined", password: "undefined")', async () => {
-    await usersTestManager.createUser(1);
-
     const resLogin: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/login`)
       .send({})
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resLogin.body).toEqual({
       errorsMessages: [
@@ -94,15 +98,13 @@ describe('AuthController - login() (POST: /auth)', () => {
   });
 
   it('should not log in if the user has sent invalid data (loginOrEmail: type number, password: type number)', async () => {
-    await usersTestManager.createUser(1);
-
     const resLogin: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/login`)
       .send({
         loginOrEmail: 123,
         password: 123,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resLogin.body).toEqual({
       errorsMessages: [
@@ -129,15 +131,13 @@ describe('AuthController - login() (POST: /auth)', () => {
   });
 
   it('should not log in if the user has sent invalid data (loginOrEmail: empty line, password: empty line)', async () => {
-    await usersTestManager.createUser(1);
-
     const resLogin: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/login`)
       .send({
         loginOrEmail: '   ',
         password: '   ',
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resLogin.body).toEqual({
       errorsMessages: [
@@ -169,15 +169,13 @@ describe('AuthController - login() (POST: /auth)', () => {
     const loginOrEmail: string = TestUtils.generateRandomString(101);
     const password: string = TestUtils.generateRandomString(21);
 
-    await usersTestManager.createUser(1);
-
     const resLogin: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/login`)
       .send({
         loginOrEmail,
         password,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resLogin.body).toEqual({
       errorsMessages: [
@@ -207,15 +205,13 @@ describe('AuthController - login() (POST: /auth)', () => {
     const loginOrEmail: string = TestUtils.generateRandomString(2);
     const password: string = TestUtils.generateRandomString(5);
 
-    await usersTestManager.createUser(1);
-
     const resLogin: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/login`)
       .send({
         loginOrEmail,
         password,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resLogin.body).toEqual({
       errorsMessages: [
@@ -252,7 +248,7 @@ describe('AuthController - login() (POST: /auth)', () => {
         loginOrEmail,
         password: 'qwerty',
       })
-      .expect(401);
+      .expect(HttpStatus.UNAUTHORIZED);
 
     expect(resLogin.headers['set-cookie']).toBeUndefined();
 
@@ -274,7 +270,7 @@ describe('AuthController - login() (POST: /auth)', () => {
         loginOrEmail: user.email,
         password: 'incorrect_password',
       })
-      .expect(401);
+      .expect(HttpStatus.UNAUTHORIZED);
 
     expect(resLogin.headers['set-cookie']).toBeUndefined();
 

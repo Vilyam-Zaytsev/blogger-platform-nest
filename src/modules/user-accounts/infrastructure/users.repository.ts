@@ -2,7 +2,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/user.entity';
 import { DomainException } from '../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class UsersRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
 
@@ -50,6 +52,10 @@ export class UsersRepository {
       email,
       deletedAt: null,
     });
+  }
+
+  async getByIds(ids: string[]): Promise<UserDocument[]> {
+    return this.UserModel.find({ _id: { $in: ids } });
   }
 
   async save(user: UserDocument): Promise<string> {

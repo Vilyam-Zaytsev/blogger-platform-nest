@@ -1,6 +1,8 @@
 import { UserInputDto } from '../../src/modules/user-accounts/api/input-dto/user.input-dto';
 import { BlogInputDto } from '../../src/modules/bloggers-platform/blogs/api/input-dto/blog-input.dto';
 import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
+import { ReactionInputDto } from '../../src/modules/bloggers-platform/likes/api/input-dto/reaction-input.dto';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
 
 export class TestDtoFactory {
   static generateUserInputDto(quantity: number): UserInputDto[] {
@@ -47,5 +49,20 @@ export class TestDtoFactory {
     }
 
     return posts;
+  }
+
+  static generateLikeInputDto(
+    quantity: number,
+    reactionStatus: ReactionStatus,
+  ): ReactionInputDto[] {
+    const reactions: ReactionInputDto[] = [];
+
+    for (let i = 0; i < quantity; i++) {
+      reactions.push({
+        likeStatus: ReactionStatus[reactionStatus],
+      });
+    }
+
+    return reactions;
   }
 }

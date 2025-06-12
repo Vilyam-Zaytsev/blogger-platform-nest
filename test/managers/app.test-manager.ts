@@ -60,7 +60,7 @@ export class AppTestManager {
     return this.app.getHttpServer() as Server;
   }
 
-  getAdminData(): AdminCredentials {
+  getAdminCredentials(): AdminCredentials {
     const login: string | undefined = this.coreConfig.adminLogin;
     const password: string | undefined = this.coreConfig.adminPassword;
 

@@ -25,7 +25,7 @@ describe('UserValidationService (integration)', () => {
     userValidationService = appTestManager.app.get<UserValidationService>(
       UserValidationService,
     );
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
     server = appTestManager.getServer();
 
     usersTestManager = new UsersTestManager(server, adminCredentials);

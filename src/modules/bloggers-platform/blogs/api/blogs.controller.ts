@@ -33,6 +33,9 @@ import { GetPostsForBlogQuery } from '../application/queries/get-posts-for-blog.
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
 import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
 import { Public } from '../../../user-accounts/decorators/public.decorator';
+import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
+import { ExtractUserIfExistsFromRequest } from '../../../user-accounts/guards/decorators/extract-user-if-exists-from-request.decorator';
+import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.dto';
 
 @Controller('blogs')
 @UseGuards(BasicAuthGuard)
@@ -58,12 +61,14 @@ export class BlogsController {
   }
 
   @Get(':blogId/posts')
+  @UseGuards(OptionalJwtAuthGuard)
   @Public()
   async getPostsForBlog(
+    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
     @Param('blogId', ObjectIdValidationPipe) blogId: string,
     @Query() query: GetPostsQueryParams,
   ): Promise<PaginatedViewDto<PostViewDto>> {
-    return this.queryBus.execute(new GetPostsForBlogQuery(query, blogId));
+    return this.queryBus.execute(new GetPostsForBlogQuery(query, user, blogId));
   }
 
   @Post()

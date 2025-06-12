@@ -10,11 +10,13 @@ import { BlogInputDto } from '../../src/modules/bloggers-platform/blogs/api/inpu
 import { BlogViewDto } from 'src/modules/bloggers-platform/blogs/api/view-dto/blog-view.dto';
 import { BlogsTestManager } from '../managers/blogs.test-manager';
 import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
+import { HttpStatus } from '@nestjs/common';
 
 describe('BlogsController - createBlog() (POST: /blogs)', () => {
   let appTestManager: AppTestManager;
   let blogsTestManager: BlogsTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
 
@@ -22,11 +24,15 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    blogsTestManager = new BlogsTestManager(server, adminCredentials);
+    blogsTestManager = new BlogsTestManager(server, adminCredentialsInBase64);
   });
 
   beforeEach(async () => {
@@ -42,36 +48,33 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
 
     const resCreateBlog: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/blogs`)
-      .send({
-        name: dto.name,
-        description: dto.description,
-        websiteUrl: dto.websiteUrl,
-      })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(201);
+      .send(dto)
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.CREATED);
 
-    const blog: BlogViewDto = resCreateBlog.body as BlogViewDto;
+    const bodyFromCreateResponse: BlogViewDto =
+      resCreateBlog.body as BlogViewDto;
 
-    expect(typeof blog.id).toBe('string');
-    expect(new Date(blog.createdAt).toString()).not.toBe('Invalid Date');
-    expect(blog.name).toBe(dto.name);
-    expect(blog.description).toBe(dto.description);
-    expect(blog.websiteUrl).toBe(dto.websiteUrl);
-    expect(typeof blog.isMembership).toBe('boolean');
+    expect(bodyFromCreateResponse).toEqual({
+      id: expect.any(String),
+      name: dto.name,
+      description: dto.description,
+      websiteUrl: dto.websiteUrl,
+      createdAt: expect.stringMatching(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+      ),
+      isMembership: false,
+    });
 
-    const foundBlog: BlogViewDto = await blogsTestManager.getById(blog.id);
+    const newlyCreatedBlog: BlogViewDto = await blogsTestManager.getById(
+      bodyFromCreateResponse.id,
+    );
 
-    expect(blog).toEqual(foundBlog);
+    expect(bodyFromCreateResponse).toEqual(newlyCreatedBlog);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E<BlogViewDto>(
-        blog,
+        bodyFromCreateResponse,
         resCreateBlog.statusCode,
         'Test №1: BlogsController - createBlog() (POST: /blogs)',
       );
@@ -88,19 +91,13 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
         description: dto.description,
         websiteUrl: dto.websiteUrl,
       })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          'incorrect_login',
-          'incorrect_password',
-        ),
-      )
-      .expect(401);
+      .set('Authorization', 'incorrect admin credentials')
+      .expect(HttpStatus.UNAUTHORIZED);
 
-    const foundBlogs: PaginatedViewDto<BlogViewDto> =
+    const blogs: PaginatedViewDto<BlogViewDto> =
       await blogsTestManager.getAll();
 
-    expect(foundBlogs.items).toHaveLength(0);
+    expect(blogs.items).toHaveLength(0);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -115,14 +112,8 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
     const resCreateBlog: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/blogs`)
       .send({})
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(400);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resCreateBlog.body).toEqual({
       errorsMessages: [
@@ -142,10 +133,10 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
       ],
     });
 
-    const foundBlogs: PaginatedViewDto<BlogViewDto> =
+    const blogs: PaginatedViewDto<BlogViewDto> =
       await blogsTestManager.getAll();
 
-    expect(foundBlogs.items).toHaveLength(0);
+    expect(blogs.items).toHaveLength(0);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -164,14 +155,8 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
         description: '   ',
         websiteUrl: '   ',
       })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(400);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resCreateBlog.body).toEqual({
       errorsMessages: [
@@ -193,10 +178,10 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
       ],
     });
 
-    const foundBlogs: PaginatedViewDto<BlogViewDto> =
+    const blogs: PaginatedViewDto<BlogViewDto> =
       await blogsTestManager.getAll();
 
-    expect(foundBlogs.items).toHaveLength(0);
+    expect(blogs.items).toHaveLength(0);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -219,14 +204,8 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
         description,
         websiteUrl,
       })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(400);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resCreateBlog.body).toEqual({
       errorsMessages: [
@@ -247,10 +226,10 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
       ],
     });
 
-    const foundBlogs: PaginatedViewDto<BlogViewDto> =
+    const blogs: PaginatedViewDto<BlogViewDto> =
       await blogsTestManager.getAll();
 
-    expect(foundBlogs.items).toHaveLength(0);
+    expect(blogs.items).toHaveLength(0);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -269,14 +248,8 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
         description: 123,
         websiteUrl: 123,
       })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(400);
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resCreateBlog.body).toEqual({
       errorsMessages: [
@@ -297,10 +270,10 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
       ],
     });
 
-    const foundBlogs: PaginatedViewDto<BlogViewDto> =
+    const blogs: PaginatedViewDto<BlogViewDto> =
       await blogsTestManager.getAll();
 
-    expect(foundBlogs.items).toHaveLength(0);
+    expect(blogs.items).toHaveLength(0);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
@@ -317,19 +290,9 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
 
     const resCreateBlog: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/blogs`)
-      .send({
-        name: dto.name,
-        description: dto.description,
-        websiteUrl: dto.websiteUrl,
-      })
-      .set(
-        'Authorization',
-        TestUtils.encodingAdminDataInBase64(
-          adminCredentials.login,
-          adminCredentials.password,
-        ),
-      )
-      .expect(400);
+      .send(dto)
+      .set('Authorization', adminCredentialsInBase64)
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resCreateBlog.body).toEqual({
       errorsMessages: [
@@ -342,10 +305,10 @@ describe('BlogsController - createBlog() (POST: /blogs)', () => {
       ],
     });
 
-    const foundBlogs: PaginatedViewDto<BlogViewDto> =
+    const blogs: PaginatedViewDto<BlogViewDto> =
       await blogsTestManager.getAll();
 
-    expect(foundBlogs.items).toHaveLength(0);
+    expect(blogs.items).toHaveLength(0);
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(

@@ -10,6 +10,7 @@ import {
 } from './email-confirmation.schema';
 import { CreateUserDomainDto } from './dto/create-user.domain.dto';
 import { HydratedDocument, Model } from 'mongoose';
+import { makeDeleted } from '../../../core/utils/entity.common-utils';
 
 export const loginConstraints = {
   minLength: 3,
@@ -145,11 +146,8 @@ export class User {
    *
    * @throws {Error} If the entity has already been soft-deleted.
    */
-  makeDeleted() {
-    if (this.deletedAt !== null) {
-      throw new Error('Entity already deleted');
-    }
-    this.deletedAt = new Date();
+  delete() {
+    makeDeleted.call(this);
   }
 
   /**

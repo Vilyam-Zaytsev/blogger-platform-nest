@@ -37,7 +37,7 @@ describe('Blog Entity - createInstance()', () => {
 
     blog.deletedAt = null;
 
-    blog.makeDeleted();
+    blog.delete();
 
     expect(blog.deletedAt).toBeInstanceOf(Date);
 
@@ -58,7 +58,7 @@ describe('Blog Entity - createInstance()', () => {
 
     blog.deletedAt = new Date();
 
-    expect(() => blog.makeDeleted()).toThrow('Entity already deleted');
+    expect(() => blog.delete()).toThrow('Entity already deleted');
 
     TestLoggers.logUnit<BlogDocument>(
       blog,

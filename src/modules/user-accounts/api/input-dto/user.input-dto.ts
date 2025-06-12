@@ -12,7 +12,6 @@ export class UserInputDto {
   @IsStringWithTrim(loginConstraints.minLength, loginConstraints.maxLength)
   login: string;
 
-  //TODO: в каком порядке выполняются декораторы?
   @IsString()
   @IsEmail()
   @Matches(emailConstraints.match)

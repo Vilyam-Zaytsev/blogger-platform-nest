@@ -83,7 +83,7 @@ describe('User Entity', () => {
 
     user.deletedAt = null;
 
-    user.makeDeleted();
+    user.delete();
 
     expect(user.deletedAt).toBeInstanceOf(Date);
 
@@ -106,7 +106,7 @@ describe('User Entity', () => {
 
     user.deletedAt = new Date();
 
-    expect(() => user.makeDeleted()).toThrow('Entity already deleted');
+    expect(() => user.delete()).toThrow('Entity already deleted');
 
     TestLoggers.logUnit<UserDocument>(
       user,

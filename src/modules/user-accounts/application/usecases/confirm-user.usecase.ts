@@ -24,8 +24,6 @@ export class ConfirmUserUseCase implements ICommandHandler<ConfirmUserCommand> {
       user.emailConfirmation.expirationDate < new Date() ||
       user.emailConfirmation.confirmationStatus === ConfirmationStatus.Confirmed
     ) {
-      //TODO: как лучше формировать extensions? Так как у меня или через new Extension(message, field)?
-
       throw new ValidationException([
         {
           message: `Confirmation code (${dto.code}) incorrect or the email address has already been confirmed`,

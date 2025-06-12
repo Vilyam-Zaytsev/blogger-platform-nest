@@ -13,12 +13,14 @@ import { UsersRepository } from '../../src/modules/user-accounts/infrastructure/
 import { UserDocument } from '../../src/modules/user-accounts/domain/user.entity';
 import { ConfirmationStatus } from '../../src/modules/user-accounts/domain/email-confirmation.schema';
 import { TestUtils } from '../helpers/test.utils';
+import { HttpStatus } from '@nestjs/common';
 
 describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let usersRepository: UsersRepository;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
   let sendEmailMock: jest.Mock;
@@ -27,11 +29,15 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    usersTestManager = new UsersTestManager(server, adminCredentials);
+    usersTestManager = new UsersTestManager(server, adminCredentialsInBase64);
     usersRepository = appTestManager.app.get(UsersRepository);
 
     sendEmailMock = jest
@@ -80,7 +86,7 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
       .send({
         code: user_notConfirmed.emailConfirmation.confirmationCode,
       })
-      .expect(204);
+      .expect(HttpStatus.NO_CONTENT);
 
     const user_confirmed: UserDocument | null =
       await usersRepository.getByEmail(dto.email);
@@ -127,7 +133,7 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
       .send({
         code,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistrationConfirmation.body).toEqual({
       errorsMessages: [
@@ -203,7 +209,7 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
       .send({
         code: user_notConfirmed.emailConfirmation.confirmationCode,
       })
-      .expect(204);
+      .expect(HttpStatus.NO_CONTENT);
 
     const user: UserDocument | null = await usersRepository.getByEmail(
       dto.email,
@@ -232,7 +238,7 @@ describe('AuthController - registrationConfirmation() (POST: /auth)', () => {
       .send({
         code: user_notConfirmed.emailConfirmation.confirmationCode,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(sendEmailMock).toHaveBeenCalled();
     expect(sendEmailMock).toHaveBeenCalledTimes(1);

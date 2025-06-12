@@ -14,7 +14,7 @@ export class DeletePostUseCase implements ICommandHandler<DeletePostCommand> {
     const post: PostDocument =
       await this.postsRepository.getByIdOrNotFoundFail(id);
 
-    post.makeDeleted();
+    post.delete();
 
     return this.postsRepository.save(post);
   }

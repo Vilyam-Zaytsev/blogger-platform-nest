@@ -1,7 +1,10 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Post, PostDocument, PostModelType } from '../domain/post.entity';
+import { DomainException } from '../../../../core/exceptions/damain-exceptions';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
+@Injectable()
 export class PostsRepository {
   constructor(@InjectModel(Post.name) private PostModel: PostModelType) {}
 
@@ -12,7 +15,10 @@ export class PostsRepository {
     });
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: `The post with ID (${id}) does not exist`,
+      });
     }
 
     return post;

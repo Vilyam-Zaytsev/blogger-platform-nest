@@ -32,3 +32,7 @@ export class ReactionsCount {
 
 export const ReactionsCountSchema =
   SchemaFactory.createForClass(ReactionsCount);
+
+export type HasReactions = {
+  reactionsCount: ReactionsCount;
+};

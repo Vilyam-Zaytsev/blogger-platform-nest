@@ -12,11 +12,13 @@ import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.v
 import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { EmailTemplate } from '../../src/modules/notifications/templates/types';
 import { TestUtils } from '../helpers/test.utils';
+import { HttpStatus } from '@nestjs/common';
 
 describe('AuthController - registration() (POST: /auth)', () => {
   let appTestManager: AppTestManager;
   let usersTestManager: UsersTestManager;
   let adminCredentials: AdminCredentials;
+  let adminCredentialsInBase64: string;
   let testLoggingEnabled: boolean;
   let server: Server;
   let sendEmailMock: jest.Mock;
@@ -25,11 +27,15 @@ describe('AuthController - registration() (POST: /auth)', () => {
     appTestManager = new AppTestManager();
     await appTestManager.init();
 
-    adminCredentials = appTestManager.getAdminData();
+    adminCredentials = appTestManager.getAdminCredentials();
+    adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
+      adminCredentials.login,
+      adminCredentials.password,
+    );
     server = appTestManager.getServer();
     testLoggingEnabled = appTestManager.coreConfig.testLoggingEnabled;
 
-    usersTestManager = new UsersTestManager(server, adminCredentials);
+    usersTestManager = new UsersTestManager(server, adminCredentialsInBase64);
 
     sendEmailMock = jest
       .spyOn(EmailService.prototype, 'sendEmail')
@@ -51,12 +57,8 @@ describe('AuthController - registration() (POST: /auth)', () => {
 
     const resRegistration: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/registration`)
-      .send({
-        login: dto.login,
-        email: dto.email,
-        password: dto.password,
-      })
-      .expect(204);
+      .send(dto)
+      .expect(HttpStatus.NO_CONTENT);
 
     const { items }: PaginatedViewDto<UserViewDto> =
       await usersTestManager.getAll();
@@ -98,7 +100,7 @@ describe('AuthController - registration() (POST: /auth)', () => {
         email: 'newUser@example.com',
         password: 'qwerty',
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistration.body).toEqual({
       errorsMessages: [
@@ -136,7 +138,7 @@ describe('AuthController - registration() (POST: /auth)', () => {
         email: user.email,
         password: 'qwerty',
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistration.body).toEqual({
       errorsMessages: [
@@ -168,7 +170,7 @@ describe('AuthController - registration() (POST: /auth)', () => {
     const resRegistration: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/registration`)
       .send({})
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistration.body).toEqual({
       errorsMessages: [
@@ -213,7 +215,7 @@ describe('AuthController - registration() (POST: /auth)', () => {
         email: '   ',
         password: '   ',
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistration.body).toEqual({
       errorsMessages: [
@@ -264,7 +266,7 @@ describe('AuthController - registration() (POST: /auth)', () => {
         email,
         password,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistration.body).toEqual({
       errorsMessages: [
@@ -312,7 +314,7 @@ describe('AuthController - registration() (POST: /auth)', () => {
         email,
         password,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistration.body).toEqual({
       errorsMessages: [
@@ -356,7 +358,7 @@ describe('AuthController - registration() (POST: /auth)', () => {
         email: 123,
         password: 123,
       })
-      .expect(400);
+      .expect(HttpStatus.BAD_REQUEST);
 
     expect(resRegistration.body).toEqual({
       errorsMessages: [
