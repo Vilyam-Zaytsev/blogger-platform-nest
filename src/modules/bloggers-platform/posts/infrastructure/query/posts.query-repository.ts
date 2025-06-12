@@ -58,10 +58,15 @@ export class PostsQueryRepository {
   async getAll(
     query: GetPostsQueryParams,
     user: UserContextDto | null,
+    blogId?: string,
   ): Promise<PaginatedViewDto<PostViewDto>> {
     const filter: FilterQuery<Post> = {
       deletedAt: null,
     };
+
+    if (blogId) {
+      filter['blogId'] = blogId;
+    }
 
     const posts: PostDocument[] = await this.PostModel.find(filter)
       .sort({ [query.sortBy]: query.sortDirection })
@@ -109,40 +114,6 @@ export class PostsQueryRepository {
     );
 
     const totalCount: number = await this.PostModel.countDocuments(filter);
-
-    return PaginatedViewDto.mapToView<PostViewDto>({
-      items,
-      totalCount,
-      page: query.pageNumber,
-      size: query.pageSize,
-    });
-  }
-
-  async getPostsByBlogId(
-    query: GetPostsQueryParams,
-    blogId: string,
-  ): Promise<PaginatedViewDto<PostViewDto>> {
-    await this.blogsRepository.getByIdOrNotFoundFail(blogId);
-
-    const filter: FilterQuery<Post> = {
-      blogId,
-      deletedAt: null,
-    };
-
-    const posts: PostDocument[] = await this.PostModel.find(filter)
-      .sort({ [query.sortBy]: query.sortDirection })
-      .skip(query.calculateSkip())
-      .limit(query.pageSize);
-
-    const totalCount: number = await this.PostModel.countDocuments(filter);
-
-    //TODO:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    const ЗАГЛУШКА = ReactionStatus.None;
-
-    const items: PostViewDto[] = posts.map(
-      (post: PostDocument): PostViewDto =>
-        PostViewDto.mapToView(post, ЗАГЛУШКА),
-    );
 
     return PaginatedViewDto.mapToView<PostViewDto>({
       items,
