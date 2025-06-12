@@ -10,8 +10,6 @@ export class RegisterUserCommand {
   constructor(public dto: CreateUserDto) {}
 }
 
-//TODO: как правильно писать integration тесты для подобных use cases?
-
 @CommandHandler(RegisterUserCommand)
 export class RegisterUserUseCase
   implements ICommandHandler<RegisterUserCommand>
