@@ -1,11 +1,35 @@
 import { HasReactions } from '../../modules/bloggers-platform/posts/domain/reactions-count.schema';
 import {
+  ReactionDocument,
   ReactionStatus,
   ReactionStatusDelta,
 } from '../../modules/bloggers-platform/likes/domain/reaction.entity';
 import { DomainException } from '../exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../exceptions/domain-exception-codes';
 import { NewestLike } from '../../modules/bloggers-platform/posts/domain/newest-like.schema';
+import { UserDocument } from '../../modules/user-accounts/domain/user.entity';
+
+/**
+ * Marks an entity as deleted by setting its `deletedAt` timestamp.
+ *
+ * Throws a `DomainException` if the entity is already marked as deleted.
+ * This function is intended for use with entities that have a nullable `deletedAt` property.
+ *
+ * @this {{ deletedAt: Date | null }} - The context object must have a `deletedAt` property.
+ *
+ * @throws {DomainException} Throws an exception with code `BadRequest` and message 'Entity already deleted'
+ * if the entity was already marked as deleted.
+ */
+export function makeDeleted(this: { deletedAt: Date | null }) {
+  if (this.deletedAt !== null) {
+    throw new DomainException({
+      code: DomainExceptionCode.BadRequest,
+      message: 'Entity already deleted',
+    });
+  }
+
+  this.deletedAt = new Date();
+}
 
 /**
  * Adjusts the reactions count of an entity based on the change in user reaction.
@@ -42,47 +66,36 @@ export function recalculateReactionsCount(
 }
 
 /**
- * Marks an entity as deleted by setting its `deletedAt` timestamp.
+ * Maps an array of reaction documents to an array of `NewestLike` objects
+ * by associating each reaction with its corresponding user's login information.
  *
- * Throws a `DomainException` if the entity is already marked as deleted.
- * This function is intended for use with entities that have a nullable `deletedAt` property.
+ * This function is typically used to build a simplified list of the most recent likes
+ * to be shown in a UI, such as the 3 latest users who liked a post.
  *
- * @this {{ deletedAt: Date | null }} - The context object must have a `deletedAt` property.
+ * Each `ReactionDocument` is matched to a `UserDocument` by `userId`. If a user is found,
+ * a `NewestLike` object is created and added to the result. Reactions without a matching user
+ * are silently ignored.
  *
- * @throws {DomainException} Throws an exception with code `BadRequest` and message 'Entity already deleted'
- * if the entity was already marked as deleted.
+ * @param {ReactionDocument[]} reactions - The list of reactions to process.
+ * @param {UserDocument[]} users - A list of users, used to look up login information by userId.
+ *
+ * @returns {NewestLike[]} An array of `NewestLike` objects containing the user's ID, login, and the timestamp of the like.
  */
-export function makeDeleted(this: { deletedAt: Date | null }) {
-  if (this.deletedAt !== null) {
-    throw new DomainException({
-      code: DomainExceptionCode.BadRequest,
-      message: 'Entity already deleted',
-    });
-  }
+export function mapReactionsToNewestLikes(
+  reactions: ReactionDocument[],
+  users: UserDocument[],
+): NewestLike[] {
+  return reactions.reduce((acc: NewestLike[], like: ReactionDocument) => {
+    const user = users.find((user) => user.id === like.userId);
 
-  this.deletedAt = new Date();
-}
+    if (user) {
+      acc.push({
+        addedAt: like.createdAt,
+        userId: like.userId,
+        login: user.login,
+      });
+    }
 
-/**
- * Appends a new like reaction to the beginning of the `newestLikes` list,
- * maintaining a maximum of 3 recent entries.
- *
- * This function ensures that the most recent like appears first in the list.
- * If the list already contains 3 elements, it removes the oldest (last) one
- * before inserting the new like at the beginning.
- *
- * @param {NewestLike} newestLike - The newest like to be added to the list.
- */
-export function appendLatestReaction(
-  this: { newestLikes: NewestLike[] },
-  newestLike: NewestLike,
-) {
-  if (this.newestLikes.length < 3) {
-    this.newestLikes.unshift(newestLike);
-
-    return;
-  }
-
-  this.newestLikes.pop();
-  this.newestLikes.unshift(newestLike);
+    return acc;
+  }, []);
 }

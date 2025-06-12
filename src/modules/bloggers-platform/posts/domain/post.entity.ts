@@ -5,8 +5,8 @@ import { HydratedDocument, Model } from 'mongoose';
 import { CreatePostDomainDto } from './dto/create-post.domain.dto';
 import { UpdatePostDto } from '../dto/post.dto';
 import {
-  appendLatestReaction,
   makeDeleted,
+  mapReactionsToNewestLikes,
   recalculateReactionsCount,
 } from '../../../../core/utils/entity.common-utils';
 import {
@@ -205,50 +205,25 @@ export class Post {
   }
 
   /**
-   * Updates the list of the three most recent likes for an entity.
+   * Updates the list of newest likes for the current entity using the provided reactions and users.
    *
-   * This method maintains a list of the latest three likes (in `this.newestLikes`),
-   * ensuring that it reflects the most recent user interactions. It prepends the new like to the beginning of the array.
+   * This method transforms the given array of `ReactionDocument` (typically the latest 3 like reactions)
+   * into a list of `NewestLike` objects enriched with user login information, and assigns it
+   * to the `newestLikes` property.
    *
-   * If there are already three entries in the list, it removes the oldest one (at the end),
-   * then adds the new one to the beginning, keeping the array size at a maximum of three.
+   * It assumes that the user information is already loaded and available in the `users` array.
+   * If a matching user is not found for a reaction, the method will throw an error due to the use of non-null assertion.
    *
-   * ⚠️ Note: The current implementation adds the new like twice if `this.newestLikes.length < 3`,
-   * which might lead to incorrect state (duplicate entries). Consider fixing the logic if deduplication or strict count is required.
-   *
-   * @param {NewestLike} newestLike - The new like object to add to the recent likes list.
+   * @param {ReactionDocument[]} lastThreeLikes - The most recent like reactions to be displayed.
+   * @param {UserDocument[]} users - A list of users associated with the given reactions, used to extract login info.
    */
   updateNewestLikes(lastThreeLikes: ReactionDocument[], users: UserDocument[]) {
-    const newestLikes: NewestLike[] = lastThreeLikes.reduce(
-      (acc: NewestLike[], like: ReactionDocument): NewestLike[] => {
-        const user: UserDocument | undefined = users.find(
-          (user: UserDocument): boolean => user.id === like.userId,
-        );
-
-        const newestLike: NewestLike = {
-          addedAt: like.createdAt,
-          userId: like.userId,
-          login: user!.login,
-        };
-
-        acc.push(newestLike);
-
-        return acc;
-      },
-      [] as NewestLike[],
+    const newestLikes: NewestLike[] = mapReactionsToNewestLikes(
+      lastThreeLikes,
+      users,
     );
 
     this.newestLikes = [...newestLikes];
-  }
-
-  // updateNewestLikes(newestLike: NewestLike) {
-  //   appendLatestReaction.call(this, newestLike);
-  // }
-
-  removeFromNewestLikes(userId: string) {
-    this.newestLikes = this.newestLikes.filter(
-      (like) => like.userId !== userId,
-    );
   }
 }
 

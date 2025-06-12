@@ -17,7 +17,6 @@ import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { Filter } from '../helpers/filter';
 import { GetPostsQueryParams } from '../../src/modules/bloggers-platform/posts/api/input-dto/get-posts-query-params.input-dto';
 import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
-import { GetBlogsQueryParams } from '../../src/modules/bloggers-platform/blogs/api/input-dto/get-blogs-query-params.input-dto';
 
 describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)', () => {
   let appTestManager: AppTestManager;

@@ -56,23 +56,7 @@ export type ReactionDocument = HydratedDocument<Reaction>;
 
 export type ReactionModelType = Model<ReactionDocument> & typeof Reaction;
 
-//TODO: нормально ли тут хранить ReactionDelta и ReactionStatusDelta?
-export type ReactionDelta = {
-  currentReaction: ReactionDocument;
-  previousReaction: ReactionDocument | null;
-};
-
 export type ReactionStatusDelta = {
   currentStatus: ReactionStatus;
   previousStatus: ReactionStatus;
 };
-
-// export type ReactionDelta = {
-//   currentReaction: ReactionDocument;
-//   previousReaction: ReactionDocument | null;
-// };
-//
-// export type ReactionStatusDelta = {
-//   currentStatus: ReactionStatus;
-//   previousStatus: ReactionStatus | null;
-// };
