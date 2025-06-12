@@ -17,6 +17,7 @@ import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import { Filter } from '../helpers/filter';
 import { GetPostsQueryParams } from '../../src/modules/bloggers-platform/posts/api/input-dto/get-posts-query-params.input-dto';
 import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
+import { ObjectId } from 'mongodb';
 
 describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)', () => {
   let appTestManager: AppTestManager;
@@ -1060,7 +1061,156 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       TestLoggers.logE2E(
         {},
         HttpStatus.NO_CONTENT,
-        'Test №8: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №9: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+      );
+    }
+  });
+
+  it('should return a 401 if the user is not logged in.', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
+      1,
+      createdBlog.id,
+    );
+
+    const resUpdateReaction: Response = await request(server)
+      .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
+      .set('Authorization', `Bearer incorrect token`)
+      .send({ likeStatus: ReactionStatus.Like })
+      .expect(HttpStatus.UNAUTHORIZED);
+
+    const foundPost: PostViewDto = await postsTestManager.getById(
+      createdPost.id,
+    );
+
+    expect(foundPost.extendedLikesInfo).toEqual({
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: ReactionStatus.None,
+      newestLikes: [],
+    });
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resUpdateReaction.body,
+        resUpdateReaction.statusCode,
+        'Test №10: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+      );
+    }
+  });
+
+  it('should return the value 404 if the post the user is trying to review does not exist.', async () => {
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+    const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
+      createdUser.login,
+    ]);
+    const incorrectId: string = new ObjectId().toString();
+
+    const resUpdateReaction: Response = await request(server)
+      .put(`/${GLOBAL_PREFIX}/posts/${incorrectId}/like-status`)
+      .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
+      .send({ likeStatus: ReactionStatus.Like })
+      .expect(HttpStatus.NOT_FOUND);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resUpdateReaction.body,
+        resUpdateReaction.statusCode,
+        'Test №11: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+      );
+    }
+  });
+
+  it('should return 400 if the input data is not valid (an empty object is passed).', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
+      1,
+      createdBlog.id,
+    );
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+    const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
+      createdUser.login,
+    ]);
+
+    const resUpdateReaction: Response = await request(server)
+      .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
+      .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
+      .send({})
+      .expect(HttpStatus.BAD_REQUEST);
+
+    expect(resUpdateReaction.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'likeStatus',
+          message:
+            'likeStatus must be one of the following values: None, Like, Dislike; Received value: undefined',
+        },
+      ],
+    });
+
+    const foundPost: PostViewDto = await postsTestManager.getById(
+      createdPost.id,
+    );
+
+    expect(foundPost.extendedLikesInfo).toEqual({
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: ReactionStatus.None,
+      newestLikes: [],
+    });
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resUpdateReaction.body,
+        resUpdateReaction.statusCode,
+        'Test №12: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+      );
+    }
+  });
+
+  it('should return 400 if the input data is not valid (likeStatus differs from other values).', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
+      1,
+      createdBlog.id,
+    );
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+    const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
+      createdUser.login,
+    ]);
+
+    const resUpdateReaction: Response = await request(server)
+      .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
+      .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
+      .send({ likeStatus: 'Likes' })
+      .expect(HttpStatus.BAD_REQUEST);
+
+    expect(resUpdateReaction.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'likeStatus',
+          message:
+            'likeStatus must be one of the following values: None, Like, Dislike; Received value: Likes',
+        },
+      ],
+    });
+
+    const foundPost: PostViewDto = await postsTestManager.getById(
+      createdPost.id,
+    );
+
+    expect(foundPost.extendedLikesInfo).toEqual({
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: ReactionStatus.None,
+      newestLikes: [],
+    });
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resUpdateReaction.body,
+        resUpdateReaction.statusCode,
+        'Test №13: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       );
     }
   });
