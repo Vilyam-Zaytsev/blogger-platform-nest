@@ -1,6 +1,6 @@
 import { PostDocument } from '../../domain/post.entity';
 import { NewestLike } from '../../domain/newest-like.schema';
-import { ReactionStatus } from '../../../likes/domain/reaction.entity';
+import { ReactionStatus } from '../../../reactions/domain/reaction.entity';
 
 export class PostViewDto {
   id: string;

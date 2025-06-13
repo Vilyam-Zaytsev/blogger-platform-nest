@@ -10,8 +10,8 @@ import { UserContextDto } from '../../../../user-accounts/guards/dto/user-contex
 import {
   ReactionDocument,
   ReactionStatus,
-} from '../../../likes/domain/reaction.entity';
-import { ReactionsRepository } from '../../../likes/infrastructure/reactions-repository';
+} from '../../../reactions/domain/reaction.entity';
+import { ReactionsRepository } from '../../../reactions/infrastructure/reactions-repository';
 import { DomainException } from '../../../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 

@@ -3,7 +3,7 @@ import {
   ReactionDocument,
   ReactionStatus,
   ReactionStatusDelta,
-} from '../../modules/bloggers-platform/likes/domain/reaction.entity';
+} from '../../modules/bloggers-platform/reactions/domain/reaction.entity';
 import { DomainException } from '../exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../exceptions/domain-exception-codes';
 import { NewestLike } from '../../modules/bloggers-platform/posts/domain/newest-like.schema';

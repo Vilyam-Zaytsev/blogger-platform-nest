@@ -6,7 +6,7 @@ import { GetPostsQueryParams } from '../../src/modules/bloggers-platform/posts/a
 import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
 import { TestDtoFactory } from '../helpers/test.dto-factory';
 import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
-import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/reactions/domain/reaction.entity';
 import { HttpStatus } from '@nestjs/common';
 import { response } from 'express';
 

@@ -9,7 +9,7 @@ import { BlogViewDto } from 'src/modules/bloggers-platform/blogs/api/view-dto/bl
 import { BlogsTestManager } from '../managers/blogs.test-manager';
 import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
 import { PostsTestManager } from '../managers/posts.test-manager';
-import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/reactions/domain/reaction.entity';
 import { UsersTestManager } from '../managers/users.test-manager';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import { HttpStatus } from '@nestjs/common';

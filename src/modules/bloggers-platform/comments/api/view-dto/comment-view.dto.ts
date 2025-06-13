@@ -1,4 +1,4 @@
-import { ReactionStatus } from '../../../likes/domain/reaction.entity';
+import { ReactionStatus } from '../../../reactions/domain/reaction.entity';
 
 export type CommentatorInfo = {
   userId: string;

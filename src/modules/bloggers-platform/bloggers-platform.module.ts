@@ -20,11 +20,11 @@ import { GetBlogsQueryHandler } from './blogs/application/queries/get-blogs.quer
 import { GetPostsQueryHandler } from './posts/application/queries/get-posts.query-handler';
 import { GetPostQueryHandler } from './posts/application/queries/get-post.query-handler';
 import { UserAccountsModule } from '../user-accounts/user-accounts.module';
-import { ReactionsRepository } from './likes/infrastructure/reactions-repository';
-import { Reaction, ReactionSchema } from './likes/domain/reaction.entity';
+import { ReactionsRepository } from './reactions/infrastructure/reactions-repository';
+import { Reaction, ReactionSchema } from './reactions/domain/reaction.entity';
 import { UpdatePostReactionUseCase } from './posts/application/usecases/update-post-reaction.usecase';
-import { UpdateReactionUseCase } from './likes/application/usecases/update-reactions.usecase';
-import { CreateReactionUseCase } from './likes/application/usecases/create-reaction-use.case';
+import { UpdateReactionUseCase } from './reactions/application/usecases/update-reactions.usecase';
+import { CreateReactionUseCase } from './reactions/application/usecases/create-reaction-use.case';
 
 @Module({
   imports: [
