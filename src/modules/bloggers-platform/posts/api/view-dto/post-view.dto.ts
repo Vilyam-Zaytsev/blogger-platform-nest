@@ -9,7 +9,7 @@ export class PostViewDto {
   content: string;
   blogId: string;
   blogName: string;
-  extendedLikesInfo: ExtendedLikesInfo;
+  extendedLikesInfo: ExtendedReactionsInfo;
   createdAt: string;
 
   static mapToView(post: PostDocument, myStatus: ReactionStatus): PostViewDto {
@@ -33,7 +33,7 @@ export class PostViewDto {
   }
 }
 
-export type ExtendedLikesInfo = {
+export type ExtendedReactionsInfo = {
   likesCount: number;
   dislikesCount: number;
   myStatus: ReactionStatus;
