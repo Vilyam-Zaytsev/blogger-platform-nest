@@ -56,15 +56,6 @@ export class Comment {
   reactionsCount: ReactionsCount;
 
   /**
-   * An array of the most recent likes (up to 3).
-   *
-   * Stores minimal information (userId, login, timestamp) for each like,
-   * typically for UI display of recent activity.
-   */
-  @Prop({ type: [NewestLikeSchema], default: [] })
-  newestLikes: NewestLike[];
-
-  /**
    * The timestamp when the comment was created.
    *
    * Automatically managed by Mongoose via the `timestamps` option.
