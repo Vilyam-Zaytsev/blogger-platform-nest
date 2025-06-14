@@ -9,10 +9,6 @@ import {
 } from '../../posts/domain/reactions-count.schema';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateCommentDomainDto } from './dto/create-comment.domain.dto';
-import {
-  NewestLike,
-  NewestLikeSchema,
-} from '../../posts/domain/newest-like.schema';
 
 /**
  * Represents a comment left by a user on a specific post.
@@ -95,7 +91,6 @@ export class Comment {
       userLogin: commentatorLogin,
     };
     comment.reactionsCount = new ReactionsCount();
-    comment.newestLikes = [];
 
     return comment as CommentDocument;
   }

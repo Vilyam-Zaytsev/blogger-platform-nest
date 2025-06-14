@@ -33,11 +33,17 @@ import { UpdateReactionDto } from '../../reactions/dto/reaction.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
 import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
 import { ExtractUserIfExistsFromRequest } from '../../../user-accounts/guards/decorators/extract-user-if-exists-from-request.decorator';
+import { CommentInputDto } from '../../comments/api/input-dto/comment-input.dto';
+import { CommentViewDto } from '../../comments/api/view-dto/comment-view.dto';
+import { CreateCommentCommand } from '../../comments/application/usecases/create-comment.usecase';
+import { CreateCommentDto } from '../../comments/dto/comment.dto';
+import { CommentsQueryRepository } from '../../comments/infrastructure/query/comments.query-repository';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsQueryRepository: PostsQueryRepository,
+    private readonly commentsQueryRepository: CommentsQueryRepository,
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
@@ -67,6 +73,26 @@ export class PostsController {
     );
 
     return this.postsQueryRepository.getByIdOrNotFoundFail(postId);
+  }
+
+  @Post(':postId/comments')
+  @UseGuards(JwtAuthGuard)
+  async createComment(
+    @ExtractUserFromRequest() user: UserContextDto,
+    @Param('postId', ObjectIdValidationPipe) postId: string,
+    @Body() body: CommentInputDto,
+  ): Promise<CommentViewDto> {
+    const createCommentDto: CreateCommentDto = {
+      postId,
+      userId: user.id,
+      content: body.content,
+    };
+
+    const commentId: string = await this.commandBus.execute(
+      new CreateCommentCommand(createCommentDto),
+    );
+
+    return this.commentsQueryRepository.getByIdOrNotFoundFail(commentId);
   }
 
   @Put(':id')

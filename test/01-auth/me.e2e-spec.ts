@@ -86,7 +86,7 @@ describe('AuthController - me() (POST: /auth)', () => {
     }
   });
 
-  it('should return a 401 error if the user is logged in (sending an invalid access token)', async () => {
+  it('should return a 401 error if the user is not logged in (sending an invalid access token)', async () => {
     const [user]: UserViewDto[] = await usersTestManager.createUser(1);
 
     const [resultLogin]: TestResultLogin[] = await usersTestManager.login([

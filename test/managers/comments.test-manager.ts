@@ -1,25 +1,20 @@
-import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 import request, { Response } from 'supertest';
 import { Server } from 'http';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
-import { GetPostsQueryParams } from '../../src/modules/bloggers-platform/posts/api/input-dto/get-posts-query-params.input-dto';
-import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
 import { TestDtoFactory } from '../helpers/test.dto-factory';
-import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
 import { ReactionStatus } from '../../src/modules/bloggers-platform/reactions/domain/reaction.entity';
 import { HttpStatus } from '@nestjs/common';
-import { response } from 'express';
 import { CommentViewDto } from '../../src/modules/bloggers-platform/comments/api/view-dto/comment-view.dto';
 import { CommentInputDto } from '../../src/modules/bloggers-platform/comments/api/input-dto/comment-input.dto';
+import { GetPostsQueryParams } from '../../src/modules/bloggers-platform/posts/api/input-dto/get-posts-query-params.input-dto';
+import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
 
 export class CommentsTestManager {
-  constructor(
-    private readonly server: Server,
-    private readonly adminCredentialsInBase64: string,
-  ) {}
+  constructor(private readonly server: Server) {}
 
   async createComment(
     quantity: number,
+    postId: string,
     accessToken: string,
   ): Promise<CommentViewDto[]> {
     const newComments: CommentViewDto[] = [];
@@ -30,7 +25,7 @@ export class CommentsTestManager {
       const dto: CommentInputDto = dtos[i];
 
       const response: Response = await request(this.server)
-        .post(`/${GLOBAL_PREFIX}/comments`)
+        .post(`/${GLOBAL_PREFIX}/posts/${postId}/comments`)
         .send(dto)
         .set('Authorization', `Bearer ${accessToken}`)
         .expect(HttpStatus.CREATED);
@@ -46,7 +41,6 @@ export class CommentsTestManager {
       expect(newComment.likesInfo.likesCount).toBe(0);
       expect(newComment.likesInfo.dislikesCount).toBe(0);
       expect(newComment.likesInfo.myStatus).toBe(ReactionStatus.None);
-      expect(Array.isArray(newComment.likesInfo.newestLikes)).toBe(true);
 
       newComments.push(newComment);
     }
@@ -54,30 +48,33 @@ export class CommentsTestManager {
     return newComments;
   }
 
-  // async getAll(
-  //   query: Partial<GetPostsQueryParams> = {},
-  //   accessToken?: string,
-  // ): Promise<PaginatedViewDto<PostViewDto>> {
-  //   let req = request(this.server).get(`/${GLOBAL_PREFIX}/posts`).query(query);
-  //
-  //   if (accessToken) {
-  //     req = req.set('Authorization', `Bearer ${accessToken}`);
-  //   }
-  //
-  //   const res: Response = await req.expect(HttpStatus.OK);
-  //
-  //   return res.body as PaginatedViewDto<PostViewDto>;
-  // }
-  //
-  // async getById(id: string, accessToken?: string): Promise<PostViewDto> {
-  //   let req = request(this.server).get(`/${GLOBAL_PREFIX}/posts/${id}`);
-  //
-  //   if (accessToken) {
-  //     req = req.set('Authorization', `Bearer ${accessToken}`);
-  //   }
-  //
-  //   const res: Response = await req.expect(HttpStatus.OK);
-  //
-  //   return res.body as PostViewDto;
-  // }
+  async getAll(
+    query: Partial<GetPostsQueryParams> = {},
+    postId: string,
+    accessToken?: string,
+  ): Promise<PaginatedViewDto<CommentViewDto>> {
+    let req = request(this.server)
+      .get(`/${GLOBAL_PREFIX}/posts/${postId}/comments`)
+      .query(query);
+
+    if (accessToken) {
+      req = req.set('Authorization', `Bearer ${accessToken}`);
+    }
+
+    const res: Response = await req.expect(HttpStatus.OK);
+
+    return res.body as PaginatedViewDto<CommentViewDto>;
+  }
+
+  async getById(id: string, accessToken?: string): Promise<CommentViewDto> {
+    let req = request(this.server).get(`/${GLOBAL_PREFIX}/comments/${id}`);
+
+    if (accessToken) {
+      req = req.set('Authorization', `Bearer ${accessToken}`);
+    }
+
+    const res: Response = await req.expect(HttpStatus.OK);
+
+    return res.body as CommentViewDto;
+  }
 }

@@ -25,17 +25,24 @@ import { Reaction, ReactionSchema } from './reactions/domain/reaction.entity';
 import { UpdatePostReactionUseCase } from './posts/application/usecases/update-post-reaction.usecase';
 import { UpdateReactionUseCase } from './reactions/application/usecases/update-reactions.usecase';
 import { CreateReactionUseCase } from './reactions/application/usecases/create-reaction-use.case';
+import { CommentsQueryRepository } from './comments/infrastructure/query/comments.query-repository';
+import { Comment, CommentSchema } from './comments/domain/comment.entity';
+import { CreateCommentUseCase } from './comments/application/usecases/create-comment.usecase';
+import { CommentsRepository } from './comments/infrastructure/comments-repository';
+import { GetCommentQueryHandler } from './comments/application/queries/get-comment.query-handler';
+import { CommentsController } from './comments/api/comments.controller';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
+    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
     MongooseModule.forFeature([
       { name: Reaction.name, schema: ReactionSchema },
     ]),
     UserAccountsModule,
   ],
-  controllers: [BlogsController, PostsController],
+  controllers: [BlogsController, PostsController, CommentsController],
   providers: [
     //---blogs---//
     //repo
@@ -56,13 +63,19 @@ import { CreateReactionUseCase } from './reactions/application/usecases/create-r
     PostsQueryRepository,
     //use-cases
     CreatePostUseCase,
+    CreateCommentUseCase,
     UpdatePostUseCase,
     DeletePostUseCase,
     UpdatePostReactionUseCase,
-
     //query-handlers
     GetPostsQueryHandler,
     GetPostQueryHandler,
+    //---comments---//
+    //repo
+    CommentsRepository,
+    CommentsQueryRepository,
+    //query-handlers
+    GetCommentQueryHandler,
     //---likes---//
     //use-cases
     UpdateReactionUseCase,
