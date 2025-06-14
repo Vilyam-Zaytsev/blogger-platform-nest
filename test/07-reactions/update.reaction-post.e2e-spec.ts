@@ -9,7 +9,7 @@ import { BlogViewDto } from 'src/modules/bloggers-platform/blogs/api/view-dto/bl
 import { BlogsTestManager } from '../managers/blogs.test-manager';
 import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-dto/post-view.dto';
 import { PostsTestManager } from '../managers/posts.test-manager';
-import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/reactions/domain/reaction.entity';
 import { UsersTestManager } from '../managers/users.test-manager';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import { HttpStatus } from '@nestjs/common';
@@ -18,6 +18,9 @@ import { Filter } from '../helpers/filter';
 import { GetPostsQueryParams } from '../../src/modules/bloggers-platform/posts/api/input-dto/get-posts-query-params.input-dto';
 import { SortDirection } from '../../src/core/dto/base.query-params.input-dto';
 import { ObjectId } from 'mongodb';
+import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from '../../src/modules/user-accounts/constans/auth-tokens.inject-constants';
+import { UserAccountsConfig } from '../../src/modules/user-accounts/config/user-accounts.config';
+import { JwtService } from '@nestjs/jwt';
 
 describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)', () => {
   let appTestManager: AppTestManager;
@@ -31,7 +34,19 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
 
   beforeAll(async () => {
     appTestManager = new AppTestManager();
-    await appTestManager.init();
+    await appTestManager.init((moduleBuilder) =>
+      moduleBuilder
+        .overrideProvider(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
+        .useFactory({
+          factory: (userAccountsConfig: UserAccountsConfig) => {
+            return new JwtService({
+              secret: userAccountsConfig.accessTokenSecret,
+              signOptions: { expiresIn: '3s' },
+            });
+          },
+          inject: [UserAccountsConfig],
+        }),
+    );
 
     adminCredentials = appTestManager.getAdminCredentials();
     adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
@@ -1211,6 +1226,45 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
         resUpdateReaction.body,
         resUpdateReaction.statusCode,
         'Test №13: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+      );
+    }
+  });
+
+  it('should return a 401 error if the user is not logged in (sending an invalid access token)', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
+      1,
+      createdBlog.id,
+    );
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+    const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
+      createdUser.login,
+    ]);
+
+    await TestUtils.delay(3000);
+
+    const resUpdateReaction: Response = await request(server)
+      .put(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/like-status`)
+      .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
+      .send({ likeStatus: ReactionStatus.Like })
+      .expect(HttpStatus.UNAUTHORIZED);
+
+    const foundPost_1: PostViewDto = await postsTestManager.getById(
+      createdPost.id,
+    );
+
+    expect(foundPost_1.extendedLikesInfo).toEqual({
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: ReactionStatus.None,
+      newestLikes: [],
+    });
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resUpdateReaction.body,
+        resUpdateReaction.statusCode,
+        'Test №14: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
       );
     }
   });

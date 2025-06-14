@@ -12,7 +12,7 @@ import {
 import {
   ReactionDocument,
   ReactionStatusDelta,
-} from '../../likes/domain/reaction.entity';
+} from '../../reactions/domain/reaction.entity';
 import { UserDocument } from '../../../user-accounts/domain/user.entity';
 
 export const titleConstraints = {

@@ -14,7 +14,7 @@ import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/inpu
 import { HttpStatus } from '@nestjs/common';
 import { PostsTestManager } from '../managers/posts.test-manager';
 import { ObjectId } from 'mongodb';
-import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/reactions/domain/reaction.entity';
 
 describe('BlogsController - createPostForBlog() (POST: /blogs/{blogId}/posts)', () => {
   let appTestManager: AppTestManager;
