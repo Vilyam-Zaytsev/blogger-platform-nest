@@ -38,6 +38,8 @@ import { CommentViewDto } from '../../comments/api/view-dto/comment-view.dto';
 import { CreateCommentCommand } from '../../comments/application/usecases/create-comment.usecase';
 import { CreateCommentDto } from '../../comments/dto/comment.dto';
 import { CommentsQueryRepository } from '../../comments/infrastructure/query/comments.query-repository';
+import { GetCommentsQueryParams } from '../../comments/api/input-dto/get-comments-query-params.input-dto';
+import { GetCommentsQuery } from '../../comments/application/queries/get-comments.query-handler';
 
 @Controller('posts')
 export class PostsController {
@@ -47,6 +49,7 @@ export class PostsController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
+
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
   async getAll(
@@ -63,6 +66,16 @@ export class PostsController {
     @Param() params: IdInputDto,
   ): Promise<PostViewDto> {
     return this.queryBus.execute(new GetPostQuery(params.id, user));
+  }
+
+  @Get(':postId/comments')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getComments(
+    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
+    @Param('postId', ObjectIdValidationPipe) postId: string,
+    @Query() query: GetCommentsQueryParams,
+  ): Promise<PaginatedViewDto<CommentViewDto>> {
+    return this.queryBus.execute(new GetCommentsQuery(query, user, postId));
   }
 
   @Post()

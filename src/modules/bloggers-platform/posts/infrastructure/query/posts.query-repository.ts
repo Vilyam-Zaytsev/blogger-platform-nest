@@ -5,7 +5,6 @@ import { PostViewDto } from '../../api/view-dto/post-view.dto';
 import { PaginatedViewDto } from '../../../../../core/dto/paginated.view-dto';
 import { FilterQuery } from 'mongoose';
 import { GetPostsQueryParams } from '../../api/input-dto/get-posts-query-params.input-dto';
-import { BlogsRepository } from '../../../blogs/infrastructure/blogs.repository';
 import { UserContextDto } from '../../../../user-accounts/guards/dto/user-context.dto';
 import {
   ReactionDocument,
@@ -20,7 +19,6 @@ export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name)
     private readonly PostModel: PostModelType,
-    private readonly blogsRepository: BlogsRepository,
     private readonly reactionsRepository: ReactionsRepository,
   ) {}
 

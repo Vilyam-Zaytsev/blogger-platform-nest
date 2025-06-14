@@ -31,6 +31,7 @@ import { CreateCommentUseCase } from './comments/application/usecases/create-com
 import { CommentsRepository } from './comments/infrastructure/comments-repository';
 import { GetCommentQueryHandler } from './comments/application/queries/get-comment.query-handler';
 import { CommentsController } from './comments/api/comments.controller';
+import { GetCommentsQueryHandler } from './comments/application/queries/get-comments.query-handler';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { CommentsController } from './comments/api/comments.controller';
     CommentsQueryRepository,
     //query-handlers
     GetCommentQueryHandler,
+    GetCommentsQueryHandler,
     //---likes---//
     //use-cases
     UpdateReactionUseCase,

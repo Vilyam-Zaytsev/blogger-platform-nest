@@ -14,6 +14,9 @@ import {
 import { DomainException } from '../../../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 import { ReactionsRepository } from '../../../reactions/infrastructure/reactions-repository';
+import { PaginatedViewDto } from '../../../../../core/dto/paginated.view-dto';
+import { FilterQuery } from 'mongoose';
+import { GetCommentsQueryParams } from '../../api/input-dto/get-comments-query-params.input-dto';
 
 @Injectable()
 export class CommentsQueryRepository {
@@ -53,42 +56,70 @@ export class CommentsQueryRepository {
     return CommentViewDto.mapToView(comment, userReactionStatus);
   }
 
-  // async getLikeByUserIdAndParentId(
-  //   userId: string,
-  //   parentId: string,
-  // ): Promise<ReactionDocument | null> {
-  //   return this.LikeModel.findOne({
-  //     userId,
-  //     parentId,
-  //     deletedAt: null,
-  //   });
-  // }
-  //
-  // async getReactionsByParentIds(
-  //   parentIds: string[],
-  // ): Promise<ReactionDocument[]> {
-  //   return this.LikeModel.find({
-  //     parentId: { $in: parentIds },
-  //   });
-  // }
-  //
-  // async getRecentLikesForOnePost(
-  //   parentId: string,
-  // ): Promise<ReactionDocument[]> {
-  //   const filter = {
-  //     status: ReactionStatus.Like,
-  //     parentId,
-  //   };
-  //
-  //   return await this.LikeModel.find(filter)
-  //     .sort({ createdAt: -1 })
-  //     .limit(3)
-  //     .exec();
-  // }
-  //
-  // async save(like: ReactionDocument): Promise<string> {
-  //   const resultSave: ReactionDocument = await like.save();
-  //
-  //   return resultSave._id.toString();
-  // }
+  async getAll(
+    query: GetCommentsQueryParams,
+    user: UserContextDto | null,
+    postId: string,
+  ): Promise<PaginatedViewDto<CommentViewDto>> {
+    const filter: FilterQuery<Comment> = {
+      postId,
+      deletedAt: null,
+    };
+
+    const comments: CommentDocument[] = await this.CommentModel.find(filter)
+      .sort({ [query.sortBy]: query.sortDirection })
+      .skip(query.calculateSkip())
+      .limit(query.pageSize);
+
+    const commentsIds: string[] = comments.map(
+      (comment: CommentDocument): string => comment._id.toString(),
+    );
+
+    const allReactionsForComments: ReactionDocument[] =
+      await this.reactionsRepository.getByParentIds(commentsIds);
+
+    const mapUserReactionsForComments: Map<string, ReactionStatus> = new Map();
+
+    if (user) {
+      allReactionsForComments.reduce<Map<string, ReactionStatus>>(
+        (
+          acc: Map<string, ReactionStatus>,
+          reaction: ReactionDocument,
+        ): Map<string, ReactionStatus> => {
+          if (reaction.userId === user.id) {
+            acc.set(reaction.parentId, reaction.status);
+          }
+
+          return acc;
+        },
+        mapUserReactionsForComments,
+      );
+    }
+
+    const items: CommentViewDto[] = comments.map(
+      (comment: CommentDocument): CommentViewDto => {
+        let myStatus: ReactionStatus | undefined;
+
+        if (user) {
+          const id: string = comment._id.toString();
+
+          myStatus = mapUserReactionsForComments.get(id);
+        }
+
+        return CommentViewDto.mapToView(
+          comment,
+          myStatus ? myStatus : ReactionStatus.None,
+        );
+      },
+    );
+
+    const totalCount: number = await this.CommentModel.countDocuments(filter);
+
+    return PaginatedViewDto.mapToView<CommentViewDto>({
+      items,
+      totalCount,
+      page: query.pageNumber,
+      size: query.pageSize,
+    });
+  }
 }
