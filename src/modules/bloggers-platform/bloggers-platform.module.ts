@@ -33,6 +33,7 @@ import { GetCommentQueryHandler } from './comments/application/queries/get-comme
 import { CommentsController } from './comments/api/comments.controller';
 import { GetCommentsQueryHandler } from './comments/application/queries/get-comments.query-handler';
 import { UpdateCommentUseCase } from './comments/application/usecases/update-comment.usecase';
+import { DeleteCommentUseCase } from './comments/application/usecases/delete-comment.usecase';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { UpdateCommentUseCase } from './comments/application/usecases/update-com
     //use-cases
     CreateCommentUseCase,
     UpdateCommentUseCase,
+    DeleteCommentUseCase,
     //query-handlers
     GetCommentQueryHandler,
     GetCommentsQueryHandler,

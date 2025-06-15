@@ -10,6 +10,7 @@ import {
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateCommentDomainDto } from './dto/create-comment.domain.dto';
 import { UpdateCommentDto } from '../dto/comment.dto';
+import { makeDeleted } from '../../../../core/utils/entity.common-utils';
 
 /**
  * Represents a comment left by a user on a specific post.
@@ -107,6 +108,21 @@ export class Comment {
    */
   update(data: UpdateCommentDto) {
     this.content = data.content;
+  }
+
+  /**
+   * Marks the entity as soft-deleted by setting the `deletedAt` timestamp.
+   *
+   * If the entity has already been marked as deleted (i.e., `deletedAt` is not null),
+   * an error will be thrown to prevent duplicate deletion operations.
+   *
+   * This method is typically used to implement soft deletion logic,
+   * allowing the entity to be excluded from active queries without being permanently removed from the database.
+   *
+   * @throws {Error} If the entity has already been soft-deleted.
+   */
+  delete() {
+    makeDeleted.call(this);
   }
 }
 
