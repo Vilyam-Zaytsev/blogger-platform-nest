@@ -1,16 +1,16 @@
 import { PostsRepository } from '../../infrastructure/posts.repository';
 import { PostDocument } from '../../domain/post.entity';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UpdateReactionDto } from '../../../likes/dto/reaction.dto';
-import { UpdateReactionsCommand } from '../../../likes/application/usecases/update-reactions.usecase';
+import { UpdateReactionDto } from '../../../reactions/dto/reaction.dto';
+import { UpdateReactionsCommand } from '../../../reactions/application/usecases/update-reactions.usecase';
 import {
   ReactionDocument,
   ReactionStatus,
   ReactionStatusDelta,
-} from '../../../likes/domain/reaction.entity';
+} from '../../../reactions/domain/reaction.entity';
 import { UsersRepository } from '../../../../user-accounts/infrastructure/users.repository';
 import { UserDocument } from '../../../../user-accounts/domain/user.entity';
-import { ReactionsRepository } from '../../../likes/infrastructure/reactions-repository';
+import { ReactionsRepository } from '../../../reactions/infrastructure/reactions-repository';
 
 export class UpdatePostReactionCommand {
   constructor(public readonly dto: UpdateReactionDto) {}
