@@ -1,22 +1,51 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { IdInputDto } from '../../../user-accounts/api/input-dto/id.input-dto';
 import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
 import { ExtractUserIfExistsFromRequest } from '../../../user-accounts/guards/decorators/extract-user-if-exists-from-request.decorator';
 import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.dto';
 import { CommentViewDto } from './view-dto/comment-view.dto';
-import { QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetCommentQuery } from '../application/queries/get-comment.query-handler';
+import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
+import { CommentInputDto } from './input-dto/comment-input.dto';
+import { UpdateCommentCommand } from '../application/usecases/update-comment.usecase';
+import { ExtractUserFromRequest } from '../../../user-accounts/guards/decorators/extract-user-from-request.decorator';
 
 @Controller('comments')
 export class CommentsController {
-  constructor(private readonly queryBus: QueryBus) {}
+  constructor(
+    private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
   async getById(
-    @Param() params: IdInputDto,
     @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
+    @Param() params: IdInputDto,
   ): Promise<CommentViewDto> {
     return this.queryBus.execute(new GetCommentQuery(params.id, user));
+  }
+
+  @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async updateComment(
+    @ExtractUserFromRequest() user: UserContextDto,
+    @Param() params: IdInputDto,
+    @Body() body: CommentInputDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new UpdateCommentCommand(body, params.id, user),
+    );
   }
 }

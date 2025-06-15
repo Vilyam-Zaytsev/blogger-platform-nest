@@ -32,6 +32,7 @@ import { CommentsRepository } from './comments/infrastructure/comments-repositor
 import { GetCommentQueryHandler } from './comments/application/queries/get-comment.query-handler';
 import { CommentsController } from './comments/api/comments.controller';
 import { GetCommentsQueryHandler } from './comments/application/queries/get-comments.query-handler';
+import { UpdateCommentUseCase } from './comments/application/usecases/update-comment.usecase';
 
 @Module({
   imports: [
@@ -59,12 +60,10 @@ import { GetCommentsQueryHandler } from './comments/application/queries/get-comm
     GetPostsForBlogQueryHandler,
     //🔸 Posts:
     //repo
-    ReactionsRepository,
     PostsRepository,
     PostsQueryRepository,
     //use-cases
     CreatePostUseCase,
-    CreateCommentUseCase,
     UpdatePostUseCase,
     DeletePostUseCase,
     UpdatePostReactionUseCase,
@@ -75,10 +74,15 @@ import { GetCommentsQueryHandler } from './comments/application/queries/get-comm
     //repo
     CommentsRepository,
     CommentsQueryRepository,
+    //use-cases
+    CreateCommentUseCase,
+    UpdateCommentUseCase,
     //query-handlers
     GetCommentQueryHandler,
     GetCommentsQueryHandler,
-    //🔸 Likes:
+    //🔸 Reactions:
+    //repo
+    ReactionsRepository,
     //use-cases
     UpdateReactionUseCase,
     CreateReactionUseCase,

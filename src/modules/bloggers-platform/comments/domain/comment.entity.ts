@@ -9,6 +9,7 @@ import {
 } from '../../posts/domain/reactions-count.schema';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateCommentDomainDto } from './dto/create-comment.domain.dto';
+import { UpdateCommentDto } from '../dto/comment.dto';
 
 /**
  * Represents a comment left by a user on a specific post.
@@ -93,6 +94,19 @@ export class Comment {
     comment.reactionsCount = new ReactionsCount();
 
     return comment as CommentDocument;
+  }
+
+  /**
+   * Updates the content of the comment.
+   *
+   * @param data - An object containing the updated comment content.
+   * @param data.content - The new text content of the comment.
+   *
+   * This method is typically used when editing an existing comment.
+   * It replaces the current comment content with the new value provided.
+   */
+  update(data: UpdateCommentDto) {
+    this.content = data.content;
   }
 }
 

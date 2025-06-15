@@ -3,3 +3,7 @@ export class CreateCommentDto {
   userId: string;
   content: string;
 }
+
+export class UpdateCommentDto {
+  content: string;
+}
