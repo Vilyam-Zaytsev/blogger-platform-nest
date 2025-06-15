@@ -305,4 +305,54 @@ describe('UsersController - getUser() (GET: /users (pagination, sort, search in 
       );
     }
   });
+
+  it('should return a 400 error if the client has passed invalid pagination values.', async () => {
+    await usersTestManager.createUser(12);
+
+    const resGetUsers: Response = await request(server)
+      .get(`/${GLOBAL_PREFIX}/users`)
+      .set('Authorization', adminCredentialsInBase64)
+      .query({
+        pageNumber: 'xxx',
+        pageSize: 'xxx',
+        sortBy: 123,
+        sortDirection: 'xxx',
+        searchLoginTerm: 123,
+        searchEmailTerm: 123,
+      })
+      .expect(HttpStatus.BAD_REQUEST);
+
+    expect(resGetUsers.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'sortDirection',
+          message:
+            'sortDirection must be one of the following values: asc, desc; Received value: xxx',
+        },
+        {
+          field: 'pageSize',
+          message:
+            'pageSize must be a number conforming to the specified constraints; Received value: NaN',
+        },
+        {
+          field: 'pageNumber',
+          message:
+            'pageNumber must be a number conforming to the specified constraints; Received value: NaN',
+        },
+        {
+          field: 'sortBy',
+          message:
+            'sortBy must be one of the following values: createdAt, updatedAt, deletedAt, login, email; Received value: 123',
+        },
+      ],
+    });
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetUsers.body,
+        resGetUsers.statusCode,
+        'Test №7: UsersController - getUser() (GET: /users (pagination, sort, search in term))',
+      );
+    }
+  });
 });

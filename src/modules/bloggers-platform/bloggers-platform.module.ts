@@ -45,7 +45,7 @@ import { GetCommentsQueryHandler } from './comments/application/queries/get-comm
   ],
   controllers: [BlogsController, PostsController, CommentsController],
   providers: [
-    //---blogs---//
+    //🔸 Blogs:
     //repo
     BlogsRepository,
     BlogsQueryRepository,
@@ -57,7 +57,7 @@ import { GetCommentsQueryHandler } from './comments/application/queries/get-comm
     GetBlogsQueryHandler,
     GetBlogQueryHandler,
     GetPostsForBlogQueryHandler,
-    //---posts---//
+    //🔸 Posts:
     //repo
     ReactionsRepository,
     PostsRepository,
@@ -71,14 +71,14 @@ import { GetCommentsQueryHandler } from './comments/application/queries/get-comm
     //query-handlers
     GetPostsQueryHandler,
     GetPostQueryHandler,
-    //---comments---//
+    //🔸 Comments:
     //repo
     CommentsRepository,
     CommentsQueryRepository,
     //query-handlers
     GetCommentQueryHandler,
     GetCommentsQueryHandler,
-    //---likes---//
+    //🔸 Likes:
     //use-cases
     UpdateReactionUseCase,
     CreateReactionUseCase,

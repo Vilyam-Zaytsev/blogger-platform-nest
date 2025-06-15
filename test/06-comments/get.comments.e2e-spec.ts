@@ -12,14 +12,13 @@ import { PostViewDto } from '../../src/modules/bloggers-platform/posts/api/view-
 import { PostsTestManager } from '../managers/posts.test-manager';
 import { UsersTestManager } from '../managers/users.test-manager';
 import { CommentsTestManager } from '../managers/comments.test-manager';
-import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from '../../src/modules/user-accounts/constans/auth-tokens.inject-constants';
-import { UserAccountsConfig } from '../../src/modules/user-accounts/config/user-accounts.config';
-import { JwtService } from '@nestjs/jwt';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
-import { CommentInputDto } from '../../src/modules/bloggers-platform/comments/api/input-dto/comment-input.dto';
 import { ReactionStatus } from '../../src/modules/bloggers-platform/reactions/domain/reaction.entity';
 import { CommentViewDto } from '../../src/modules/bloggers-platform/comments/api/view-dto/comment-view.dto';
 import { PaginatedViewDto } from '../../src/core/dto/paginated.view-dto';
+import { Filter } from '../helpers/filter';
+import { GetCommentsQueryParams } from '../../src/modules/bloggers-platform/comments/api/input-dto/get-comments-query-params.input-dto';
+import { ObjectId } from 'mongodb';
 
 describe('PostsController - getComments() (GET: /posts/{postId}/comments)', () => {
   let appTestManager: AppTestManager;
@@ -34,19 +33,7 @@ describe('PostsController - getComments() (GET: /posts/{postId}/comments)', () =
 
   beforeAll(async () => {
     appTestManager = new AppTestManager();
-    await appTestManager.init((moduleBuilder) =>
-      moduleBuilder
-        .overrideProvider(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
-        .useFactory({
-          factory: (userAccountsConfig: UserAccountsConfig) => {
-            return new JwtService({
-              secret: userAccountsConfig.accessTokenSecret,
-              signOptions: { expiresIn: '2s' },
-            });
-          },
-          inject: [UserAccountsConfig],
-        }),
-    );
+    await appTestManager.init();
 
     adminCredentials = appTestManager.getAdminCredentials();
     adminCredentialsInBase64 = TestUtils.encodingAdminDataInBase64(
@@ -108,11 +95,12 @@ describe('PostsController - getComments() (GET: /posts/{postId}/comments)', () =
     const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
       createdUser.login,
     ]);
-    const [createdComment] = await commentsTestManager.createComment(
-      1,
-      createdPost.id,
-      resultLogin.authTokens.accessToken,
-    );
+    const [createdComment]: CommentViewDto[] =
+      await commentsTestManager.createComment(
+        1,
+        createdPost.id,
+        resultLogin.authTokens.accessToken,
+      );
 
     const resGetComments: Response = await request(server)
       .get(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/comments`)
@@ -157,232 +145,140 @@ describe('PostsController - getComments() (GET: /posts/{postId}/comments)', () =
     }
   });
 
-  // it('should return a 401 error if the user is not logged in (sending an invalid access token)', async () => {
-  //   const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
-  //   const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
-  //     1,
-  //     createdBlog.id,
-  //   );
-  //   const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
-  //   const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
-  //     createdUser.login,
-  //   ]);
-  //   const [dto]: CommentInputDto[] = TestDtoFactory.generateCommentInputDto(1);
-  //
-  //   await TestUtils.delay(3000);
-  //
-  //   const resCreateComment: Response = await request(server)
-  //     .post(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/comments`)
-  //     .send(dto)
-  //     .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
-  //     .expect(HttpStatus.UNAUTHORIZED);
-  //
-  //   const comments: PaginatedViewDto<CommentViewDto> =
-  //     await commentsTestManager.getAll({}, createdPost.id);
-  //
-  //   expect(comments.items.length).toEqual(0);
-  //
-  //   if (testLoggingEnabled) {
-  //     TestLoggers.logE2E(
-  //       resCreateComment.body,
-  //       resCreateComment.statusCode,
-  //       'Test №2: PostsController - createComment() (POST: /posts/{postId}/comments)',
-  //     );
-  //   }
-  // });
-  //
-  // it("should not create a new comment If post with specified postId doesn't exists.", async () => {
-  //   const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
-  //   const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
-  //     1,
-  //     createdBlog.id,
-  //   );
-  //   const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
-  //   const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
-  //     createdUser.login,
-  //   ]);
-  //   const [dto]: CommentInputDto[] = TestDtoFactory.generateCommentInputDto(1);
-  //   const incorrectId: string = new ObjectId().toString();
-  //
-  //   const resCreateComment: Response = await request(server)
-  //     .post(`/${GLOBAL_PREFIX}/posts/${incorrectId}/comments`)
-  //     .send(dto)
-  //     .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
-  //     .expect(HttpStatus.NOT_FOUND);
-  //
-  //   const comments: PaginatedViewDto<CommentViewDto> =
-  //     await commentsTestManager.getAll({}, createdPost.id);
-  //
-  //   expect(comments.items.length).toEqual(0);
-  //
-  //   if (testLoggingEnabled) {
-  //     TestLoggers.logE2E(
-  //       resCreateComment.body,
-  //       resCreateComment.statusCode,
-  //       'Test №3: PostsController - createComment() (POST: /posts/{postId}/comments)',
-  //     );
-  //   }
-  // });
-  //
-  // it('should not create a commentary if the data in the request body is incorrect (an empty object is passed).', async () => {
-  //   const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
-  //   const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
-  //     1,
-  //     createdBlog.id,
-  //   );
-  //   const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
-  //   const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
-  //     createdUser.login,
-  //   ]);
-  //
-  //   const resCreateComment: Response = await request(server)
-  //     .post(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/comments`)
-  //     .send({})
-  //     .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
-  //     .expect(HttpStatus.BAD_REQUEST);
-  //
-  //   expect(resCreateComment.body).toEqual({
-  //     errorsMessages: [
-  //       {
-  //         field: 'content',
-  //         message: 'The "content" field must be of the string type.',
-  //       },
-  //     ],
-  //   });
-  //
-  //   const comments: PaginatedViewDto<CommentViewDto> =
-  //     await commentsTestManager.getAll({}, createdPost.id);
-  //
-  //   expect(comments.items.length).toEqual(0);
-  //
-  //   if (testLoggingEnabled) {
-  //     TestLoggers.logE2E(
-  //       resCreateComment.body,
-  //       resCreateComment.statusCode,
-  //       'Test №4: PostsController - createComment() (POST: /posts/{postId}/comments)',
-  //     );
-  //   }
-  // });
-  //
-  // it('should not create a commentary if the data in the request body is incorrect (the content field contains data of the number type).', async () => {
-  //   const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
-  //   const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
-  //     1,
-  //     createdBlog.id,
-  //   );
-  //   const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
-  //   const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
-  //     createdUser.login,
-  //   ]);
-  //
-  //   const resCreateComment: Response = await request(server)
-  //     .post(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/comments`)
-  //     .send({ content: 123 })
-  //     .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
-  //     .expect(HttpStatus.BAD_REQUEST);
-  //
-  //   expect(resCreateComment.body).toEqual({
-  //     errorsMessages: [
-  //       {
-  //         field: 'content',
-  //         message: 'The "content" field must be of the string type.',
-  //       },
-  //     ],
-  //   });
-  //
-  //   const comments: PaginatedViewDto<CommentViewDto> =
-  //     await commentsTestManager.getAll({}, createdPost.id);
-  //
-  //   expect(comments.items.length).toEqual(0);
-  //
-  //   if (testLoggingEnabled) {
-  //     TestLoggers.logE2E(
-  //       resCreateComment.body,
-  //       resCreateComment.statusCode,
-  //       'Test №5: PostsController - createComment() (POST: /posts/{postId}/comments)',
-  //     );
-  //   }
-  // });
-  //
-  // it('should not create a commentary if the data in the request body is incorrect (the content field is less than 20 characters long).', async () => {
-  //   const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
-  //   const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
-  //     1,
-  //     createdBlog.id,
-  //   );
-  //   const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
-  //   const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
-  //     createdUser.login,
-  //   ]);
-  //   const content: string = TestUtils.generateRandomString(19);
-  //
-  //   const resCreateComment: Response = await request(server)
-  //     .post(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/comments`)
-  //     .send({ content })
-  //     .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
-  //     .expect(HttpStatus.BAD_REQUEST);
-  //
-  //   expect(resCreateComment.body).toEqual({
-  //     errorsMessages: [
-  //       {
-  //         field: 'content',
-  //         message: 'The "content" field must be of the string type.',
-  //       },
-  //     ],
-  //   });
-  //
-  //   const comments: PaginatedViewDto<CommentViewDto> =
-  //     await commentsTestManager.getAll({}, createdPost.id);
-  //
-  //   expect(comments.items.length).toEqual(0);
-  //
-  //   if (testLoggingEnabled) {
-  //     TestLoggers.logE2E(
-  //       resCreateComment.body,
-  //       resCreateComment.statusCode,
-  //       'Test №6: PostsController - createComment() (POST: /posts/{postId}/comments)',
-  //     );
-  //   }
-  // });
-  //
-  // it('should not create a commentary if the data in the request body is incorrect (the content field is more than 300 characters long).', async () => {
-  //   const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
-  //   const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
-  //     1,
-  //     createdBlog.id,
-  //   );
-  //   const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
-  //   const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
-  //     createdUser.login,
-  //   ]);
-  //   const content: string = TestUtils.generateRandomString(301);
-  //
-  //   const resCreateComment: Response = await request(server)
-  //     .post(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/comments`)
-  //     .send({ content })
-  //     .set('Authorization', `Bearer ${resultLogin.authTokens.accessToken}`)
-  //     .expect(HttpStatus.BAD_REQUEST);
-  //
-  //   expect(resCreateComment.body).toEqual({
-  //     errorsMessages: [
-  //       {
-  //         field: 'content',
-  //         message: 'The "content" field must be of the string type.',
-  //       },
-  //     ],
-  //   });
-  //
-  //   const comments: PaginatedViewDto<CommentViewDto> =
-  //     await commentsTestManager.getAll({}, createdPost.id);
-  //
-  //   expect(comments.items.length).toEqual(0);
-  //
-  //   if (testLoggingEnabled) {
-  //     TestLoggers.logE2E(
-  //       resCreateComment.body,
-  //       resCreateComment.statusCode,
-  //       'Test №7: PostsController - createComment() (POST: /posts/{postId}/comments)',
-  //     );
-  //   }
-  // });
+  it('should return an array with three comments.', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
+      1,
+      createdBlog.id,
+    );
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+    const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
+      createdUser.login,
+    ]);
+    const createdComments: CommentViewDto[] =
+      await commentsTestManager.createComment(
+        3,
+        createdPost.id,
+        resultLogin.authTokens.accessToken,
+      );
+
+    const resGetComments: Response = await request(server)
+      .get(`/${GLOBAL_PREFIX}/posts/${createdPost.id}/comments`)
+      .expect(HttpStatus.OK);
+
+    const bodyFromGetResponse: PaginatedViewDto<CommentViewDto> =
+      resGetComments.body as PaginatedViewDto<CommentViewDto>;
+
+    const query: GetCommentsQueryParams = new GetCommentsQueryParams();
+    const filteredCreatedComments: CommentViewDto[] =
+      new Filter<CommentViewDto>(createdComments)
+        .sort({ [query.sortBy]: query.sortDirection })
+        .skip(query.calculateSkip())
+        .limit(query.pageSize)
+        .getResult();
+
+    expect(bodyFromGetResponse.items).toEqual(filteredCreatedComments);
+
+    expect(bodyFromGetResponse.items.length).toEqual(3);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        bodyFromGetResponse,
+        resGetComments.statusCode,
+        'Test №3: PostsController - getComments() (GET: /posts/{postId}/comments)',
+      );
+    }
+  });
+
+  it('should return comment found by id.', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
+      1,
+      createdBlog.id,
+    );
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+    const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
+      createdUser.login,
+    ]);
+    const [createdComment]: CommentViewDto[] =
+      await commentsTestManager.createComment(
+        1,
+        createdPost.id,
+        resultLogin.authTokens.accessToken,
+      );
+
+    const resGetComment: Response = await request(server)
+      .get(`/${GLOBAL_PREFIX}/comments/${createdComment.id}`)
+      .expect(HttpStatus.OK);
+
+    expect(resGetComment.body).toEqual(createdComment);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetComment.body,
+        resGetComment.statusCode,
+        'Test №4: CommentsController - getById() (GET: /comments/:id)',
+      );
+    }
+  });
+
+  it('should return the 404 not found error (if the comment with this ID does not exist).', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
+      1,
+      createdBlog.id,
+    );
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+    const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
+      createdUser.login,
+    ]);
+    await commentsTestManager.createComment(
+      1,
+      createdPost.id,
+      resultLogin.authTokens.accessToken,
+    );
+    const incorrectId: string = new ObjectId().toString();
+
+    const resGetComment: Response = await request(server)
+      .get(`/${GLOBAL_PREFIX}/comments/${incorrectId}`)
+      .expect(HttpStatus.NOT_FOUND);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetComment.body,
+        resGetComment.statusCode,
+        'Test №5: CommentsController - getById() (GET: /comments/:id)',
+      );
+    }
+  });
+
+  it('should return the 404 not found error (if the post with this ID does not exist).', async () => {
+    const [createdBlog]: BlogViewDto[] = await blogsTestManager.createBlog(1);
+    const [createdPost]: PostViewDto[] = await postsTestManager.createPost(
+      1,
+      createdBlog.id,
+    );
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+    const [resultLogin]: TestResultLogin[] = await usersTestManager.login([
+      createdUser.login,
+    ]);
+    await commentsTestManager.createComment(
+      1,
+      createdPost.id,
+      resultLogin.authTokens.accessToken,
+    );
+    const incorrectId: string = new ObjectId().toString();
+
+    const resGetComment: Response = await request(server)
+      .get(`/${GLOBAL_PREFIX}/posts/${incorrectId}/comments`)
+      .expect(HttpStatus.NOT_FOUND);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetComment.body,
+        resGetComment.statusCode,
+        'Test №6: PostsController - gtComments() (GET: /posts/{postId}comments)',
+      );
+    }
+  });
 });

@@ -212,7 +212,7 @@ describe('PostsController - createComment() (POST: /posts/{postId}/comments)', (
       errorsMessages: [
         {
           field: 'content',
-          message: 'The "content" field must be of the string type.',
+          message: 'content must be a string; Received value: undefined',
         },
       ],
     });
@@ -252,7 +252,7 @@ describe('PostsController - createComment() (POST: /posts/{postId}/comments)', (
       errorsMessages: [
         {
           field: 'content',
-          message: 'The "content" field must be of the string type.',
+          message: 'content must be a string; Received value: 123',
         },
       ],
     });
@@ -293,7 +293,7 @@ describe('PostsController - createComment() (POST: /posts/{postId}/comments)', (
       errorsMessages: [
         {
           field: 'content',
-          message: 'The "content" field must be of the string type.',
+          message: `content must be longer than or equal to 20 characters; Received value: ${content}`,
         },
       ],
     });
@@ -334,7 +334,7 @@ describe('PostsController - createComment() (POST: /posts/{postId}/comments)', (
       errorsMessages: [
         {
           field: 'content',
-          message: 'The "content" field must be of the string type.',
+          message: `content must be shorter than or equal to 300 characters; Received value: ${content}`,
         },
       ],
     });
