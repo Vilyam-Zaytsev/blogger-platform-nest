@@ -7,7 +7,7 @@ import {
 import { DomainException } from '../exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../exceptions/domain-exception-codes';
 import { NewestLike } from '../../modules/bloggers-platform/posts/domain/newest-like.schema';
-import { UserDocument } from '../../modules/user-accounts/domain/user.entity';
+import { UserDocument } from '../../modules/user-accounts/domain/entities/user/user.entity';
 
 /**
  * Marks an entity as deleted by setting its `deletedAt` timestamp.

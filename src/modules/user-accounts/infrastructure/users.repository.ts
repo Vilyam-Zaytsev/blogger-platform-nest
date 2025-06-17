@@ -1,5 +1,9 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument, UserModelType } from '../domain/user.entity';
+import {
+  User,
+  UserDocument,
+  UserModelType,
+} from '../domain/entities/user/user.entity';
 import { DomainException } from '../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 import { Injectable } from '@nestjs/common';

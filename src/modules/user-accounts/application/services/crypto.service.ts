@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'node:crypto';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class CryptoService {
@@ -22,5 +23,9 @@ export class CryptoService {
 
   generateUUID(): string {
     return randomUUID();
+  }
+
+  generateObjectId(): ObjectId {
+    return new ObjectId();
   }
 }

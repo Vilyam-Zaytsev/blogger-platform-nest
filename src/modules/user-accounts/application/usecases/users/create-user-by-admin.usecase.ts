@@ -1,8 +1,8 @@
-import { UsersRepository } from '../../infrastructure/users.repository';
-import { UserDocument } from '../../domain/user.entity';
-import { CreateUserDto } from '../../dto/create-user.dto';
-import { UsersFactory } from '../users.factory';
-import { UserValidationService } from '../services/user-validation.service';
+import { UsersRepository } from '../../../infrastructure/users.repository';
+import { UserDocument } from '../../../domain/entities/user/user.entity';
+import { CreateUserDto } from '../../../dto/create-user.dto';
+import { UsersFactory } from '../../factories/users.factory';
+import { UserValidationService } from '../../services/user-validation.service';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class CreateUserCommand {

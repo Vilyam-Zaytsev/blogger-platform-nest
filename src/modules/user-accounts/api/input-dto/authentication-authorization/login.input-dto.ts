@@ -1,5 +1,5 @@
 import { IsStringWithTrim } from '../../../../../core/decorators/validation/is-string-with-trim';
-import { passwordConstraints } from '../../../domain/user.entity';
+import { passwordConstraints } from '../../../domain/entities/user/user.entity';
 
 export class LoginInputDto {
   @IsStringWithTrim(3, 100)

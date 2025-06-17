@@ -8,9 +8,9 @@ import {
   EmailConfirmation,
   EmailConfirmationSchema,
 } from './email-confirmation.schema';
-import { CreateUserDomainDto } from './dto/create-user.domain.dto';
+import { CreateUserDomainDto } from '../../dto/create-user.domain.dto';
 import { HydratedDocument, Model } from 'mongoose';
-import { makeDeleted } from '../../../core/utils/entity.common-utils';
+import { makeDeleted } from '../../../../../core/utils/entity.common-utils';
 
 export const loginConstraints = {
   minLength: 3,

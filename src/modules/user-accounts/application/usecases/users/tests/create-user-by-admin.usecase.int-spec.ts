@@ -1,18 +1,18 @@
-import { AdminCredentials } from '../../../../../../test/types';
+import { AdminCredentials } from '../../../../../../../test/types';
 import { Server } from 'http';
-import { AppTestManager } from '../../../../../../test/managers/app.test-manager';
-import { UsersTestManager } from '../../../../../../test/managers/users.test-manager';
-import { UserInputDto } from '../../../api/input-dto/user.input-dto';
-import { TestDtoFactory } from '../../../../../../test/helpers/test.dto-factory';
-import { CryptoService } from '../../services/crypto.service';
+import { AppTestManager } from '../../../../../../../test/managers/app.test-manager';
+import { UsersTestManager } from '../../../../../../../test/managers/users.test-manager';
+import { UserInputDto } from '../../../../api/input-dto/user.input-dto';
+import { TestDtoFactory } from '../../../../../../../test/helpers/test.dto-factory';
+import { CryptoService } from '../../../services/crypto.service';
 import { CreateUserByAdminUseCase } from '../create-user-by-admin.usecase';
-import { TestLoggers } from '../../../../../../test/helpers/test.loggers';
-import { UsersRepository } from '../../../infrastructure/users.repository';
-import { UserDocument } from '../../../domain/user.entity';
-import { ConfirmationStatus } from '../../../domain/email-confirmation.schema';
-import { DomainException } from '../../../../../core/exceptions/damain-exceptions';
-import { PaginatedViewDto } from '../../../../../core/dto/paginated.view-dto';
-import { UserViewDto } from '../../../api/view-dto/user.view-dto';
+import { TestLoggers } from '../../../../../../../test/helpers/test.loggers';
+import { UsersRepository } from '../../../../infrastructure/users.repository';
+import { UserDocument } from '../../../../domain/entities/user/user.entity';
+import { ConfirmationStatus } from '../../../../domain/entities/user/email-confirmation.schema';
+import { DomainException } from '../../../../../../core/exceptions/damain-exceptions';
+import { PaginatedViewDto } from '../../../../../../core/dto/paginated.view-dto';
+import { UserViewDto } from '../../../../api/view-dto/user.view-dto';
 
 describe('CreateUserByAdminUseCase (integration)', () => {
   let appTestManager: AppTestManager;

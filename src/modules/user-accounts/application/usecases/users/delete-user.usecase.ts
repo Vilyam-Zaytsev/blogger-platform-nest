@@ -1,6 +1,6 @@
-import { UsersRepository } from '../../infrastructure/users.repository';
-import { UserDocument } from '../../domain/user.entity';
-import { IdInputDto } from '../../api/input-dto/id.input-dto';
+import { UsersRepository } from '../../../infrastructure/users.repository';
+import { UserDocument } from '../../../domain/entities/user/user.entity';
+import { IdInputDto } from '../../../api/input-dto/id.input-dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 export class DeleteUserCommand {

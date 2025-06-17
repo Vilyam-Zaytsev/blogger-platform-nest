@@ -4,7 +4,7 @@ import { CreateUserDto } from '../../dto/create-user.dto';
 import { DomainException } from '../../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 import { UserContextDto } from '../../guards/dto/user-context.dto';
-import { UserDocument } from '../../domain/user.entity';
+import { UserDocument } from '../../domain/entities/user/user.entity';
 import { CryptoService } from './crypto.service';
 import { ValidationException } from '../../../../core/exceptions/validation-exception';
 

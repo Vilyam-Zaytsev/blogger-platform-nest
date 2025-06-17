@@ -9,7 +9,7 @@ import {
   ReactionStatusDelta,
 } from '../../../reactions/domain/reaction.entity';
 import { UsersRepository } from '../../../../user-accounts/infrastructure/users.repository';
-import { UserDocument } from '../../../../user-accounts/domain/user.entity';
+import { UserDocument } from '../../../../user-accounts/domain/entities/user/user.entity';
 import { ReactionsRepository } from '../../../reactions/infrastructure/reactions-repository';
 
 export class UpdatePostReactionCommand {

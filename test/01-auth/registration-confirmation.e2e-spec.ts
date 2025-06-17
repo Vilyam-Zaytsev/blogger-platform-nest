@@ -10,8 +10,8 @@ import { Server } from 'http';
 import { EmailService } from '../../src/modules/notifications/email.service';
 import { EmailTemplate } from '../../src/modules/notifications/templates/types';
 import { UsersRepository } from '../../src/modules/user-accounts/infrastructure/users.repository';
-import { UserDocument } from '../../src/modules/user-accounts/domain/user.entity';
-import { ConfirmationStatus } from '../../src/modules/user-accounts/domain/email-confirmation.schema';
+import { UserDocument } from '../../src/modules/user-accounts/domain/entities/user/user.entity';
+import { ConfirmationStatus } from '../../src/modules/user-accounts/domain/entities/user/email-confirmation.schema';
 import { TestUtils } from '../helpers/test.utils';
 import { HttpStatus } from '@nestjs/common';
 

@@ -1,10 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../infrastructure/users.repository';
-import { UserDocument } from '../../domain/user.entity';
-import { CryptoService } from '../services/crypto.service';
-import { NewPasswordInputDto } from '../../api/input-dto/authentication-authorization/new-password-input.dto';
-import { DomainException } from '../../../../core/exceptions/damain-exceptions';
-import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
+import { UsersRepository } from '../../../infrastructure/users.repository';
+import { UserDocument } from '../../../domain/entities/user/user.entity';
+import { CryptoService } from '../../services/crypto.service';
+import { NewPasswordInputDto } from '../../../api/input-dto/authentication-authorization/new-password-input.dto';
+import { DomainException } from '../../../../../core/exceptions/damain-exceptions';
+import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 
 export class NewPasswordCommand {
   constructor(public readonly dto: NewPasswordInputDto) {}
