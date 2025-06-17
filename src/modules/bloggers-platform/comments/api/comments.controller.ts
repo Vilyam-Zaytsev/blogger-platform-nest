@@ -20,9 +20,12 @@ import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guar
 import { CommentInputDto } from './input-dto/comment-input.dto';
 import { UpdateCommentCommand } from '../application/usecases/update-comment.usecase';
 import { ExtractUserFromRequest } from '../../../user-accounts/guards/decorators/extract-user-from-request.decorator';
-import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
-import { DeletePostCommand } from '../../posts/application/usecases/delete-post.usecase';
 import { DeleteCommentCommand } from '../application/usecases/delete-comment.usecase';
+import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
+import { ReactionInputDto } from '../../reactions/api/input-dto/reaction-input.dto';
+import { UpdateReactionDto } from '../../reactions/dto/reaction.dto';
+import { UpdatePostReactionCommand } from '../../posts/application/usecases/update-post-reaction.usecase';
+import { UpdateCommentReactionCommand } from '../application/usecases/update-comment-reaction.usecase';
 
 @Controller('comments')
 export class CommentsController {
@@ -50,6 +53,25 @@ export class CommentsController {
   ): Promise<void> {
     await this.commandBus.execute(
       new UpdateCommentCommand(body, params.id, user),
+    );
+  }
+
+  @Put(':commentId/like-status')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async updateReaction(
+    @ExtractUserFromRequest() user: UserContextDto,
+    @Param('commentId', ObjectIdValidationPipe) commentId: string,
+    @Body() body: ReactionInputDto,
+  ): Promise<void> {
+    const updateReactionDto: UpdateReactionDto = {
+      status: body.likeStatus,
+      userId: user.id,
+      parentId: commentId,
+    };
+
+    await this.commandBus.execute(
+      new UpdateCommentReactionCommand(updateReactionDto),
     );
   }
 

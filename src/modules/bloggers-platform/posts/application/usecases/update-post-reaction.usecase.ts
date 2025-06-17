@@ -43,7 +43,7 @@ export class UpdatePostReactionUseCase
         previousStatus === ReactionStatus.Like)
     ) {
       const lastThreeLikes: ReactionDocument[] =
-        await this.reactionsRepository.getRecentLikesForOnePost(dto.parentId);
+        await this.reactionsRepository.getRecentLikes(dto.parentId);
 
       const userIds: string[] = lastThreeLikes.map(
         (like: ReactionDocument): string => like.userId,

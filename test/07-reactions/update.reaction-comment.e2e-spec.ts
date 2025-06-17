@@ -107,15 +107,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 1,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
-      newestLikes: [
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUser.id,
-          login: createdUser.login,
-        },
-      ],
     });
 
     // The 'myStatus' field must be 'Like' because the user requesting the comment is authenticated.
@@ -129,15 +120,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 1,
       dislikesCount: 0,
       myStatus: ReactionStatus.Like,
-      newestLikes: [
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUser.id,
-          login: createdUser.login,
-        },
-      ],
     });
 
     if (testLoggingEnabled) {
@@ -189,22 +171,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 2,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
-      newestLikes: [
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[1].id,
-          login: createdUsers[1].login,
-        },
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[0].id,
-          login: createdUsers[0].login,
-        },
-      ],
     });
 
     // The 'myStatus' field must be 'Like' because the user requesting the comment is authenticated.
@@ -220,22 +186,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
         likesCount: 2,
         dislikesCount: 0,
         myStatus: ReactionStatus.Like,
-        newestLikes: [
-          {
-            addedAt: expect.stringMatching(
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-            ),
-            userId: createdUsers[1].id,
-            login: createdUsers[1].login,
-          },
-          {
-            addedAt: expect.stringMatching(
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-            ),
-            userId: createdUsers[0].id,
-            login: createdUsers[0].login,
-          },
-        ],
       });
     }
 
@@ -243,7 +193,7 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       TestLoggers.logE2E(
         resUpdateReaction[0].body,
         resUpdateReaction[0].statusCode,
-        'Test №2: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №2: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -288,29 +238,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 3,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
-      newestLikes: [
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[2].id,
-          login: createdUsers[2].login,
-        },
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[1].id,
-          login: createdUsers[1].login,
-        },
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[0].id,
-          login: createdUsers[0].login,
-        },
-      ],
     });
 
     // The 'myStatus' field must be 'Like' because the user requesting the comment is authenticated.
@@ -326,29 +253,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
         likesCount: 3,
         dislikesCount: 0,
         myStatus: ReactionStatus.Like,
-        newestLikes: [
-          {
-            addedAt: expect.stringMatching(
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-            ),
-            userId: createdUsers[2].id,
-            login: createdUsers[2].login,
-          },
-          {
-            addedAt: expect.stringMatching(
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-            ),
-            userId: createdUsers[1].id,
-            login: createdUsers[1].login,
-          },
-          {
-            addedAt: expect.stringMatching(
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-            ),
-            userId: createdUsers[0].id,
-            login: createdUsers[0].login,
-          },
-        ],
       });
     }
 
@@ -356,7 +260,7 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       TestLoggers.logE2E(
         resUpdateReaction[0].body,
         resUpdateReaction[0].statusCode,
-        'Test №3: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №3: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -400,29 +304,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 3,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
-      newestLikes: [
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[2].id,
-          login: createdUsers[2].login,
-        },
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[1].id,
-          login: createdUsers[1].login,
-        },
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[0].id,
-          login: createdUsers[0].login,
-        },
-      ],
     });
 
     // The 'myStatus' field must be 'Like' because the user requesting the comment is authenticated.
@@ -438,29 +319,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
         likesCount: 3,
         dislikesCount: 0,
         myStatus: ReactionStatus.Like,
-        newestLikes: [
-          {
-            addedAt: expect.stringMatching(
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-            ),
-            userId: createdUsers[2].id,
-            login: createdUsers[2].login,
-          },
-          {
-            addedAt: expect.stringMatching(
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-            ),
-            userId: createdUsers[1].id,
-            login: createdUsers[1].login,
-          },
-          {
-            addedAt: expect.stringMatching(
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-            ),
-            userId: createdUsers[0].id,
-            login: createdUsers[0].login,
-          },
-        ],
       });
     }
 
@@ -481,36 +339,13 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 4,
       dislikesCount: 0,
       myStatus: ReactionStatus.Like,
-      newestLikes: [
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[3].id,
-          login: createdUsers[3].login,
-        },
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[2].id,
-          login: createdUsers[2].login,
-        },
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[1].id,
-          login: createdUsers[1].login,
-        },
-      ],
     });
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
         resUpdateReaction_2.body,
         resUpdateReaction_2.statusCode,
-        'Test №4: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №4: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -549,7 +384,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 0,
       dislikesCount: 1,
       myStatus: ReactionStatus.None,
-      newestLikes: [],
     });
 
     // The 'myStatus' field must be 'Like' because the user requesting the comment is authenticated.
@@ -563,14 +397,13 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 0,
       dislikesCount: 1,
       myStatus: ReactionStatus.Dislike,
-      newestLikes: [],
     });
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
         resUpdateReaction.body,
         resUpdateReaction.statusCode,
-        'Test №5: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №5: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -614,7 +447,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 0,
       dislikesCount: 2,
       myStatus: ReactionStatus.None,
-      newestLikes: [],
     });
 
     // The 'myStatus' field must be 'Dislike' because the user requesting the comment is authenticated.
@@ -629,7 +461,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
         likesCount: 0,
         dislikesCount: 2,
         myStatus: ReactionStatus.Dislike,
-        newestLikes: [],
       });
     }
 
@@ -637,7 +468,7 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       TestLoggers.logE2E(
         resUpdateReaction[0].body,
         resUpdateReaction[0].statusCode,
-        'Test №6: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №6: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -676,15 +507,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 1,
       dislikesCount: 0,
       myStatus: ReactionStatus.Like,
-      newestLikes: [
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUser.id,
-          login: createdUser.login,
-        },
-      ],
     });
 
     // Like to Dislike
@@ -704,7 +526,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 0,
       dislikesCount: 1,
       myStatus: ReactionStatus.Dislike,
-      newestLikes: [],
     });
 
     // Dislike to Like
@@ -724,15 +545,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 1,
       dislikesCount: 0,
       myStatus: ReactionStatus.Like,
-      newestLikes: [
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUser.id,
-          login: createdUser.login,
-        },
-      ],
     });
 
     //Like to None
@@ -752,14 +564,13 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 0,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
-      newestLikes: [],
     });
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
         resUpdateReaction.body,
         resUpdateReaction.statusCode,
-        'Test №7: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №7: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -863,30 +674,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
           likesCount: 1,
           dislikesCount: 1,
           myStatus: ReactionStatus.Like,
-          newestLikes: [
-            {
-              addedAt: expect.stringMatching(
-                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-              ),
-              userId: createUser1.id,
-              login: createUser1.login,
-            },
-          ],
-        });
-      } else {
-        expect(sortedComments[i].likesInfo).toEqual({
-          likesCount: 1,
-          dislikesCount: 1,
-          myStatus: ReactionStatus.Dislike,
-          newestLikes: [
-            {
-              addedAt: expect.stringMatching(
-                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-              ),
-              userId: createUser2.id,
-              login: createUser2.login,
-            },
-          ],
         });
       }
     }
@@ -915,30 +702,12 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
           likesCount: 1,
           dislikesCount: 1,
           myStatus: ReactionStatus.Dislike,
-          newestLikes: [
-            {
-              addedAt: expect.stringMatching(
-                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-              ),
-              userId: createUser1.id,
-              login: createUser1.login,
-            },
-          ],
         });
       } else {
         expect(sortedComments_2[i].likesInfo).toEqual({
           likesCount: 1,
           dislikesCount: 1,
           myStatus: ReactionStatus.Like,
-          newestLikes: [
-            {
-              addedAt: expect.stringMatching(
-                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-              ),
-              userId: createUser2.id,
-              login: createUser2.login,
-            },
-          ],
         });
       }
     }
@@ -963,30 +732,12 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
           likesCount: 1,
           dislikesCount: 1,
           myStatus: ReactionStatus.None,
-          newestLikes: [
-            {
-              addedAt: expect.stringMatching(
-                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-              ),
-              userId: createUser1.id,
-              login: createUser1.login,
-            },
-          ],
         });
       } else {
         expect(sortedComments_3[i].likesInfo).toEqual({
           likesCount: 1,
           dislikesCount: 1,
           myStatus: ReactionStatus.None,
-          newestLikes: [
-            {
-              addedAt: expect.stringMatching(
-                /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-              ),
-              userId: createUser2.id,
-              login: createUser2.login,
-            },
-          ],
         });
       }
     }
@@ -995,7 +746,7 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       TestLoggers.logE2E(
         {},
         HttpStatus.NO_CONTENT,
-        'Test №8: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №8: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -1037,29 +788,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 10,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
-      newestLikes: [
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[9].id,
-          login: createdUsers[9].login,
-        },
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[8].id,
-          login: createdUsers[8].login,
-        },
-        {
-          addedAt: expect.stringMatching(
-            /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-          ),
-          userId: createdUsers[7].id,
-          login: createdUsers[7].login,
-        },
-      ],
     });
 
     for (let i = resultLogins.length - 1; i >= 0; i--) {
@@ -1083,66 +811,6 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
         likesCount: 10 - dislikesCount,
         dislikesCount,
         myStatus: ReactionStatus.Dislike,
-        newestLikes: (() => {
-          if (i >= 3) {
-            return [
-              {
-                addedAt: expect.stringMatching(
-                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-                ),
-                userId: createdUsers[i - 1].id,
-                login: createdUsers[i - 1].login,
-              },
-              {
-                addedAt: expect.stringMatching(
-                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-                ),
-                userId: createdUsers[i - 2].id,
-                login: createdUsers[i - 2].login,
-              },
-              {
-                addedAt: expect.stringMatching(
-                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-                ),
-                userId: createdUsers[i - 3].id,
-                login: createdUsers[i - 3].login,
-              },
-            ];
-          }
-
-          if (i === 2) {
-            return [
-              {
-                addedAt: expect.stringMatching(
-                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-                ),
-                userId: createdUsers[i - 1].id,
-                login: createdUsers[i - 1].login,
-              },
-              {
-                addedAt: expect.stringMatching(
-                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-                ),
-                userId: createdUsers[i - 2].id,
-                login: createdUsers[i - 2].login,
-              },
-            ];
-          }
-
-          if (i === 1) {
-            return [
-              {
-                addedAt: expect.stringMatching(
-                  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
-                ),
-                userId: createdUsers[i - 1].id,
-                login: createdUsers[i - 1].login,
-              },
-            ];
-          }
-
-          return [];
-        })(),
       });
     }
 
@@ -1150,7 +818,7 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       TestLoggers.logE2E(
         {},
         HttpStatus.NO_CONTENT,
-        'Test №9: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №9: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -1186,14 +854,13 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 0,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
-      newestLikes: [],
     });
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
         resUpdateReaction.body,
         resUpdateReaction.statusCode,
-        'Test №10: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №10: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -1215,7 +882,7 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       TestLoggers.logE2E(
         resUpdateReaction.body,
         resUpdateReaction.statusCode,
-        'Test №11: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №11: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -1261,14 +928,13 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 0,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
-      newestLikes: [],
     });
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
         resUpdateReaction.body,
         resUpdateReaction.statusCode,
-        'Test №12: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №12: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -1314,14 +980,13 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 0,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
-      newestLikes: [],
     });
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
         resUpdateReaction.body,
         resUpdateReaction.statusCode,
-        'Test №13: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №13: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });
@@ -1359,14 +1024,13 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
       likesCount: 0,
       dislikesCount: 0,
       myStatus: ReactionStatus.None,
-      newestLikes: [],
     });
 
     if (testLoggingEnabled) {
       TestLoggers.logE2E(
         resUpdateReaction.body,
         resUpdateReaction.statusCode,
-        'Test №14: PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
+        'Test №14: CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)',
       );
     }
   });

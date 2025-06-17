@@ -7,7 +7,6 @@ import {
   ReactionStatusDelta,
 } from '../../domain/reaction.entity';
 import { CreateReactionCommand } from './create-reaction-use.case';
-import { PostsRepository } from '../../../posts/infrastructure/posts.repository';
 
 export class UpdateReactionsCommand {
   constructor(public readonly dto: UpdateReactionDto) {}
@@ -19,7 +18,6 @@ export class UpdateReactionUseCase
 {
   constructor(
     private readonly reactionsRepository: ReactionsRepository,
-    private readonly postsRepository: PostsRepository,
     private readonly commandBus: CommandBus,
   ) {}
 
