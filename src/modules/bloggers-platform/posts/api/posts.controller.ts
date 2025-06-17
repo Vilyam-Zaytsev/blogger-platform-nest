@@ -25,22 +25,31 @@ import { GetPostQuery } from '../application/queries/get-post.query-handler';
 import { UpdatePostCommand } from '../application/usecases/update-post.usecase';
 import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
 import { JwtAuthGuard } from '../../../user-accounts/guards/bearer/jwt-auth.guard';
-import { ReactionInputDto } from '../../likes/api/input-dto/reaction-input.dto';
+import { ReactionInputDto } from '../../reactions/api/input-dto/reaction-input.dto';
 import { ExtractUserFromRequest } from '../../../user-accounts/guards/decorators/extract-user-from-request.decorator';
 import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.dto';
 import { UpdatePostReactionCommand } from '../application/usecases/update-post-reaction.usecase';
-import { UpdateReactionDto } from '../../likes/dto/reaction.dto';
+import { UpdateReactionDto } from '../../reactions/dto/reaction.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
 import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
 import { ExtractUserIfExistsFromRequest } from '../../../user-accounts/guards/decorators/extract-user-if-exists-from-request.decorator';
+import { CommentInputDto } from '../../comments/api/input-dto/comment-input.dto';
+import { CommentViewDto } from '../../comments/api/view-dto/comment-view.dto';
+import { CreateCommentCommand } from '../../comments/application/usecases/create-comment.usecase';
+import { CreateCommentDto } from '../../comments/dto/comment.dto';
+import { CommentsQueryRepository } from '../../comments/infrastructure/query/comments.query-repository';
+import { GetCommentsQueryParams } from '../../comments/api/input-dto/get-comments-query-params.input-dto';
+import { GetCommentsQuery } from '../../comments/application/queries/get-comments.query-handler';
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private readonly postsQueryRepository: PostsQueryRepository,
+    private readonly commentsQueryRepository: CommentsQueryRepository,
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
+
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
   async getAll(
@@ -59,6 +68,16 @@ export class PostsController {
     return this.queryBus.execute(new GetPostQuery(params.id, user));
   }
 
+  @Get(':postId/comments')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getComments(
+    @ExtractUserIfExistsFromRequest() user: UserContextDto | null,
+    @Param('postId', ObjectIdValidationPipe) postId: string,
+    @Query() query: GetCommentsQueryParams,
+  ): Promise<PaginatedViewDto<CommentViewDto>> {
+    return this.queryBus.execute(new GetCommentsQuery(query, user, postId));
+  }
+
   @Post()
   @UseGuards(BasicAuthGuard)
   async createPost(@Body() body: PostInputDto): Promise<PostViewDto> {
@@ -67,6 +86,26 @@ export class PostsController {
     );
 
     return this.postsQueryRepository.getByIdOrNotFoundFail(postId);
+  }
+
+  @Post(':postId/comments')
+  @UseGuards(JwtAuthGuard)
+  async createComment(
+    @ExtractUserFromRequest() user: UserContextDto,
+    @Param('postId', ObjectIdValidationPipe) postId: string,
+    @Body() body: CommentInputDto,
+  ): Promise<CommentViewDto> {
+    const createCommentDto: CreateCommentDto = {
+      postId,
+      userId: user.id,
+      content: body.content,
+    };
+
+    const commentId: string = await this.commandBus.execute(
+      new CreateCommentCommand(createCommentDto),
+    );
+
+    return this.commentsQueryRepository.getByIdOrNotFoundFail(commentId);
   }
 
   @Put(':id')

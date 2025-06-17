@@ -1,46 +1,47 @@
 import { UserInputDto } from '../../src/modules/user-accounts/api/input-dto/user.input-dto';
 import { BlogInputDto } from '../../src/modules/bloggers-platform/blogs/api/input-dto/blog-input.dto';
 import { PostInputDto } from '../../src/modules/bloggers-platform/posts/api/input-dto/post-input.dto';
-import { ReactionInputDto } from '../../src/modules/bloggers-platform/likes/api/input-dto/reaction-input.dto';
-import { ReactionStatus } from '../../src/modules/bloggers-platform/likes/domain/reaction.entity';
+import { ReactionInputDto } from '../../src/modules/bloggers-platform/reactions/api/input-dto/reaction-input.dto';
+import { ReactionStatus } from '../../src/modules/bloggers-platform/reactions/domain/reaction.entity';
+import { CommentInputDto } from '../../src/modules/bloggers-platform/comments/api/input-dto/comment-input.dto';
 
 export class TestDtoFactory {
   static generateUserInputDto(quantity: number): UserInputDto[] {
-    const users: UserInputDto[] = [];
+    const dtos: UserInputDto[] = [];
 
     for (let i = 0; i < quantity; i++) {
-      users.push({
+      dtos.push({
         login: `testUser${i}`,
         email: `testUser${i}@example.com`,
         password: 'qwerty',
       });
     }
 
-    return users;
+    return dtos;
   }
 
   static generateBlogInputDto(quantity: number): BlogInputDto[] {
-    const blogs: BlogInputDto[] = [];
+    const dtos: BlogInputDto[] = [];
 
     for (let i = 0; i < quantity; i++) {
-      blogs.push({
+      dtos.push({
         name: `testBlog${i}`,
         description: `test description blog - ${i}`,
         websiteUrl: `https://test.blog-${i}.com`,
       });
     }
 
-    return blogs;
+    return dtos;
   }
 
   static generatePostInputDto(
     quantity: number,
     blogId: string,
   ): PostInputDto[] {
-    const posts: PostInputDto[] = [];
+    const dtos: PostInputDto[] = [];
 
     for (let i = 0; i < quantity; i++) {
-      posts.push({
+      dtos.push({
         title: `testTitle${i}`,
         shortDescription: `test shortDescription post - ${i}`,
         content: `test content post - ${i}`,
@@ -48,21 +49,18 @@ export class TestDtoFactory {
       });
     }
 
-    return posts;
+    return dtos;
   }
 
-  static generateLikeInputDto(
-    quantity: number,
-    reactionStatus: ReactionStatus,
-  ): ReactionInputDto[] {
-    const reactions: ReactionInputDto[] = [];
+  static generateCommentInputDto(quantity: number): CommentInputDto[] {
+    const dtos: CommentInputDto[] = [];
 
     for (let i = 0; i < quantity; i++) {
-      reactions.push({
-        likeStatus: ReactionStatus[reactionStatus],
+      dtos.push({
+        content: `test comment content - ${i}`,
       });
     }
 
-    return reactions;
+    return dtos;
   }
 }

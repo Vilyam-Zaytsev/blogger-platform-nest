@@ -48,9 +48,7 @@ export class ReactionsRepository {
     });
   }
 
-  async getRecentLikesForOnePost(
-    parentId: string,
-  ): Promise<ReactionDocument[]> {
+  async getRecentLikes(parentId: string): Promise<ReactionDocument[]> {
     const filter = {
       status: ReactionStatus.Like,
       parentId,

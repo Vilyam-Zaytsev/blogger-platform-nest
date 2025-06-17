@@ -20,24 +20,35 @@ import { GetBlogsQueryHandler } from './blogs/application/queries/get-blogs.quer
 import { GetPostsQueryHandler } from './posts/application/queries/get-posts.query-handler';
 import { GetPostQueryHandler } from './posts/application/queries/get-post.query-handler';
 import { UserAccountsModule } from '../user-accounts/user-accounts.module';
-import { ReactionsRepository } from './likes/infrastructure/reactions-repository';
-import { Reaction, ReactionSchema } from './likes/domain/reaction.entity';
+import { ReactionsRepository } from './reactions/infrastructure/reactions-repository';
+import { Reaction, ReactionSchema } from './reactions/domain/reaction.entity';
 import { UpdatePostReactionUseCase } from './posts/application/usecases/update-post-reaction.usecase';
-import { UpdateReactionUseCase } from './likes/application/usecases/update-reactions.usecase';
-import { CreateReactionUseCase } from './likes/application/usecases/create-reaction-use.case';
+import { UpdateReactionUseCase } from './reactions/application/usecases/update-reactions.usecase';
+import { CreateReactionUseCase } from './reactions/application/usecases/create-reaction-use.case';
+import { CommentsQueryRepository } from './comments/infrastructure/query/comments.query-repository';
+import { Comment, CommentSchema } from './comments/domain/comment.entity';
+import { CreateCommentUseCase } from './comments/application/usecases/create-comment.usecase';
+import { CommentsRepository } from './comments/infrastructure/comments-repository';
+import { GetCommentQueryHandler } from './comments/application/queries/get-comment.query-handler';
+import { CommentsController } from './comments/api/comments.controller';
+import { GetCommentsQueryHandler } from './comments/application/queries/get-comments.query-handler';
+import { UpdateCommentUseCase } from './comments/application/usecases/update-comment.usecase';
+import { DeleteCommentUseCase } from './comments/application/usecases/delete-comment.usecase';
+import { UpdateCommentReactionUseCase } from './comments/application/usecases/update-comment-reaction.usecase';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
+    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
     MongooseModule.forFeature([
       { name: Reaction.name, schema: ReactionSchema },
     ]),
     UserAccountsModule,
   ],
-  controllers: [BlogsController, PostsController],
+  controllers: [BlogsController, PostsController, CommentsController],
   providers: [
-    //---blogs---//
+    //🔸 Blogs:
     //repo
     BlogsRepository,
     BlogsQueryRepository,
@@ -49,9 +60,8 @@ import { CreateReactionUseCase } from './likes/application/usecases/create-react
     GetBlogsQueryHandler,
     GetBlogQueryHandler,
     GetPostsForBlogQueryHandler,
-    //---posts---//
+    //🔸 Posts:
     //repo
-    ReactionsRepository,
     PostsRepository,
     PostsQueryRepository,
     //use-cases
@@ -59,11 +69,24 @@ import { CreateReactionUseCase } from './likes/application/usecases/create-react
     UpdatePostUseCase,
     DeletePostUseCase,
     UpdatePostReactionUseCase,
-
     //query-handlers
     GetPostsQueryHandler,
     GetPostQueryHandler,
-    //---likes---//
+    //🔸 Comments:
+    //repo
+    CommentsRepository,
+    CommentsQueryRepository,
+    //use-cases
+    CreateCommentUseCase,
+    UpdateCommentUseCase,
+    DeleteCommentUseCase,
+    UpdateCommentReactionUseCase,
+    //query-handlers
+    GetCommentQueryHandler,
+    GetCommentsQueryHandler,
+    //🔸 Reactions:
+    //repo
+    ReactionsRepository,
     //use-cases
     UpdateReactionUseCase,
     CreateReactionUseCase,

@@ -210,4 +210,52 @@ describe('BlogsController - getBlog() (GET: /blogs (pagination, sort, search in 
       );
     }
   });
+
+  it('should return a 400 error if the client has passed invalid pagination values.', async () => {
+    await blogsTestManager.createBlog(12);
+
+    const resGetBlogs: Response = await request(server)
+      .get(`/${GLOBAL_PREFIX}/blogs`)
+      .query({
+        pageNumber: 'xxx',
+        pageSize: 'xxx',
+        sortBy: 123,
+        sortDirection: 'xxx',
+        searchNameTerm: 123,
+      })
+      .expect(HttpStatus.BAD_REQUEST);
+
+    expect(resGetBlogs.body).toEqual({
+      errorsMessages: [
+        {
+          field: 'sortDirection',
+          message:
+            'sortDirection must be one of the following values: asc, desc; Received value: xxx',
+        },
+        {
+          field: 'pageSize',
+          message:
+            'pageSize must be a number conforming to the specified constraints; Received value: NaN',
+        },
+        {
+          field: 'pageNumber',
+          message:
+            'pageNumber must be a number conforming to the specified constraints; Received value: NaN',
+        },
+        {
+          field: 'sortBy',
+          message:
+            'sortBy must be one of the following values: createdAt, updatedAt, deletedAt, name; Received value: 123',
+        },
+      ],
+    });
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resGetBlogs.body,
+        resGetBlogs.statusCode,
+        'Test №5: BlogsController - getBlog() (GET: /blogs (pagination, sort, search in term))',
+      );
+    }
+  });
 });

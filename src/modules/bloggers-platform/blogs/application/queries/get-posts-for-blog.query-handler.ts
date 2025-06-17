@@ -28,9 +28,7 @@ export class GetPostsForBlogQueryHandler
     user,
     blogId,
   }: GetPostsForBlogQuery): Promise<PaginatedViewDto<PostViewDto>> {
-    if (blogId) {
-      await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
-    }
+    await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
 
     return this.postsQueryRepository.getAll(queryParams, user, blogId);
   }
