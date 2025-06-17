@@ -12,6 +12,7 @@ export class CreateSessionUseCase
   constructor() {}
 
   async execute({ dto }: CreateSessionCommand): Promise<string> {
+    //TODO: необходимо продолжить разработку логики сознания сессии (создать репо и т.д)
     return '';
   }
 }
