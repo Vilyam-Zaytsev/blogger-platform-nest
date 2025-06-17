@@ -24,7 +24,6 @@ import { DeleteCommentCommand } from '../application/usecases/delete-comment.use
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
 import { ReactionInputDto } from '../../reactions/api/input-dto/reaction-input.dto';
 import { UpdateReactionDto } from '../../reactions/dto/reaction.dto';
-import { UpdatePostReactionCommand } from '../../posts/application/usecases/update-post-reaction.usecase';
 import { UpdateCommentReactionCommand } from '../application/usecases/update-comment-reaction.usecase';
 
 @Controller('comments')

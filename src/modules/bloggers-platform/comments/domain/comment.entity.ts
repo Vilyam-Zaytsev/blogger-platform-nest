@@ -10,7 +10,11 @@ import {
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateCommentDomainDto } from './dto/create-comment.domain.dto';
 import { UpdateCommentDto } from '../dto/comment.dto';
-import { makeDeleted } from '../../../../core/utils/entity.common-utils';
+import {
+  makeDeleted,
+  recalculateReactionsCount,
+} from '../../../../core/utils/entity.common-utils';
+import { ReactionStatusDelta } from '../../reactions/domain/reaction.entity';
 
 /**
  * Represents a comment left by a user on a specific post.
@@ -108,6 +112,23 @@ export class Comment {
    */
   update(data: UpdateCommentDto) {
     this.content = data.content;
+  }
+
+  /**
+   * Updates the count of likes and dislikes based on the current and previous user reaction.
+   *
+   * This method adjusts the `reactionsCount` object by decrementing the count of the previous reaction
+   * (if it exists) and incrementing the count of the current reaction (if it exists).
+   * It is typically used when a user adds, removes, or changes their reaction (like/dislike) to a post or comment.
+   *
+   * @param {ReactionChange} statusDelta - An object containing the current and previous reactions.
+   * @param {'Like' | 'Dislike' | null} statusDelta.currentReaction - The new reaction provided by the user, or `null` if removed.
+   * @param {'Like' | 'Dislike' | null} statusDelta.previousReaction - The old reaction that is being replaced or removed, or `null` if none existed.
+   *
+   * @throws Will not throw, but assumes `reactionsCount` contains valid numeric keys `likesCount` and `dislikesCount`.
+   */
+  updateReactionsCount(statusDelta: ReactionStatusDelta) {
+    recalculateReactionsCount.call(this, statusDelta);
   }
 
   /**
