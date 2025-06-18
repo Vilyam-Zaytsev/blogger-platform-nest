@@ -37,6 +37,7 @@ import {
 import { SessionsController } from './api/sessions.controller';
 import { CreateSessionUseCase } from './application/usecases/sessions/create-session.usecase';
 import { SessionsRepository } from './infrastructure/sessions.repository';
+import { JwtRefreshStrategy } from './guards/bearer/jwt-refresh.strategy';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { SessionsRepository } from './infrastructure/sessions.repository';
     },
     //strategies
     JwtStrategy,
+    JwtRefreshStrategy,
     BasicStrategy,
     LocalStrategy,
     //repo

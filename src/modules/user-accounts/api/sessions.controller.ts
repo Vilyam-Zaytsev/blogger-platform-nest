@@ -1,8 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { QueryBus } from '@nestjs/cqrs';
+import { JwtRefreshAuthGuard } from '../guards/bearer/jwt-refresh-auth.guard';
 
-@Controller('security-devices')
+@Controller('security/devices')
+@UseGuards(JwtRefreshAuthGuard)
 export class SessionsController {
-  constructor() {}
+  constructor(private readonly queryBus: QueryBus) {}
 
-  async;
+  @Get()
+  async getAll() {}
 }
