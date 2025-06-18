@@ -19,7 +19,7 @@ import { PaginatedViewDto } from '../../../../core/dto/paginated.view-dto';
 import { GetPostsQueryParams } from './input-dto/get-posts-query-params.input-dto';
 import { DeletePostCommand } from '../application/usecases/delete-post.usecase';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { IdInputDto } from '../../../user-accounts/api/input-dto/id.input-dto';
+import { IdInputDto } from '../../../../core/types/id.input-dto';
 import { GetPostsQuery } from '../application/queries/get-posts.query-handler';
 import { GetPostQuery } from '../application/queries/get-post.query-handler';
 import { UpdatePostCommand } from '../application/usecases/update-post.usecase';

@@ -26,7 +26,7 @@ import { CreatePostCommand } from '../../posts/application/usecases/create-post.
 import { CreatePostDto } from '../../posts/dto/post.dto';
 import { CreatePostForBlogInputDto } from '../../posts/api/input-dto/create-post-for-blog-input.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { IdInputDto } from '../../../user-accounts/api/input-dto/id.input-dto';
+import { IdInputDto } from '../../../../core/types/id.input-dto';
 import { GetBlogQuery } from '../application/queries/get-blog.query-handler';
 import { GetBlogsQuery } from '../application/queries/get-blogs.query-handler';
 import { GetPostsForBlogQuery } from '../application/queries/get-posts-for-blog.query-handler';
