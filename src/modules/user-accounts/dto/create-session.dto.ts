@@ -3,6 +3,6 @@ export class CreateSessionDto {
   deviceId: string;
   userAgent: string;
   ip: string;
-  iat: Date;
-  exp: Date;
+  iat: number;
+  exp: number;
 }

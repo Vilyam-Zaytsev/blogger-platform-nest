@@ -30,7 +30,6 @@ import { NewPasswordCommand } from '../application/usecases/auth/new-password.us
 import { MeViewDto } from './view-dto/user.view-dto';
 import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
 import { GetMeQuery } from '../application/queries/auth/get-me.query-handler';
-import { parseUserAgent } from '../../../core/utils/parse-user-agent.util';
 
 @Controller('auth')
 export class AuthController {

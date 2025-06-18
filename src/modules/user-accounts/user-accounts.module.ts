@@ -30,13 +30,21 @@ import { NewPasswordUseCase } from './application/usecases/auth/new-password.use
 import { GetMeQueryHandler } from './application/queries/auth/get-me.query-handler';
 import { AuthQueryRepository } from './infrastructure/query/auth.query-repository';
 import { GetUsersQueryHandler } from './application/queries/users/get-users.query-handler';
+import {
+  Session,
+  SessionSchema,
+} from './domain/entities/session/session.entity';
+import { SessionsController } from './api/sessions.controller';
+import { CreateSessionUseCase } from './application/usecases/sessions/create-session.usecase';
+import { SessionsRepository } from './infrastructure/sessions.repository';
 
 @Module({
   imports: [
     NotificationsModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: Session.name, schema: SessionSchema }]),
   ],
-  controllers: [UsersController, AuthController],
+  controllers: [UsersController, AuthController, SessionsController],
   providers: [
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
@@ -71,19 +79,21 @@ import { GetUsersQueryHandler } from './application/queries/users/get-users.quer
     //repo
     UsersRepository,
     UsersQueryRepository,
+    SessionsRepository,
     //services
     BcryptService,
     CryptoService,
     UserValidationService,
     //use-cases
-    LoginUserUseCase,
-    DeleteUserUseCase,
-    ConfirmUserUseCase,
-    NewPasswordUseCase,
     RegisterUserUseCase,
-    PasswordRecoveryUseCase,
-    CreateUserByAdminUseCase,
     ResendRegistrationEmailUseCase,
+    ConfirmUserUseCase,
+    LoginUserUseCase,
+    PasswordRecoveryUseCase,
+    NewPasswordUseCase,
+    CreateSessionUseCase,
+    CreateUserByAdminUseCase,
+    DeleteUserUseCase,
     //factories
     UsersFactory,
     //config

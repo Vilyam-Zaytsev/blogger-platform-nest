@@ -56,8 +56,8 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
       deviceId,
       userAgent,
       ip,
-      iat: new Date(iat * 1000),
-      exp: new Date(exp * 1000),
+      iat,
+      exp,
     };
 
     await this.commandBus.execute(new CreateSessionCommand(createSessionDto));
