@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -14,6 +15,7 @@ import { SessionContextDto } from '../guards/dto/session-context.dto';
 import { GetSessionsQuery } from '../application/queries/sessions/get-sessions.query-handler';
 import { DeleteSessionsCommand } from '../application/usecases/sessions/delete-sessions.usecase';
 import { DeleteSessionCommand } from '../application/usecases/sessions/delete-session.usecase';
+import { IdInputDto } from '../../../core/types/id.input-dto';
 
 @Controller('security/devices')
 @UseGuards(JwtRefreshAuthGuard)
@@ -34,8 +36,11 @@ export class SessionsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteSession(
     @ExtractSessionFromRequest() session: SessionContextDto,
+    @Param() params: IdInputDto,
   ): Promise<void> {
-    return this.commandBus.execute(new DeleteSessionCommand(session));
+    return this.commandBus.execute(
+      new DeleteSessionCommand(session, params.id),
+    );
   }
 
   @Delete()

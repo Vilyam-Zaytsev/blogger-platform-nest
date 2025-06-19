@@ -6,7 +6,10 @@ import { DomainException } from '../../../../../core/exceptions/damain-exception
 import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 
 export class DeleteSessionCommand {
-  constructor(public readonly dto: SessionContextDto) {}
+  constructor(
+    public readonly dto: SessionContextDto,
+    public readonly deviceId: string,
+  ) {}
 }
 
 @CommandHandler(DeleteSessionCommand)
@@ -15,14 +18,14 @@ export class DeleteSessionUseCase
 {
   constructor(private readonly sessionsRepository: SessionsRepository) {}
 
-  async execute({ dto }: DeleteSessionCommand): Promise<string> {
+  async execute({ dto, deviceId }: DeleteSessionCommand): Promise<string> {
     const session: SessionDocument | null =
-      await this.sessionsRepository.getByDeviceId(dto.deviceId);
+      await this.sessionsRepository.getByDeviceId(deviceId);
 
     if (!session) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
-        message: `The session with ID (${dto.deviceId}) does not exist`,
+        message: `The session with ID (${deviceId}) does not exist`,
       });
     }
 
