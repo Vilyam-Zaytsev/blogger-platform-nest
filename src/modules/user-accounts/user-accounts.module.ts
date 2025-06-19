@@ -42,6 +42,7 @@ import { SessionsQueryRepository } from './infrastructure/query/sessions-query-r
 import { GetSessionsQueryHandler } from './application/queries/sessions/get-sessions.query-handler';
 import { DeleteSessionsUseCase } from './application/usecases/sessions/delete-sessions.usecase';
 import { DeleteSessionUseCase } from './application/usecases/sessions/delete-session.usecase';
+import { RefreshTokenUseCase } from './application/usecases/auth/refreah-token.usecase';
 
 @Module({
   imports: [
@@ -87,6 +88,7 @@ import { DeleteSessionUseCase } from './application/usecases/sessions/delete-ses
     RegisterUserUseCase,
     ConfirmUserUseCase,
     LoginUserUseCase,
+    RefreshTokenUseCase,
     ResendRegistrationEmailUseCase,
     PasswordRecoveryUseCase,
     NewPasswordUseCase,

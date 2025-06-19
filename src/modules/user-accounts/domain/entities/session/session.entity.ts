@@ -90,6 +90,22 @@ export class Session {
   }
 
   /**
+   * Updates the session's issued-at (`iat`) and expiration (`exp`) timestamps.
+   *
+   * Converts UNIX timestamps (in seconds) to JavaScript `Date` objects and assigns them
+   * to the corresponding properties of the session.
+   *
+   * @param iat - The new "issued at" timestamp in UNIX seconds.
+   * @param exp - The new "expiration" timestamp in UNIX seconds.
+   *
+   * This method is useful when refreshing a session or updating JWT token-related metadata.
+   */
+  updateTimestamps(iat: number, exp: number) {
+    this.iat = new Date(iat * 1000);
+    this.exp = new Date(exp * 1000);
+  }
+
+  /**
    * Marks the session as deleted by setting the deletedAt timestamp to the current date.
    * Throws an exception if the session is already deleted.
    */

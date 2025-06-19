@@ -30,6 +30,10 @@ import { NewPasswordCommand } from '../application/usecases/auth/new-password.us
 import { MeViewDto } from './view-dto/user.view-dto';
 import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
 import { GetMeQuery } from '../application/queries/auth/get-me.query-handler';
+import { JwtRefreshAuthGuard } from '../guards/bearer/jwt-refresh-auth.guard';
+import { ExtractSessionFromRequest } from '../guards/decorators/extract-session-from-request.decorator';
+import { SessionContextDto } from '../guards/dto/session-context.dto';
+import { RefreshTokenCommand } from '../application/usecases/auth/refreah-token.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -96,6 +100,27 @@ export class AuthController {
     @Body() body: PasswordRecoveryInputDto,
   ): Promise<void> {
     return this.commandBus.execute(new PasswordRecoveryCommand(body));
+  }
+
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtRefreshAuthGuard)
+  async refreshToken(
+    @ExtractSessionFromRequest() session: SessionContextDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LoginViewDto> {
+    const { accessToken, refreshToken }: AuthTokens =
+      await this.commandBus.execute(new RefreshTokenCommand(session));
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 120000,
+      path: '/',
+    });
+
+    return { accessToken };
   }
 
   @Post('new-password')
