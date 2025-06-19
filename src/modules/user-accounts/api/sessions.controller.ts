@@ -13,6 +13,7 @@ import { ExtractSessionFromRequest } from '../guards/decorators/extract-session-
 import { SessionContextDto } from '../guards/dto/session-context.dto';
 import { GetSessionsQuery } from '../application/queries/sessions/get-sessions.query-handler';
 import { DeleteSessionsCommand } from '../application/usecases/sessions/delete-sessions.usecase';
+import { DeleteSessionCommand } from '../application/usecases/sessions/delete-session.usecase';
 
 @Controller('security/devices')
 @UseGuards(JwtRefreshAuthGuard)
@@ -27,6 +28,14 @@ export class SessionsController {
     @ExtractSessionFromRequest() session: SessionContextDto,
   ): Promise<SessionViewDto> {
     return this.queryBus.execute(new GetSessionsQuery(session));
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteSession(
+    @ExtractSessionFromRequest() session: SessionContextDto,
+  ): Promise<void> {
+    return this.commandBus.execute(new DeleteSessionCommand(session));
   }
 
   @Delete()

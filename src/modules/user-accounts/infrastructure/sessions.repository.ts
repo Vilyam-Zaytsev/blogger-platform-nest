@@ -5,7 +5,6 @@ import {
   SessionDocument,
   SessionModelType,
 } from '../domain/entities/session/session.entity';
-import { UserDocument } from '../domain/entities/user/user.entity';
 import { DomainException } from '../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 
@@ -15,46 +14,36 @@ export class SessionsRepository {
     @InjectModel(Session.name) private readonly SessionModel: SessionModelType,
   ) {}
 
-  async getByUserId(userId: string): Promise<SessionDocument[]> {
+  async getAllSessionsExceptCurrent(
+    userId: string,
+    deviceId: string,
+  ): Promise<SessionDocument[]> {
     return this.SessionModel.find({
       userId,
+      deviceId: { $ne: deviceId },
       deletedAt: null,
     });
   }
 
-  // async getByConfirmationCode(
-  //   confirmationCode: string,
-  // ): Promise<UserDocument | null> {
-  //   return this.UserModel.findOne({
-  //     'emailConfirmation.confirmationCode': confirmationCode,
-  //     deletedAt: null,
-  //   });
-  // }
-  //
-  // async getByRecoveryCode(recoveryCode: string): Promise<UserDocument | null> {
-  //   return this.UserModel.findOne({
-  //     'passwordRecovery.recoveryCode': recoveryCode,
-  //     deletedAt: null,
-  //   });
-  // }
-  //
-  // async getByLogin(login: string): Promise<UserDocument | null> {
-  //   return this.UserModel.findOne({
-  //     login,
-  //     deletedAt: null,
-  //   });
-  // }
-  //
-  // async getByEmail(email: string): Promise<UserDocument | null> {
-  //   return this.UserModel.findOne({
-  //     email,
-  //     deletedAt: null,
-  //   });
-  // }
-  //
-  // async getByIds(ids: string[]): Promise<UserDocument[]> {
-  //   return this.UserModel.find({ _id: { $in: ids } });
-  // }
+  async getByUserIdAndDeviceIdOrNotFoundFail(
+    userId: string,
+    deviceId: string,
+  ): Promise<SessionDocument> {
+    const session: SessionDocument | null = await this.SessionModel.findOne({
+      userId,
+      deviceId,
+      deletedAt: null,
+    });
+
+    if (!session) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: `The user (id: ${userId}) no active session on device (id: ${deviceId})`,
+      });
+    }
+
+    return session;
+  }
 
   async save(session: SessionDocument): Promise<string> {
     const resultSave: SessionDocument = await session.save();

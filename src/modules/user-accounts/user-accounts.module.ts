@@ -41,6 +41,7 @@ import { JwtRefreshStrategy } from './guards/bearer/jwt-refresh.strategy';
 import { SessionsQueryRepository } from './infrastructure/query/sessions-query-repository.service';
 import { GetSessionsQueryHandler } from './application/queries/sessions/get-sessions.query-handler';
 import { DeleteSessionsUseCase } from './application/usecases/sessions/delete-sessions.usecase';
+import { DeleteSessionUseCase } from './application/usecases/sessions/delete-session.usecase';
 
 @Module({
   imports: [
@@ -97,6 +98,7 @@ import { DeleteSessionsUseCase } from './application/usecases/sessions/delete-se
     //🔸 Sessions:
     //use-cases
     CreateSessionUseCase,
+    DeleteSessionUseCase,
     DeleteSessionsUseCase,
     //query-handlers
     GetSessionsQueryHandler,

@@ -15,13 +15,18 @@ export class DeleteSessionsUseCase
 
   async execute({ dto }: DeleteSessionsCommand): Promise<void> {
     const sessions: SessionDocument[] =
-      await this.sessionsRepository.getByUserId(dto.userId);
+      await this.sessionsRepository.getAllSessionsExceptCurrent(
+        dto.userId,
+        dto.deviceId,
+      );
 
-    const savePromises: Promise<string>[] = sessions.map((session) => {
-      session.delete();
+    const savePromises: Promise<string>[] = sessions.map(
+      (session: SessionDocument): Promise<string> => {
+        session.delete();
 
-      return this.sessionsRepository.save(session);
-    });
+        return this.sessionsRepository.save(session);
+      },
+    );
 
     await Promise.all(savePromises);
   }
