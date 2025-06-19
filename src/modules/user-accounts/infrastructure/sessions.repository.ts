@@ -5,6 +5,9 @@ import {
   SessionDocument,
   SessionModelType,
 } from '../domain/entities/session/session.entity';
+import { UserDocument } from '../domain/entities/user/user.entity';
+import { DomainException } from '../../../core/exceptions/damain-exceptions';
+import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class SessionsRepository {
@@ -12,22 +15,13 @@ export class SessionsRepository {
     @InjectModel(Session.name) private readonly SessionModel: SessionModelType,
   ) {}
 
-  // async getByIdOrNotFoundFail(id: string): Promise<UserDocument> {
-  //   const user: UserDocument | null = await this.UserModel.findOne({
-  //     _id: id,
-  //     deletedAt: null,
-  //   });
-  //
-  //   if (!user) {
-  //     throw new DomainException({
-  //       code: DomainExceptionCode.NotFound,
-  //       message: `The user with ID (${id}) does not exist`,
-  //     });
-  //   }
-  //
-  //   return user;
-  // }
-  //
+  async getByUserId(userId: string): Promise<SessionDocument[]> {
+    return this.SessionModel.find({
+      userId,
+      deletedAt: null,
+    });
+  }
+
   // async getByConfirmationCode(
   //   confirmationCode: string,
   // ): Promise<UserDocument | null> {

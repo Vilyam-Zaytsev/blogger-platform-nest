@@ -40,6 +40,7 @@ import { SessionsRepository } from './infrastructure/sessions.repository';
 import { JwtRefreshStrategy } from './guards/bearer/jwt-refresh.strategy';
 import { SessionsQueryRepository } from './infrastructure/query/sessions-query-repository.service';
 import { GetSessionsQueryHandler } from './application/queries/sessions/get-sessions.query-handler';
+import { DeleteSessionsUseCase } from './application/usecases/sessions/delete-sessions.usecase';
 
 @Module({
   imports: [
@@ -75,40 +76,54 @@ import { GetSessionsQueryHandler } from './application/queries/sessions/get-sess
         });
       },
     },
+    //🔸 Auth:
     //strategies
     JwtStrategy,
     JwtRefreshStrategy,
     BasicStrategy,
     LocalStrategy,
+    //use-cases
+    RegisterUserUseCase,
+    ConfirmUserUseCase,
+    LoginUserUseCase,
+    ResendRegistrationEmailUseCase,
+    PasswordRecoveryUseCase,
+    NewPasswordUseCase,
+    //query-handlers
+    GetMeQueryHandler,
+    //repo
+    AuthQueryRepository,
+
+    //🔸 Sessions:
+    //use-cases
+    CreateSessionUseCase,
+    DeleteSessionsUseCase,
+    //query-handlers
+    GetSessionsQueryHandler,
+    //repo
+    SessionsRepository,
+    SessionsQueryRepository,
+
+    //🔸 User:
+    //use-cases
+    CreateUserByAdminUseCase,
+    DeleteUserUseCase,
+    //query-handlers
+    GetUsersQueryHandler,
     //repo
     UsersRepository,
     UsersQueryRepository,
-    SessionsRepository,
-    SessionsQueryRepository,
     //services
     BcryptService,
-    CryptoService,
     UserValidationService,
-    //use-cases
-    RegisterUserUseCase,
-    ResendRegistrationEmailUseCase,
-    ConfirmUserUseCase,
-    LoginUserUseCase,
-    PasswordRecoveryUseCase,
-    NewPasswordUseCase,
-    CreateSessionUseCase,
-    CreateUserByAdminUseCase,
-    DeleteUserUseCase,
     //factories
     UsersFactory,
+
+    //🔸 Common:
+    //services
+    CryptoService,
     //config
     UserAccountsConfig,
-    //query-handlers
-    GetMeQueryHandler,
-    GetUsersQueryHandler,
-    GetSessionsQueryHandler,
-    //repo
-    AuthQueryRepository,
   ],
   exports: [BasicStrategy, UsersRepository],
 })
