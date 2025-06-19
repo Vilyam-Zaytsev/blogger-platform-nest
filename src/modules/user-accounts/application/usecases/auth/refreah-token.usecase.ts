@@ -31,7 +31,7 @@ export class RefreshTokenUseCase
 
   async execute({ dto }: RefreshTokenCommand): Promise<AuthTokens> {
     const [accessToken, refreshToken] = await Promise.all([
-      this.accessTokenContext.sign(dto.userId),
+      this.accessTokenContext.sign({ id: dto.userId }),
       this.refreshTokenContext.sign({
         userId: dto.userId,
         deviceId: dto.deviceId,

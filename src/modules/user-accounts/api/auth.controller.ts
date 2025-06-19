@@ -103,7 +103,7 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   @UseGuards(JwtRefreshAuthGuard)
   async refreshToken(
     @ExtractSessionFromRequest() session: SessionContextDto,
