@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../users.repository';
 import { MeViewDto } from '../../api/view-dto/user.view-dto';
-import { UserDocument } from '../../domain/user.entity';
+import { UserDocument } from '../../domain/entities/user/user.entity';
 
 @Injectable()
 export class AuthQueryRepository {

@@ -6,7 +6,7 @@ import { Server } from 'http';
 import { EmailService } from '../../src/modules/notifications/email.service';
 import { UserViewDto } from '../../src/modules/user-accounts/api/view-dto/user.view-dto';
 import { EmailTemplate } from '../../src/modules/notifications/templates/types';
-import { UserDocument } from '../../src/modules/user-accounts/domain/user.entity';
+import { UserDocument } from '../../src/modules/user-accounts/domain/entities/user/user.entity';
 import { UsersRepository } from '../../src/modules/user-accounts/infrastructure/users.repository';
 import request, { Response } from 'supertest';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';

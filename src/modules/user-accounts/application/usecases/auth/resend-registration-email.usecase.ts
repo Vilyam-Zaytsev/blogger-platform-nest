@@ -1,12 +1,12 @@
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../infrastructure/users.repository';
-import { UserDocument } from '../../domain/user.entity';
-import { ConfirmationStatus } from '../../domain/email-confirmation.schema';
-import { RegistrationEmailResandingInputDto } from '../../api/input-dto/authentication-authorization/registration-email-resending.input-dto';
+import { UsersRepository } from '../../../infrastructure/users.repository';
+import { UserDocument } from '../../../domain/entities/user/user.entity';
+import { ConfirmationStatus } from '../../../domain/entities/user/email-confirmation.schema';
+import { RegistrationEmailResandingInputDto } from '../../../api/input-dto/authentication-authorization/registration-email-resending.input-dto';
 import { add } from 'date-fns';
-import { CryptoService } from '../services/crypto.service';
-import { UserResendRegisteredEvent } from '../../domain/events/user-resend-registered.event';
-import { ValidationException } from '../../../../core/exceptions/validation-exception';
+import { CryptoService } from '../../services/crypto.service';
+import { UserResendRegisteredEvent } from '../../../domain/events/user-resend-registered.event';
+import { ValidationException } from '../../../../../core/exceptions/validation-exception';
 
 export class ResendRegistrationEmailCommand {
   constructor(public readonly dto: RegistrationEmailResandingInputDto) {}

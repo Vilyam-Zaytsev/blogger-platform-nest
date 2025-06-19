@@ -1,10 +1,10 @@
-import { UsersRepository } from '../../infrastructure/users.repository';
-import { UserDocument } from '../../domain/user.entity';
-import { CreateUserDto } from '../../dto/create-user.dto';
-import { UsersFactory } from '../users.factory';
-import { UserValidationService } from '../services/user-validation.service';
+import { UsersRepository } from '../../../infrastructure/users.repository';
+import { UserDocument } from '../../../domain/entities/user/user.entity';
+import { CreateUserDto } from '../../../dto/create-user.dto';
+import { UsersFactory } from '../../factories/users.factory';
+import { UserValidationService } from '../../services/user-validation.service';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
-import { UserRegisteredEvent } from '../../domain/events/user-registered.event';
+import { UserRegisteredEvent } from '../../../domain/events/user-registered.event';
 
 export class RegisterUserCommand {
   constructor(public dto: CreateUserDto) {}

@@ -3,7 +3,7 @@ import {
   emailConstraints,
   loginConstraints,
   passwordConstraints,
-} from '../../domain/user.entity';
+} from '../../domain/entities/user/user.entity';
 import { IsEmail, IsString, Matches } from 'class-validator';
 import { Trim } from '../../../../core/decorators/transform/trim';
 

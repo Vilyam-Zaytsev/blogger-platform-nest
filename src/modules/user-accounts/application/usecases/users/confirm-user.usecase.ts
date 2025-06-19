@@ -1,9 +1,9 @@
-import { RegistrationConfirmationCodeInputDto } from '../../api/input-dto/authentication-authorization/registration-confirmation-code.input-dto';
+import { RegistrationConfirmationCodeInputDto } from '../../../api/input-dto/authentication-authorization/registration-confirmation-code.input-dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '../../infrastructure/users.repository';
-import { UserDocument } from '../../domain/user.entity';
-import { ConfirmationStatus } from '../../domain/email-confirmation.schema';
-import { ValidationException } from '../../../../core/exceptions/validation-exception';
+import { UsersRepository } from '../../../infrastructure/users.repository';
+import { UserDocument } from '../../../domain/entities/user/user.entity';
+import { ConfirmationStatus } from '../../../domain/entities/user/email-confirmation.schema';
+import { ValidationException } from '../../../../../core/exceptions/validation-exception';
 
 export class ConfirmUserCommand {
   constructor(public readonly dto: RegistrationConfirmationCodeInputDto) {}

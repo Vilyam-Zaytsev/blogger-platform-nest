@@ -13,7 +13,7 @@ import {
   ReactionDocument,
   ReactionStatusDelta,
 } from '../../reactions/domain/reaction.entity';
-import { UserDocument } from '../../../user-accounts/domain/user.entity';
+import { UserDocument } from '../../../user-accounts/domain/entities/user/user.entity';
 
 export const titleConstraints = {
   maxLength: 30,

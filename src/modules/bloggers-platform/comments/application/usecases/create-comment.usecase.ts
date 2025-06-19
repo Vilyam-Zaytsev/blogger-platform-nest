@@ -8,7 +8,7 @@ import {
 } from '../../domain/comment.entity';
 import { PostsRepository } from '../../../posts/infrastructure/posts.repository';
 import { CreateCommentDomainDto } from '../../domain/dto/create-comment.domain.dto';
-import { UserDocument } from '../../../../user-accounts/domain/user.entity';
+import { UserDocument } from '../../../../user-accounts/domain/entities/user/user.entity';
 import { UsersRepository } from '../../../../user-accounts/infrastructure/users.repository';
 import { CommentsRepository } from '../../infrastructure/comments-repository';
 

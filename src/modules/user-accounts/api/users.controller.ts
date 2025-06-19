@@ -15,12 +15,12 @@ import { UsersQueryRepository } from '../infrastructure/query/users.query-reposi
 import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
 import { PaginatedViewDto } from '../../../core/dto/paginated.view-dto';
 import { UserViewDto } from './view-dto/user.view-dto';
-import { DeleteUserCommand } from '../application/usecases/delete-user.usecase';
+import { DeleteUserCommand } from '../application/usecases/users/delete-user.usecase';
 import { BasicAuthGuard } from '../guards/basic/basic-auth.guard';
-import { IdInputDto } from './input-dto/id.input-dto';
+import { IdInputDto } from '../../../core/types/id.input-dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetUsersQuery } from '../application/queries/users/get-users.query-handler';
-import { CreateUserCommand } from '../application/usecases/create-user-by-admin.usecase';
+import { CreateUserCommand } from '../application/usecases/users/create-user-by-admin.usecase';
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)

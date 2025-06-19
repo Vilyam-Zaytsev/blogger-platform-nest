@@ -1,10 +1,14 @@
-import { CreateUserDto } from '../dto/create-user.dto';
-import { User, UserDocument, UserModelType } from '../domain/user.entity';
+import { CreateUserDto } from '../../dto/create-user.dto';
+import {
+  User,
+  UserDocument,
+  UserModelType,
+} from '../../domain/entities/user/user.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateUserDomainDto } from '../domain/dto/create-user.domain.dto';
+import { CreateUserDomainDto } from '../../domain/dto/create-user.domain.dto';
 import { add } from 'date-fns';
 import { Injectable } from '@nestjs/common';
-import { CryptoService } from './services/crypto.service';
+import { CryptoService } from '../services/crypto.service';
 
 @Injectable()
 export class UsersFactory {
