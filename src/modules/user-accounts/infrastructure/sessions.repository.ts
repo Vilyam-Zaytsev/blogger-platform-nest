@@ -7,6 +7,7 @@ import {
 } from '../domain/entities/session/session.entity';
 import { DomainException } from '../../../core/exceptions/damain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
+import { session } from 'passport';
 
 @Injectable()
 export class SessionsRepository {
@@ -25,24 +26,11 @@ export class SessionsRepository {
     });
   }
 
-  async getByUserIdAndDeviceIdOrNotFoundFail(
-    userId: string,
-    deviceId: string,
-  ): Promise<SessionDocument> {
-    const session: SessionDocument | null = await this.SessionModel.findOne({
-      userId,
+  async getByDeviceId(deviceId: string): Promise<SessionDocument | null> {
+    return this.SessionModel.findOne({
       deviceId,
       deletedAt: null,
     });
-
-    if (!session) {
-      throw new DomainException({
-        code: DomainExceptionCode.NotFound,
-        message: `The user (id: ${userId}) no active session on device (id: ${deviceId})`,
-      });
-    }
-
-    return session;
   }
 
   async save(session: SessionDocument): Promise<string> {
