@@ -9,7 +9,7 @@ import {
 import { SessionViewDto } from '../../api/view-dto/session.view-dto';
 
 @Injectable()
-export class SessionQueryRepository {
+export class SessionsQueryRepository {
   constructor(
     @InjectModel(Session.name)
     private SessionModel: SessionModelType,

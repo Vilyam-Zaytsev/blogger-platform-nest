@@ -38,6 +38,8 @@ import { SessionsController } from './api/sessions.controller';
 import { CreateSessionUseCase } from './application/usecases/sessions/create-session.usecase';
 import { SessionsRepository } from './infrastructure/sessions.repository';
 import { JwtRefreshStrategy } from './guards/bearer/jwt-refresh.strategy';
+import { SessionsQueryRepository } from './infrastructure/query/sessions-query-repository.service';
+import { GetSessionsQueryHandler } from './application/queries/sessions/get-sessions.query-handler';
 
 @Module({
   imports: [
@@ -82,6 +84,7 @@ import { JwtRefreshStrategy } from './guards/bearer/jwt-refresh.strategy';
     UsersRepository,
     UsersQueryRepository,
     SessionsRepository,
+    SessionsQueryRepository,
     //services
     BcryptService,
     CryptoService,
@@ -103,6 +106,7 @@ import { JwtRefreshStrategy } from './guards/bearer/jwt-refresh.strategy';
     //query-handlers
     GetMeQueryHandler,
     GetUsersQueryHandler,
+    GetSessionsQueryHandler,
     //repo
     AuthQueryRepository,
   ],
