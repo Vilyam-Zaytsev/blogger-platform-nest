@@ -35,6 +35,7 @@ import { SessionContextDto } from '../guards/dto/session-context.dto';
 import { RefreshTokenCommand } from '../application/usecases/auth/refreah-token.usecase';
 import { ExtractClientInfo } from '../../../core/decorators/request/extract-client-info.decorator';
 import { ClientInfoDto } from '../../../core/dto/client-info.dto';
+import { LogoutCommand } from '../application/usecases/auth/logout.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -87,7 +88,14 @@ export class AuthController {
     return { accessToken };
   }
 
-  async logout() {}
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtRefreshAuthGuard)
+  async logout(
+    @ExtractSessionFromRequest() session: SessionContextDto,
+  ): Promise<void> {
+    return this.commandBus.execute(new LogoutCommand(session));
+  }
 
   @Post('password-recovery')
   @HttpCode(HttpStatus.NO_CONTENT)
