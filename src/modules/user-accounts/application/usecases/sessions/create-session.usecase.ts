@@ -25,6 +25,7 @@ export class CreateSessionUseCase
 
   async execute({ dto }: CreateSessionCommand): Promise<string> {
     const deviceName: string = parseUserAgent(dto.userAgent);
+
     const createSessionDomainDto: CreateSessionDomainDto = {
       userId: dto.userId,
       deviceId: dto.deviceId,

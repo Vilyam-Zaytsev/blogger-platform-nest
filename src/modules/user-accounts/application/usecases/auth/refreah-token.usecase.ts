@@ -44,9 +44,15 @@ export class RefreshTokenUseCase
     const session: SessionDocument | null =
       await this.sessionsRepository.getByDeviceId(dto.deviceId);
 
-    session!.updateTimestamps(iat, exp);
+    if (!session) {
+      throw new Error(
+        'Failed to update a pair of tokens. The session was not found.',
+      );
+    }
 
-    await this.sessionsRepository.save(session!);
+    session.updateTimestamps(iat, exp);
+
+    await this.sessionsRepository.save(session);
 
     return {
       accessToken,

@@ -1,6 +1,6 @@
-import { IsStringWithTrim } from '../../../../../core/decorators/validation/is-string-with-trim';
+import { IsStringWithTrimDecorator } from '../../../../../core/decorators/validation/is-string-with-trim.decorator';
 
 export class RegistrationConfirmationCodeInputDto {
-  @IsStringWithTrim(1, 1000)
+  @IsStringWithTrimDecorator(1, 1000)
   code: string;
 }

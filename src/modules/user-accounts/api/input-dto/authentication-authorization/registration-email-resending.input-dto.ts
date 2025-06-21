@@ -1,11 +1,11 @@
 import { IsEmail, IsString, Matches } from 'class-validator';
 import { emailConstraints } from '../../../domain/entities/user/user.entity';
-import { Trim } from '../../../../../core/decorators/transform/trim';
+import { TrimDecorator } from '../../../../../core/decorators/transform/trim.decorator';
 
 export class RegistrationEmailResandingInputDto {
   @IsString()
   @IsEmail()
   @Matches(emailConstraints.match)
-  @Trim()
+  @TrimDecorator()
   email: string;
 }
