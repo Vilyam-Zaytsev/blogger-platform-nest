@@ -1,4 +1,4 @@
-import { IsStringWithTrim } from '../../../../../core/decorators/validation/is-string-with-trim';
+import { IsStringWithTrimDecorator } from '../../../../../core/decorators/validation/is-string-with-trim.decorator';
 import {
   contentConstraints,
   shortDescriptionConstraints,
@@ -6,12 +6,12 @@ import {
 } from '../../domain/post.entity';
 
 export class CreatePostForBlogInputDto {
-  @IsStringWithTrim(1, titleConstraints.maxLength)
+  @IsStringWithTrimDecorator(1, titleConstraints.maxLength)
   title: string;
 
-  @IsStringWithTrim(1, shortDescriptionConstraints.maxLength)
+  @IsStringWithTrimDecorator(1, shortDescriptionConstraints.maxLength)
   shortDescription: string;
 
-  @IsStringWithTrim(1, contentConstraints.maxLength)
+  @IsStringWithTrimDecorator(1, contentConstraints.maxLength)
   content: string;
 }

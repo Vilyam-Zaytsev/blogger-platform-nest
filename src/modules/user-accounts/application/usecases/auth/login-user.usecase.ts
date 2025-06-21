@@ -11,12 +11,12 @@ import { AuthTokens } from '../../../types/auth-tokens.type';
 import { PayloadRefreshToken } from '../../types/payload-refresh-token.type';
 import { CreateSessionDto } from '../../../dto/create-session.dto';
 import { CreateSessionCommand } from '../sessions/create-session.usecase';
+import { ClientInfoDto } from '../../../../../core/dto/client-info.dto';
 
 export class LoginUserCommand {
   constructor(
     public readonly user: UserContextDto,
-    public readonly userAgent: string,
-    public readonly ip: string,
+    public readonly clientInfo: ClientInfoDto,
   ) {}
 }
 
@@ -33,11 +33,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
     private readonly commandBus: CommandBus,
   ) {}
 
-  async execute({
-    user,
-    userAgent,
-    ip,
-  }: LoginUserCommand): Promise<AuthTokens> {
+  async execute({ user, clientInfo }: LoginUserCommand): Promise<AuthTokens> {
     const accessToken: string = this.accessTokenContext.sign({
       id: user.id,
     });
@@ -54,8 +50,8 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
     const createSessionDto: CreateSessionDto = {
       userId: user.id,
       deviceId,
-      userAgent,
-      ip,
+      userAgent: clientInfo.userAgent,
+      ip: clientInfo.ip,
       iat,
       exp,
     };

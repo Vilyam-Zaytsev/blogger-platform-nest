@@ -1,23 +1,23 @@
-import { IsStringWithTrim } from '../../../../../core/decorators/validation/is-string-with-trim';
+import { IsStringWithTrimDecorator } from '../../../../../core/decorators/validation/is-string-with-trim.decorator';
 import {
   contentConstraints,
   shortDescriptionConstraints,
   titleConstraints,
 } from '../../domain/post.entity';
-import { Trim } from '../../../../../core/decorators/transform/trim';
+import { TrimDecorator } from '../../../../../core/decorators/transform/trim.decorator';
 import { IsString } from 'class-validator';
 
 export class PostInputDto {
-  @IsStringWithTrim(1, titleConstraints.maxLength)
+  @IsStringWithTrimDecorator(1, titleConstraints.maxLength)
   title: string;
 
-  @IsStringWithTrim(1, shortDescriptionConstraints.maxLength)
+  @IsStringWithTrimDecorator(1, shortDescriptionConstraints.maxLength)
   shortDescription: string;
 
-  @IsStringWithTrim(1, contentConstraints.maxLength)
+  @IsStringWithTrimDecorator(1, contentConstraints.maxLength)
   content: string;
 
   @IsString()
-  @Trim()
+  @TrimDecorator()
   blogId: string;
 }

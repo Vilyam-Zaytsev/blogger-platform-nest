@@ -5,7 +5,6 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -21,7 +20,7 @@ import { ExtractUserFromRequest } from '../guards/decorators/extract-user-from-r
 import { UserContextDto } from '../guards/dto/user-context.dto';
 import { LoginUserCommand } from '../application/usecases/auth/login-user.usecase';
 import { AuthTokens } from '../types/auth-tokens.type';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { PasswordRecoveryInputDto } from './input-dto/authentication-authorization/password-recovery.input-dto';
 import { LoginViewDto } from './view-dto/login.view-dto';
 import { PasswordRecoveryCommand } from '../application/usecases/auth/password-recovery.usecase';
@@ -30,6 +29,12 @@ import { NewPasswordCommand } from '../application/usecases/auth/new-password.us
 import { MeViewDto } from './view-dto/user.view-dto';
 import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
 import { GetMeQuery } from '../application/queries/auth/get-me.query-handler';
+import { JwtRefreshAuthGuard } from '../guards/bearer/jwt-refresh-auth.guard';
+import { ExtractSessionFromRequest } from '../guards/decorators/extract-session-from-request.decorator';
+import { SessionContextDto } from '../guards/dto/session-context.dto';
+import { RefreshTokenCommand } from '../application/usecases/auth/refreah-token.usecase';
+import { ExtractClientInfo } from '../../../core/decorators/request/extract-client-info.decorator';
+import { ClientInfoDto } from '../../../core/dto/client-info.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -65,17 +70,11 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   async login(
     @ExtractUserFromRequest() user: UserContextDto,
+    @ExtractClientInfo() clientInfo: ClientInfoDto,
     @Res({ passthrough: true }) res: Response,
-    @Req() req: Request,
   ): Promise<LoginViewDto> {
-    const userAgent: string = req.headers['user-agent'] || '';
-    const ip: string =
-      req.headers['x-forwarded-for']?.toString().split(',')[0] ||
-      req.socket.remoteAddress ||
-      '0.0.0.0';
-
     const { accessToken, refreshToken }: AuthTokens =
-      await this.commandBus.execute(new LoginUserCommand(user, userAgent, ip));
+      await this.commandBus.execute(new LoginUserCommand(user, clientInfo));
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -96,6 +95,27 @@ export class AuthController {
     @Body() body: PasswordRecoveryInputDto,
   ): Promise<void> {
     return this.commandBus.execute(new PasswordRecoveryCommand(body));
+  }
+
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(JwtRefreshAuthGuard)
+  async refreshToken(
+    @ExtractSessionFromRequest() session: SessionContextDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LoginViewDto> {
+    const { accessToken, refreshToken }: AuthTokens =
+      await this.commandBus.execute(new RefreshTokenCommand(session));
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 120000,
+      path: '/',
+    });
+
+    return { accessToken };
   }
 
   @Post('new-password')

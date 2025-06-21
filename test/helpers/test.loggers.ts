@@ -25,7 +25,6 @@ export class TestLoggers {
           typeof value === 'object' && value !== null ? value : value,
         2,
       ),
-      // responseBody,
       '\n\n\x1b[33mStatusCode: \x1b[0m',
       statusCode,
       '\n\x1b[36m+-----------------------------------------------------------+\x1b[0m\n\n',

@@ -30,7 +30,7 @@ import { ExtractUserFromRequest } from '../../../user-accounts/guards/decorators
 import { UserContextDto } from '../../../user-accounts/guards/dto/user-context.dto';
 import { UpdatePostReactionCommand } from '../application/usecases/update-post-reaction.usecase';
 import { UpdateReactionDto } from '../../reactions/dto/reaction.dto';
-import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
+import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id.validation-pipe';
 import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';
 import { ExtractUserIfExistsFromRequest } from '../../../user-accounts/guards/decorators/extract-user-if-exists-from-request.decorator';
 import { CommentInputDto } from '../../comments/api/input-dto/comment-input.dto';

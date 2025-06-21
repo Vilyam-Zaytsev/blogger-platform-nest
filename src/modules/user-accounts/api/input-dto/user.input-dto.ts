@@ -1,24 +1,27 @@
-import { IsStringWithTrim } from '../../../../core/decorators/validation/is-string-with-trim';
+import { IsStringWithTrimDecorator } from '../../../../core/decorators/validation/is-string-with-trim.decorator';
 import {
   emailConstraints,
   loginConstraints,
   passwordConstraints,
 } from '../../domain/entities/user/user.entity';
 import { IsEmail, IsString, Matches } from 'class-validator';
-import { Trim } from '../../../../core/decorators/transform/trim';
+import { TrimDecorator } from '../../../../core/decorators/transform/trim.decorator';
 
 export class UserInputDto {
   @Matches(loginConstraints.match)
-  @IsStringWithTrim(loginConstraints.minLength, loginConstraints.maxLength)
+  @IsStringWithTrimDecorator(
+    loginConstraints.minLength,
+    loginConstraints.maxLength,
+  )
   login: string;
 
   @IsString()
   @IsEmail()
   @Matches(emailConstraints.match)
-  @Trim()
+  @TrimDecorator()
   email: string;
 
-  @IsStringWithTrim(
+  @IsStringWithTrimDecorator(
     passwordConstraints.minLength,
     passwordConstraints.maxLength,
   )

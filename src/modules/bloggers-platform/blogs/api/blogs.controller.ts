@@ -30,7 +30,7 @@ import { IdInputDto } from '../../../../core/types/id.input-dto';
 import { GetBlogQuery } from '../application/queries/get-blog.query-handler';
 import { GetBlogsQuery } from '../application/queries/get-blogs.query-handler';
 import { GetPostsForBlogQuery } from '../application/queries/get-posts-for-blog.query-handler';
-import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
+import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id.validation-pipe';
 import { BasicAuthGuard } from '../../../user-accounts/guards/basic/basic-auth.guard';
 import { Public } from '../../../user-accounts/decorators/public.decorator';
 import { OptionalJwtAuthGuard } from '../../../user-accounts/guards/bearer/optional-jwt-auth.guard';

@@ -1,4 +1,4 @@
-import { IsStringWithTrim } from '../../../../../core/decorators/validation/is-string-with-trim';
+import { IsStringWithTrimDecorator } from '../../../../../core/decorators/validation/is-string-with-trim.decorator';
 import {
   descriptionConstraints,
   nameConstraints,
@@ -7,13 +7,13 @@ import {
 import { IsUrl, Matches } from 'class-validator';
 
 export class BlogInputDto {
-  @IsStringWithTrim(1, nameConstraints.maxLength)
+  @IsStringWithTrimDecorator(1, nameConstraints.maxLength)
   name: string;
 
-  @IsStringWithTrim(1, descriptionConstraints.maxLength)
+  @IsStringWithTrimDecorator(1, descriptionConstraints.maxLength)
   description: string;
 
-  @IsStringWithTrim(1, websiteUrlConstraints.maxLength)
+  @IsStringWithTrimDecorator(1, websiteUrlConstraints.maxLength)
   @IsUrl()
   @Matches(websiteUrlConstraints.match)
   websiteUrl: string;

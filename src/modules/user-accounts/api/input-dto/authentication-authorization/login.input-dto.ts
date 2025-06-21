@@ -1,11 +1,11 @@
-import { IsStringWithTrim } from '../../../../../core/decorators/validation/is-string-with-trim';
+import { IsStringWithTrimDecorator } from '../../../../../core/decorators/validation/is-string-with-trim.decorator';
 import { passwordConstraints } from '../../../domain/entities/user/user.entity';
 
 export class LoginInputDto {
-  @IsStringWithTrim(3, 100)
+  @IsStringWithTrimDecorator(3, 100)
   loginOrEmail: string;
 
-  @IsStringWithTrim(
+  @IsStringWithTrimDecorator(
     passwordConstraints.minLength,
     passwordConstraints.maxLength,
   )

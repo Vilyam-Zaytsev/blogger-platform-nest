@@ -21,7 +21,7 @@ import { CommentInputDto } from './input-dto/comment-input.dto';
 import { UpdateCommentCommand } from '../application/usecases/update-comment.usecase';
 import { ExtractUserFromRequest } from '../../../user-accounts/guards/decorators/extract-user-from-request.decorator';
 import { DeleteCommentCommand } from '../application/usecases/delete-comment.usecase';
-import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation-pipe';
+import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id.validation-pipe';
 import { ReactionInputDto } from '../../reactions/api/input-dto/reaction-input.dto';
 import { UpdateReactionDto } from '../../reactions/dto/reaction.dto';
 import { UpdateCommentReactionCommand } from '../application/usecases/update-comment-reaction.usecase';
