@@ -66,6 +66,24 @@ export class CoreConfig {
   })
   testLoggingEnabled: boolean;
 
+  @IsNumber(
+    {},
+    {
+      message:
+        'Set Env variable THROTTLE_TTL to a numeric value. Example: 10 (in seconds)',
+    },
+  )
+  throttleTtl: number;
+
+  @IsNumber(
+    {},
+    {
+      message:
+        'Set Env variable THROTTLE_LIMIT to a numeric value. Example: 5 (requests per TTL)',
+    },
+  )
+  throttleLimit: number;
+
   constructor(private configService: ConfigService<any, true>) {
     this.port = Number(this.configService.get('PORT'));
 
@@ -95,6 +113,10 @@ export class CoreConfig {
     this.testLoggingEnabled = configValidationUtility.convertToBoolean(
       this.configService.get('TEST_LOGGING_ENABLED'),
     ) as boolean;
+
+    this.throttleTtl = Number(this.configService.get('THROTTLE_TTL'));
+
+    this.throttleLimit = Number(this.configService.get('THROTTLE_LIMIT'));
 
     configValidationUtility.validateConfig(this);
   }

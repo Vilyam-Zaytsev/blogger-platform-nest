@@ -33,6 +33,7 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.1.6",
+    "@nestjs/throttler": "^6.4.0",
     "bcrypt": "^5.1.1",
     "chalk": "4",
     "class-transformer": "^0.5.1",

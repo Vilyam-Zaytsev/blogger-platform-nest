@@ -49,6 +49,8 @@ describe('AuthController - me() (POST: /auth)', () => {
 
   beforeEach(async () => {
     await appTestManager.cleanupDb();
+
+    appTestManager.clearThrottlerStorage();
   });
 
   afterAll(async () => {

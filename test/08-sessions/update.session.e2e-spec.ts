@@ -47,6 +47,8 @@ describe('SessionsController - deleteSession() (DELETE: /security/devices/{devic
 
   beforeEach(async () => {
     await appTestManager.cleanupDb();
+
+    appTestManager.clearThrottlerStorage();
   });
 
   afterAll(async () => {

@@ -11,6 +11,7 @@ import { ValidationExceptionFilter } from './core/exceptions/filters/validation-
 import { CoreModule } from './core/core.module';
 import { CoreConfig } from './core/core.config';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -28,6 +29,15 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
           dbName: coreConfig.dbName,
         };
       },
+    }),
+    ThrottlerModule.forRootAsync({
+      inject: [CoreConfig],
+      useFactory: (coreConfig: CoreConfig) => [
+        {
+          ttl: coreConfig.throttleTtl,
+          limit: coreConfig.throttleLimit,
+        },
+      ],
     }),
   ],
   providers: [

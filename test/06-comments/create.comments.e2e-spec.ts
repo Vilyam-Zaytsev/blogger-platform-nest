@@ -66,6 +66,8 @@ describe('PostsController - createComment() (POST: /posts/{postId}/comments)', (
 
   beforeEach(async () => {
     await appTestManager.cleanupDb();
+
+    appTestManager.clearThrottlerStorage();
   });
 
   afterAll(async () => {

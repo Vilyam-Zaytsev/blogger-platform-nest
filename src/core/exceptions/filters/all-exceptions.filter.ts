@@ -2,6 +2,7 @@ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
+  HttpException,
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
@@ -13,12 +14,13 @@ import { CoreConfig } from '../../core.config';
 export class AllHttpExceptionsFilter implements ExceptionFilter {
   constructor(private readonly coreConfig: CoreConfig) {}
 
-  catch(exception: { message?: string }, host: ArgumentsHost): void {
+  catch(exception: Error, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const message: string = exception.message || 'Unknown exception occurred.';
-    const status: number = HttpStatus.INTERNAL_SERVER_ERROR;
+    let status: number = HttpStatus.INTERNAL_SERVER_ERROR;
+    if (exception instanceof HttpException) status = exception.getStatus();
     const responseBody: ErrorResponseBody = this.buildResponseBody(
       request.url,
       message,
