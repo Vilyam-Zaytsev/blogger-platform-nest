@@ -49,6 +49,8 @@ describe('AuthController - refreshToken() (POST: /auth/refresh-token)', () => {
 
   beforeEach(async () => {
     await appTestManager.cleanupDb();
+
+    appTestManager.clearThrottlerStorage();
   });
 
   afterAll(async () => {
@@ -106,6 +108,72 @@ describe('AuthController - refreshToken() (POST: /auth/refresh-token)', () => {
 
     const resRefreshToken: Response = await request(server)
       .post(`/${GLOBAL_PREFIX}/auth/refresh-token`)
+      .set('Cookie', [...cookiesLogin])
+      .expect(HttpStatus.UNAUTHORIZED);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRefreshToken.body,
+        resRefreshToken.statusCode,
+        'Test №2: refreshToken() (POST: /auth/refresh-token)',
+      );
+    }
+  });
+
+  it('111', async () => {
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+
+    const resLogin: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/login`)
+      .send({
+        loginOrEmail: createdUser.login,
+        password: 'qwerty',
+      })
+      .expect(HttpStatus.OK);
+
+    const cookiesLogin: string = resLogin.headers['set-cookie'];
+
+    await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/logout`)
+      .set('Cookie', [...cookiesLogin])
+      .expect(HttpStatus.NO_CONTENT);
+
+    const resRefreshToken: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/refresh-token`)
+      .set('Cookie', [...cookiesLogin])
+      .expect(HttpStatus.UNAUTHORIZED);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resRefreshToken.body,
+        resRefreshToken.statusCode,
+        'Test №2: refreshToken() (POST: /auth/refresh-token)',
+      );
+    }
+  });
+
+  it('222', async () => {
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+
+    const resLogin: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/login`)
+      .send({
+        loginOrEmail: createdUser.login,
+        password: 'qwerty',
+      })
+      .expect(HttpStatus.OK);
+
+    const cookiesLogin: string = resLogin.headers['set-cookie'];
+
+    await TestUtils.delay(1000);
+
+    const resRefreshToken: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/refresh-token`)
+      .set('Cookie', [...cookiesLogin])
+      .expect(HttpStatus.OK);
+
+    await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/logout`)
       .set('Cookie', [...cookiesLogin])
       .expect(HttpStatus.UNAUTHORIZED);
 

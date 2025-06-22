@@ -4,9 +4,10 @@ import { Test, TestingModuleBuilder } from '@nestjs/testing';
 import { appSetup } from '../../src/setup/app.setup';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { Server } from 'http';
-import { AdminCredentials } from '../types';
+import { AdminCredentials, MemoryThrottlerStorageLike } from '../types';
 import { CoreConfig } from '../../src/core/core.config';
 import { initAppModule } from '../../src/init-app-module';
+import { ThrottlerStorage } from '@nestjs/throttler';
 
 export class AppTestManager {
   app: INestApplication;
@@ -50,6 +51,17 @@ export class AppTestManager {
     await Promise.all(
       collections.map((collection) => collection.deleteMany({})),
     );
+  }
+
+  clearThrottlerStorage() {
+    const throttlerStorage: ThrottlerStorage =
+      this.app.get<ThrottlerStorage>(ThrottlerStorage);
+
+    const memoryStorage = throttlerStorage as MemoryThrottlerStorageLike;
+
+    if (memoryStorage.storage instanceof Map) {
+      memoryStorage.storage.clear();
+    }
   }
 
   async close() {

@@ -34,6 +34,8 @@ describe('AuthController - login() (POST: /auth)', () => {
 
   beforeEach(async () => {
     await appTestManager.cleanupDb();
+
+    appTestManager.clearThrottlerStorage();
   });
 
   afterAll(async () => {
@@ -66,6 +68,38 @@ describe('AuthController - login() (POST: /auth)', () => {
       );
     }
   });
+
+  it('should not log in if the user has sent more than 5 requests from one IP to "/login" in the last 10 seconds.', async () => {
+    const [createdUser]: UserViewDto[] = await usersTestManager.createUser(1);
+
+    for (let i = 0; i < 5; i++) {
+      await request(server)
+        .post(`/${GLOBAL_PREFIX}/auth/login`)
+        .send({
+          loginOrEmail: createdUser.login,
+          password: 'qwerty',
+        })
+        .expect(HttpStatus.OK);
+    }
+
+    const resLogin: Response = await request(server)
+      .post(`/${GLOBAL_PREFIX}/auth/login`)
+      .send({
+        loginOrEmail: createdUser.login,
+        password: 'qwerty',
+      })
+      .expect(HttpStatus.TOO_MANY_REQUESTS);
+
+    console.log(resLogin.body);
+
+    if (testLoggingEnabled) {
+      TestLoggers.logE2E(
+        resLogin.body,
+        resLogin.statusCode,
+        'Test №2: AuthController - login() (POST: /auth)',
+      );
+    }
+  }, 10000);
 
   it('should not log in if the user has sent invalid data (loginOrEmail: "undefined", password: "undefined")', async () => {
     const resLogin: Response = await request(server)

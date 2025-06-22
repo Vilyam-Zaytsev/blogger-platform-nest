@@ -63,6 +63,8 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
 
   beforeEach(async () => {
     await appTestManager.cleanupDb();
+
+    appTestManager.clearThrottlerStorage();
   });
 
   afterAll(async () => {
@@ -940,7 +942,11 @@ describe('PostsController - updateReaction() (PUT: /posts/:postId/like-status)',
     );
     const createdUsers: UserViewDto[] = await usersTestManager.createUser(10);
     const resultLogins: TestResultLogin[] = await usersTestManager.login(
-      createdUsers.map((user) => user.login),
+      createdUsers.map((user: UserViewDto, index: number): string => {
+        if (index === 5) appTestManager.clearThrottlerStorage();
+
+        return user.login;
+      }),
     );
 
     //All ten users like one post.

@@ -47,6 +47,8 @@ describe('AuthController - newPassword() (POST: /auth)', () => {
     await appTestManager.cleanupDb();
 
     sendEmailMock.mockClear();
+
+    appTestManager.clearThrottlerStorage();
   });
 
   afterAll(async () => {

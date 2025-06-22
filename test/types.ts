@@ -1,3 +1,5 @@
+import { ThrottlerStorage } from '@nestjs/throttler';
+
 export type AdminCredentials = {
   login: string;
   password: string;
@@ -16,3 +18,7 @@ export type TestResultLogin = {
     refreshToken: string;
   };
 };
+
+export interface MemoryThrottlerStorageLike extends ThrottlerStorage {
+  storage: Map<string, unknown>;
+}

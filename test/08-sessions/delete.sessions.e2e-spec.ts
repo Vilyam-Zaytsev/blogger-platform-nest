@@ -51,6 +51,8 @@ describe('SessionsController - deleteSessions() (DELETE: /security/devices)', ()
 
   beforeEach(async () => {
     await appTestManager.cleanupDb();
+
+    appTestManager.clearThrottlerStorage();
   });
 
   afterAll(async () => {

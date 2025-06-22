@@ -36,7 +36,9 @@ import { RefreshTokenCommand } from '../application/usecases/auth/refreah-token.
 import { ExtractClientInfo } from '../../../core/decorators/request/extract-client-info.decorator';
 import { ClientInfoDto } from '../../../core/dto/client-info.dto';
 import { LogoutCommand } from '../application/usecases/auth/logout.usecase';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
+@UseGuards(ThrottlerGuard)
 @Controller('auth')
 export class AuthController {
   constructor(

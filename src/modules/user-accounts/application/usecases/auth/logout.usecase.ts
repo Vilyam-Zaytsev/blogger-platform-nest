@@ -2,6 +2,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { SessionContextDto } from '../../../guards/dto/session-context.dto';
 import { SessionDocument } from '../../../domain/entities/session/session.entity';
 import { SessionsRepository } from '../../../infrastructure/sessions.repository';
+import { DomainException } from '../../../../../core/exceptions/damain-exceptions';
+import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 
 export class LogoutCommand {
   constructor(public readonly sessionData: SessionContextDto) {}
@@ -16,7 +18,11 @@ export class LogoutUseCase implements ICommandHandler<LogoutCommand> {
       await this.sessionsRepository.getByDeviceId(sessionData.deviceId);
 
     if (!session) {
-      throw new Error('Failed to delete a session. The session was not found.');
+      // throw new Error('Failed to delete a session. The session was not found.');
+      throw new DomainException({
+        code: DomainExceptionCode.Unauthorized,
+        message: `Unauthorized`,
+      });
     }
 
     session.delete();

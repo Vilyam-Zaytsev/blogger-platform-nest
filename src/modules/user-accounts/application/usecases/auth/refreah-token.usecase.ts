@@ -10,6 +10,8 @@ import { PayloadRefreshToken } from '../../types/payload-refresh-token.type';
 import { SessionsRepository } from '../../../infrastructure/sessions.repository';
 import { SessionDocument } from '../../../domain/entities/session/session.entity';
 import { AuthTokens } from '../../../types/auth-tokens.type';
+import { DomainException } from '../../../../../core/exceptions/damain-exceptions';
+import { DomainExceptionCode } from '../../../../../core/exceptions/domain-exception-codes';
 
 export class RefreshTokenCommand {
   constructor(public readonly dto: SessionContextDto) {}
@@ -45,9 +47,10 @@ export class RefreshTokenUseCase
       await this.sessionsRepository.getByDeviceId(dto.deviceId);
 
     if (!session) {
-      throw new Error(
-        'Failed to update a pair of tokens. The session was not found.',
-      );
+      throw new DomainException({
+        code: DomainExceptionCode.Unauthorized,
+        message: `Unauthorized`,
+      });
     }
 
     session.updateTimestamps(iat, exp);

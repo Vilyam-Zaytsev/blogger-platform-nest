@@ -67,6 +67,8 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
 
   beforeEach(async () => {
     await appTestManager.cleanupDb();
+
+    appTestManager.clearThrottlerStorage();
   });
 
   afterAll(async () => {
