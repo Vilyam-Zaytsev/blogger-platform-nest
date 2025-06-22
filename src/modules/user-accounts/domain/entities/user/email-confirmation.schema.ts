@@ -51,7 +51,6 @@ export class EmailConfirmation {
    * @param {Date} expirationDate - The date and time when the confirmation code expires.
    * @returns {EmailConfirmation} A new instance of EmailConfirmation with the specified values.
    */
-  //TODO: написать unit тест
   static createInstance(
     confirmationCode: string,
     expirationDate: Date,
