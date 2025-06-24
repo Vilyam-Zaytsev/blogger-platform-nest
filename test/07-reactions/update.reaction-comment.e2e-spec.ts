@@ -23,6 +23,8 @@ import { UserAccountsConfig } from '../../src/modules/user-accounts/config/user-
 import { JwtService } from '@nestjs/jwt';
 import { CommentsTestManager } from '../managers/comments.test-manager';
 import { CommentViewDto } from '../../src/modules/bloggers-platform/comments/api/view-dto/comment-view.dto';
+import { CoreConfig } from '../../src/core/core.config';
+import { ConfigService } from '@nestjs/config';
 
 describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-status)', () => {
   let appTestManager: AppTestManager;
@@ -39,6 +41,17 @@ describe('CommentsController - updateReaction() (PUT: /comments/:commentId/like-
     appTestManager = new AppTestManager();
     await appTestManager.init((moduleBuilder) =>
       moduleBuilder
+        .overrideProvider(CoreConfig)
+        .useFactory({
+          factory: (configService: ConfigService<any, true>) => {
+            const coreConfig = new CoreConfig(configService);
+            coreConfig.throttleLimit = 10000;
+            coreConfig.throttleTtl = 15;
+
+            return coreConfig;
+          },
+          inject: [ConfigService],
+        })
         .overrideProvider(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
         .useFactory({
           factory: (userAccountsConfig: UserAccountsConfig) => {
